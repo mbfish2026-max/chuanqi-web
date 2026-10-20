@@ -218,7 +218,7 @@ function buildScene(){
     UI.roleItem = inst('itemRole'); UI.roleItem.ref('monsterRoot').setActive(false); UI.cells[G.battle && G.battle.roleIdx != null ? G.battle.roleIdx : ROLE_CELL].addChild(UI.roleItem); UI.roleItem._cell = G.battle && G.battle.roleIdx;
     UI.roleItem.ref('roleSign').setImage(IMG + 'role_create/icon_avatar_' + G.role.prof + '_0.png');
     UI.roleItem.ref('roleSign').el.style.backgroundSize = 'contain';
-    if (typeof POP !== 'undefined') POP.attach(UI.roleItem, UI.roleItem.ref('roleSign'), 'icon_avatar_' + G.role.prof + '_0', IMG + 'role_create/icon_avatar_' + G.role.prof + '_0.png', {rise: 1.7});
+    if (typeof POP !== 'undefined') POP.attach(UI.roleItem, UI.roleItem.ref('roleSign'), 'icon_avatar_' + G.role.prof + '_0', IMG + 'role_create/icon_avatar_' + G.role.prof + '_0.png', {rise: 1.5, paperdoll: true, box: [20, 4, 80, 66]});
     UI.monItems = [];
     UI.petItems = [];
     if (typeof FX !== 'undefined') FX.attach(UI.battleHolder);
@@ -352,7 +352,7 @@ var EQUIP_ART = {5: 'weapon', 10: 'clothes', 15: 'helmet', 20: 'neckless', 22: '
 var ROLE_SLOTS = [5, 10, 15, 20, 22, 23, 24, 25, 62, 64];
 PAGES.main_role = function(p){
   UI.roleTab = UI.roleTab || 'bag';
-  p.ref('avatarNode').setImage(IMG + 'role_create/icon_avatar_' + G.role.prof + '_1.png');
+  p.ref('avatarNode').setImage(IMG + 'role_create/icon_avatar_' + G.role.prof + '_1.png'); if (typeof PD !== 'undefined' && p.ref('avatarNode').spEl) PD.mount(p.ref('avatarNode').spEl);
   p.ref('avatarNode').el.firstChild.style.backgroundSize = 'contain'; p.ref('avatarNode').el.firstChild.style.backgroundPosition = 'center bottom';
   var tabs = {bag: 'btnBag', yyshop: 'btnBusinessman', intensify: 'btnIntensify'};
   Object.keys(tabs).forEach(function(k){ p.ref(tabs[k]).on(function(){ UI.roleTab = k; drawRoleTab(p); }); });

@@ -12,7 +12,7 @@ var POP = (function(){
     // tilt the card frame (large sprite nodes), not the figure, so the figure stays upright and on top
     (function walk(n){ n.children.forEach(function(c){ if (c === icon) return; if (c.spEl && c.w >= it.w * .7 && c.h >= it.h * .5) c.el.classList.add('pop-tilt'); else walk(c); }); })(it);
     if (it._pop) it._pop.remove();
-    var cs = icon.el.style, w = parseFloat(cs.width), h = parseFloat(cs.height), l = parseFloat(cs.left), t = parseFloat(cs.top);
+    var cs = icon.el.style, w = parseFloat(cs.width), h = parseFloat(cs.height), l = parseFloat(cs.left), t = parseFloat(cs.top); if (opts.box) { l = opts.box[0]; t = opts.box[1]; w = opts.box[2]; h = opts.box[3]; }
     var rise = (opts.rise || 1.45) * 1.25;           // cutout height relative to window
     var win = document.createElement('div'); win.className = 'pop-win';
     win.style.cssText = 'left:' + l + 'px;top:' + t + 'px;width:' + w + 'px;height:' + h + 'px;';
@@ -22,10 +22,13 @@ var POP = (function(){
     var shadow = document.createElement('div'); shadow.className = 'pop-shadow'; win.appendChild(shadow);
     win.appendChild(fig); card.appendChild(win); it._pop = win; it._popFig = fig;
     icon.el.style.visibility = 'hidden';
-    var set = function(u, cut){ img.style.backgroundImage = 'url("' + u + '")'; win.classList.toggle('pop-cut', !!cut); };
+    var set = function(u, cut){ if (img.dataset.pd) return; img.style.backgroundImage = 'url("' + u + '")'; win.classList.toggle('pop-cut', !!cut); };
     set(fallback, false);
     var url = 'assets/cutout/' + name + '.png', e = probe(url);
     if (e === true) set(url, true); else if (e && e.then) e.then(function(ok){ if (ok && it._pop === win) set(url, true); });
+    if (opts.paperdoll && typeof PD !== 'undefined') PD.mount(img);
+    // keep the Lv./name plate labels above the risen figure
+    (function up(n){ n.children.forEach(function(c){ if (c.lb && /level|lv/i.test(c.n || (c.d && c.d.n) || '')) { c.el.style.zIndex = 41; c.el.classList.add('pop-lv'); } up(c); }); })(it);
     // spawn: card tilts back, figure rises out
     card.classList.remove('pop-spawn'); void card.offsetWidth; card.classList.add('pop-spawn');
     fig.style.animationDelay = '0s,' + (Math.random() * -2).toFixed(2) + 's';

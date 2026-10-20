@@ -42,3 +42,13 @@ html,body{margin:0;height:100%;background:#000;overflow:hidden;font-family:"Ping
 .pop-dying .pop-fig{animation:popSink .5s ease-in forwards}
 @keyframes popSink{to{transform:translateY(85%) scale(.9);opacity:0}}
 @keyframes popCardOut{to{transform:perspective(520px) rotateX(40deg) scale(.9);opacity:0}}
+
+/* ---- paperdoll (js/paperdoll.js) ---- */
+.pd-stack{position:absolute;inset:0;pointer-events:none}
+.pd-layer{position:absolute;inset:0;background:no-repeat 50% 100%/contain}
+.pd-shimmer{animation:pdFlash .65s ease-out}
+.pd-shimmer::after{content:'';position:absolute;inset:-10% -30%;pointer-events:none;background:linear-gradient(105deg,transparent 35%,rgba(255,240,180,.85) 50%,transparent 65%);mix-blend-mode:screen;animation:pdSweep .65s ease-out forwards}
+@keyframes pdFlash{0%{filter:brightness(1)}25%{filter:brightness(2.2) saturate(1.4)}100%{filter:brightness(1)}}
+@keyframes pdSweep{from{transform:translateX(-70%)}to{transform:translateX(70%);opacity:0}}
+
+.pop-lv{text-shadow:0 0 2px #000,0 1px 2px #000;font-weight:700}

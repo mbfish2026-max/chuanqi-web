@@ -107,7 +107,7 @@
     });
     // 召唤兽攻击 (DamageTool.getPartnerDamage)
     (b._pets||[]).forEach(function(p){ if(p.hp<=0) return; p.atkT-=dt; if(p.atkT>0) return; p.atkT=p.cfg.attack_spd||1.5;
-      var t=b.mons.filter(function(m){return !m.dead;})[0]; if(!t) return;
+      var t=b.mons.filter(function(m){return !m.dead && (typeof MOVE==='undefined' || p.idx==null || m.idx==null || MOVE.cheb(p.idx,m.idx)<=1);})[0]; if(!t) return; // [move] 召唤兽需相邻才能攻击
       if(Math.random()*100 >= 90+p.hit-(t.cfg.evade||0)) return;
       var d=Math.floor(Math.random()*Math.abs(p.maxzs-p.minzs)+p.minzs); if(Math.random()*100<p.critical) d*=1.5;
       if(a.buffDamageUp) d*=1+a.buffDamageUp/100;
