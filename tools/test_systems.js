@@ -67,7 +67,7 @@ R('loadConfigs()').then(()=>{
   R('enterMap(CFG.map.list.find(function(m){return m.type==2;}).id)');
   let pets=0, logs=new Set();
   const all=[]; R('var _log=log; log=function(s){ _log(s); G._all=(G._all||[]); G._all.push(s); }');
-  for(let i=0;i<600;i++){ R('tick(0.1)'); pets=Math.max(pets,S.pets.list().length); if(S.buff.list().length) all.push(S.buff.list().map(b=>b.name).join('+')); }
+  for(let i=0;i<600;i++){ if(i%50==0) R('(function(){var a=calcAttr();G.role.hp=a.maxhp;G.role.mp=a.maxmp;})()'); R('tick(0.1)'); pets=Math.max(pets,S.pets.list().length); if(S.buff.list().length) all.push(S.buff.list().map(b=>b.name).join('+')); }
   G.logs=G._all||G.logs; console.log('  buffs seen:', [...new Set(all)].join(' | '));
   G.logs.forEach(l=>{ const m=/\[(.+?)\]/.exec(l); if(m) logs.add(m[1]); });
   ok(pets>0,'召唤兽出现 (max '+pets+')'); console.log('  skill/buff logs:', [...logs].join(','), ' buffs:', JSON.stringify(S.buff.list()));

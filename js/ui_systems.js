@@ -1,6 +1,6 @@
 // UI panels for window.Systems (js/systems/*), using the original prefabs: fuli_sign / fuli_exchange / tipRemake / tipBlacksmith / tipFuse / tipFuseItem / itemStory
 var S_ = function(){ return window.Systems || {}; };
-function cloneTpl(tpl, str){ var n = new CC.Node(tpl.d, null); n.active = true; if (str != null) { if (n.lb) n.setString(str); else { var v = n.find('value') || (function f(x){ for (var i = 0; i < x.children.length; i++) { if (x.children[i].lb) return x.children[i]; var r = f(x.children[i]); if (r) return r; } return null; })(n); if (v) { v.setString(str); n.colorTarget = v; (function g(x){ x.children.forEach(function(c){ if (c.lb && c !== v) c.setString(''); g(c); }); })(n); } } } return n; }
+function cloneTpl(tpl, str){ var n = new CC.Node(tpl.d, null); n.active = true; n.el.classList.add('cc-tpl-line'); (function la(x){ x.children.forEach(function(c){ if (c.lb && c.ax !== 0) { c.ax = 0; c.x = 0; c.place(); } la(c); }); })(n); if (str != null) { if (n.lb) n.setString(str); else { var v = n.find('value') || (function f(x){ for (var i = 0; i < x.children.length; i++) { if (x.children[i].lb) return x.children[i]; var r = f(x.children[i]); if (r) return r; } return null; })(n); if (v) { v.setString(str); n.colorTarget = v; (function g(x){ x.children.forEach(function(c){ if (c.lb && c !== v) c.setString(''); g(c); }); })(n); } } } return n; }
 function stuffIcon(id, count){ var s = createStuff(id, count || 1); return s ? makeStuff(s, {click: false}) : null; }
 
 // ---- 福利: 签到 / 七日 / 兑换码 ----

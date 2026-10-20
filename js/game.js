@@ -129,7 +129,7 @@ function startBattle(m){
 // DamageTool: 命中 = 90 + hit - evade ; 幸运 = 5*lucky% 取最大攻击 ; 暴击 x1.5
 function roleAttack(b, a){
   var r=G.role, target=b.mons.filter(function(x){return !x.dead;})[0]; if(!target) return;
-  if(Math.random()*100 >= 90+a.hit-(target.cfg.evade||0)){ log('你的攻击被 '+target.cfg.name+' 闪避'); return; }
+  if(Math.random()*100 >= 90+a.hit-(target.cfg.evade||0)){ log('你的攻击被 '+target.cfg.name+' 闪避'); FXE('miss',{target:target}); return; }
   var lucky = Math.random()*100 < 5*a.lucky;
   var dmg = lucky ? a.atkmax : rnd(a.atkmin, a.atkmax);
   var used=null, usedSc=[];
@@ -145,10 +145,11 @@ function roleAttack(b, a){
   dmg = H('roleDamage', dmg, target, a, usedSc, crit); // [systems] Buff/词缀
   target.hp-=dmg;
   log((used?'['+used+'] ':'')+'你对 <span class="q'+target.q+'">'+target.cfg.name+'</span> 造成 '+dmg+' 伤害'+(crit?' (暴击)':''));
+  FXE('attack',{target:target,dmg:dmg,crit:crit,skills:usedSc});
   if(target.hp<=0 && !target.dead) killMonster(b,target);
 }
 function killMonster(b, m){
-  var r=G.role; m.dead=true; m.hp=0; m.respawn = (m.boss? 0 : (m.cfg.rebirth||3));
+  FXE('kill',{m:m}); var r=G.role; m.dead=true; m.hp=0; m.respawn = (m.boss? 0 : (m.cfg.rebirth||3));
   r.kills[m.cfg.id]=(r.kills[m.cfg.id]||0)+1;
   log('击败 <span class="q'+m.q+'">'+QNAME[m.q]+' '+m.cfg.name+'</span>, 获得经验 '+m.exp);
   addExp(m.exp);
@@ -181,12 +182,12 @@ function rollDrop(m){
 function monsterAttack(b, m, a){
   var r=G.role;
   if(H('monsterAttack', false, b, m, a)) return; // [systems] 眩晕/冰冻/召唤兽承伤
-  if(Math.random()*100 >= 90+(m.cfg.hit||0)-a.evade){ log(m.cfg.name+' 的攻击被你闪避'); return; }
+  if(Math.random()*100 >= 90+(m.cfg.hit||0)-a.evade){ log(m.cfg.name+' 的攻击被你闪避'); FXE('dodge',{m:m}); return; }
   var d=rnd(Math.floor(m.zs), Math.max(Math.floor(m.zs),Math.floor(m.zsmax)-1));
   if(Math.random()*100 < (m.cfg.critical||0)) d=Math.ceil(d*1.5);
   d -= rnd(a.minac, Math.max(a.minac,a.maxac)); d+=Math.max(0,(m.cfg.fixeddamage||0)-a.fixedac); d=Math.ceil(d); if(d<=0) d=1;
   d = H('roleHurt', d, m, a); // [systems] 护盾/免伤
-  r.hp-=d; log('<span style="color:#e77">'+m.cfg.name+' 对你造成 '+d+' 伤害</span>');
+  r.hp-=d; FXE('hurt',{m:m,d:d}); log('<span style="color:#e77">'+m.cfg.name+' 对你造成 '+d+' 伤害</span>');
   if(r.hp<=0) roleDie();
 }
 function roleDie(){
@@ -215,7 +216,7 @@ function tick(dt){
   r.mp=Math.min(a.maxmp, r.mp+a.maxmp*0.005*dt);
   autoDrug(a);
   // 道士治疗术
-  eachSkill(function(sc,st,base){ if(sc.triggertype==2 && !H('skillHandled',false,sc,base) && (st.cd||0)<=0 && r.hp<a.maxhp*(sc.parameter1||85)/100 && r.mp>=(sc.spell||0)){ var heal=Math.ceil(a.maxhp*(sc.power2||5)/100+a.atkmax); r.hp=Math.min(a.maxhp,r.hp+heal); r.mp-=sc.spell||0; st.cd=sc.basecd||10; st.exp=(st.exp||0)+1; log('['+sc.name+'] 回复生命 '+heal); } });
+  eachSkill(function(sc,st,base){ if(sc.triggertype==2 && !H('skillHandled',false,sc,base) && (st.cd||0)<=0 && r.hp<a.maxhp*(sc.parameter1||85)/100 && r.mp>=(sc.spell||0)){ var heal=Math.ceil(a.maxhp*(sc.power2||5)/100+a.atkmax); r.hp=Math.min(a.maxhp,r.hp+heal); r.mp-=sc.spell||0; st.cd=sc.basecd||10; st.exp=(st.exp||0)+1; log('['+sc.name+'] 回复生命 '+heal); FXE('heal',{amount:heal,sc:sc}); } });
   H('tick', dt, b, a, m); // [systems] Buff/召唤兽
   if(G.battle!==b) return;
   b.roleT-=dt; if(b.roleT<=0){ b.roleT=a.atkspeed; roleAttack(b,a); }
@@ -300,4 +301,5 @@ function offlineReward(){
   var kills=Math.floor(sec/6), exp=Math.floor(kills*avg*0.5), gold=kills*2; addExp(exp); r.gold+=gold;
   return {sec:Math.floor(sec), exp:exp, gold:gold};
 }
+function FXE(t,o){ if(typeof FX!=='undefined'&&FX.emit) try{ FX.emit(t,o); }catch(e){} }
 function log(s){ G.logs.push(s); if(G.logs.length>80) G.logs.shift(); }

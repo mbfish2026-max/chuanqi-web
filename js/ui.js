@@ -219,6 +219,7 @@ function buildScene(){
     UI.roleItem.ref('roleSign').setImage(IMG + 'role_create/icon_avatar_' + G.role.prof + '_0.png');
     UI.roleItem.ref('roleSign').el.style.backgroundSize = 'contain';
     UI.monItems = [];
+    if (typeof FX !== 'undefined') FX.attach(UI.battleHolder);
     b.ref('labBossMapName').setString('[' + m.name + ']');
     b.ref('bossInfo').setActive(m.boss > 1000);
     b.ref('labRelive').setActive(false);
@@ -253,7 +254,7 @@ function refreshScene(){
       it.ref('roleRoot').setActive(false); it.ref('monsterRoot').setActive(true);
       it.ref('monsterBg').setImage(IMG + 'main/img_quality_' + x.q + '.png');
       it.ref('monsterIcon').setImage(IMG + 'monster/' + x.cfg.model + '.png'); it.ref('monsterIcon_normal').setActive(false);
-      var mn = it.ref('monsterRoot').find('name'); mn.setString((x.boss ? '[BOSS]' : '') + x.cfg.name); mn.setColor(QCOLOR[x.q]);
+      var mn = it.ref('monsterRoot').find('name'); mn.setString((x.boss ? '[BOSS]' : '') + x.cfg.name); mn.setColor(QCOLOR[x.q]); mn.el.classList.add('fx-mon-name');
       it.ref('monsterLevel').setString('Lv.' + x.cfg.lvl);
       UI.cells[MON_CELLS[i % MON_CELLS.length]].addChild(it);
     }
@@ -513,6 +514,7 @@ function refreshAll(){
 function render(){ refreshAll(); }
 function startMain(){ buildMain(); }
 (function boot(){
+  if (typeof FX !== 'undefined') { FX.preload(); FX.hookLog(); }
   var host = document.getElementById('stage');
   UI.stage = CC.initStage(host);
   ['layerMain', 'layerPop', 'layerTop'].forEach(function(k){ var d = document.createElement('div'); d.className = 'layer'; host.appendChild(d); UI[k] = d; });
@@ -546,6 +548,11 @@ function startMain(){ buildMain(); }
         if (q.tip === 'store') openStore(3002, 'img_main_drugstore');
         if (q.tip === 'offline') showOffline({sec: 3700, exp: 12345, gold: 678});
         if (q.tip === 'die') roleDie();
+        if (q.fx && typeof FX !== 'undefined') { // ?fx=leidianshu,huoqiu  or  ?fx=all  (demo casts for screenshots)
+          var list = q.fx === 'all' ? Object.keys(FX.SKILL_DIR).map(function(k){ return FX.SKILL_DIR[k]; }) : q.fx.split(',');
+          if (q.nosheet) Object.keys(FX._sheets).forEach(function(k){ FX._sheets[k].ok = false; });
+          var di = 0; setInterval(function(){ FX.demo(list[di++ % list.length]); }, +(q.fxint || 700));
+        }
         if (q.tip === 'buy') buyDialog(CFG.shop.list.filter(function(x){ return x.items; })[0]);
         if (q.tip === 'mapdesc') tipMapDesc(mapCfg());
         if (q.tip === 'remake') { var eq = b.filter(isEquip)[0] || G.role.equip[5]; if (eq) { if (eq.q < 2) eq.q = 3; tipRemake(eq); } }

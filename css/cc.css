@@ -11,3 +11,12 @@ html,body{margin:0;height:100%;background:#000;overflow:hidden;font-family:"Ping
 .cc-scroll{scrollbar-width:none;-webkit-overflow-scrolling:touch}
 .cc-scroll::-webkit-scrollbar{display:none}
 .cc-input{position:absolute;left:0;top:0;width:100%;height:100%;background:transparent;border:0;outline:0;color:#fff;font-size:26px;text-align:center;font-family:inherit}
+
+/* ---- FX / readability ---- */
+.fx-mon-name{font-weight:700!important;text-shadow:0 0 2px #000,1px 1px 0 #000,-1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000,0 0 6px rgba(0,0,0,.8)!important;-webkit-text-stroke:.5px rgba(0,0,0,.6)}
+.fx-hit{filter:brightness(2.2) saturate(.4) drop-shadow(0 0 8px #fff);transform:translateX(3px)}
+.fx-hit-crit{filter:brightness(2.6) sepia(.6) saturate(3) hue-rotate(-15deg) drop-shadow(0 0 14px #ffb300);transform:scale(1.08)}
+.fx-poison{filter:sepia(.5) hue-rotate(60deg) saturate(2.2) drop-shadow(0 0 8px rgba(80,255,80,.8))}
+.fx-frozen{filter:saturate(.3) brightness(1.15) hue-rotate(170deg) drop-shadow(0 0 8px rgba(150,220,255,.95))}
+.fx-burn{filter:drop-shadow(0 0 10px rgba(255,120,0,.95)) brightness(1.1)}
+.fx-canvas{image-rendering:auto}
