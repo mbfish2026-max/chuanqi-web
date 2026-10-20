@@ -10,6 +10,7 @@
   var ICON_OK = {}, PART_IMG = {5: 'weapon', 10: 'clothes', 15: 'helmet', 20: 'neckless', 22: 'ring', 23: 'ring', 24: 'bracelet', 25: 'bracelet', 62: 'shoes', 64: 'belt'};
   function iconFallback(node, c){ if (!node || !c || !c.icon) return; var url = IMG + 'icon/' + c.icon + '.png', st = ICON_OK[url];
     var apply = function(){ if (!PART_IMG[c.stdmode]) return; node.setImage(IMG + 'main/img_equip_' + PART_IMG[c.stdmode] + '.png'); node.el.style.opacity = .85; node.el.dataset.iconFallback = c.icon; };
+    if (typeof ICON_LIST != 'undefined') return iconHas(c.icon) ? undefined : apply(); // 有清单: 同步判断, 不发探测请求
     if (st === false) return apply(); if (st === true) return;
     if (!st) { st = ICON_OK[url] = new Promise(function(res){ var im = new Image(); im.onload = function(){ ICON_OK[url] = true; res(true); }; im.onerror = function(){ ICON_OK[url] = false; res(false); }; im.src = url; }); }
     st.then(function(ok){ if (!ok) apply(); }); }

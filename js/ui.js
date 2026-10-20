@@ -50,7 +50,9 @@ function makeStuff(s, opts){
   }
   var isEq = c.type == 2;
   weapon.setActive(isEq); props.setActive(!isEq);
-  (isEq ? it.ref('iconEquip') : it.ref('iconProp')).setImage(IMG + 'icon/' + c.icon + '.png');
+  var icn = isEq ? it.ref('iconEquip') : it.ref('iconProp');
+  // 先查图标清单 (js/icon_list.js), 缺图不发请求避免 404; 装备由 ui_loot.js 的 iconFallback 换成部位剪影
+  if (typeof iconHas != 'function' || iconHas(c.icon)) icn.setImage(IMG + 'icon/' + c.icon + '.png'); else { icn.setFrame(null); icn.el.dataset.iconMissing = c.icon || ''; }
   it.ref('labCnt').setString(s.count > 1 ? 'x' + s.count : '');
   it.ref('intensify').setActive(!!s.ench); it.ref('intensify').setString('+' + s.ench);
   lab.setString(c.name); lab.setColor(QCOLOR[q]);
