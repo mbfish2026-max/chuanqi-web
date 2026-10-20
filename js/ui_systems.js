@@ -51,7 +51,7 @@ function fuliPay(node){ toast('离线复刻版不提供充值'); }
 // ---- 洗练 tipRemake ----
 function tipRemake(s){
   var E = S_().equip; if (!E) return;
-  var p = popup('tipRemake'); p.find('mask').el.style.background = 'rgba(0,0,0,.55)';
+  var p = popup('tipRemake'); p.find('mask').el.style.background = 'rgba(0,0,0,.35)'; p.find('mask').el.style.opacity = 1;
   p.findDeep('img_close').on(function(){ E.cancelRemake(s.uid); closePopup(p); refreshAll(); });
   p.findDeep('btn_help').setActive(false);
   p.ref('itemNode').addChild(makeStuff(s, {click: false}));
@@ -74,7 +74,7 @@ function tipRemake(s){
 // ---- 铁匠 tipBlacksmith ----
 function tipBlacksmith(){
   var SM = S_().smith; if (!SM) return openStore(3003, 'img_main_blacksmith');
-  var p = popup('tipBlacksmith'), sel = 0; p.find('mask').el.style.background = 'rgba(0,0,0,.55)';
+  var p = popup('tipBlacksmith'), sel = 0; p.find('mask').el.style.background = 'rgba(0,0,0,.35)'; p.find('mask').el.style.opacity = 1;
   p.findDeep('img_close').on(function(){ closePopup(p); });
   p.findDeep('tipDesc').setString('铁匠：可锻造随机属性的装备，每日刷新。');
   p.findDeep('img_refresh1').setActive(SM.adLeft() > 0); p.findDeep('layout').layout();

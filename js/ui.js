@@ -27,7 +27,7 @@ function msg(res){ if (!res) return; toast(res.indexOf('OK') === 0 ? (res.slice(
 // ---------- popups ----------
 function popup(name){
   var p = inst(name); CC.mount(p, UI.layerPop); UI.popups.push(p);
-  var m = p.find('mask'); if (m) { m.el.style.background = 'rgba(0,0,0,.55)'; if (m.d.bt) m.on(function(){ closePopup(p); }); }
+  var m = p.find('mask'); if (m) { m.el.style.background = 'rgba(0,0,0,.35)'; m.el.style.opacity = 1; if (m.d.bt) m.on(function(){ closePopup(p); }); }
   return p;
 }
 function closePopup(p){ p.destroy(); UI.popups.splice(UI.popups.indexOf(p), 1); }

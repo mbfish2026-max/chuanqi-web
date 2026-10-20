@@ -26,10 +26,10 @@ html,body{margin:0;height:100%;background:#000;overflow:hidden;font-family:"Ping
 .pop-spawn .pop-tilt{animation:popTilt .55s cubic-bezier(.2,1.4,.4,1)}
 @keyframes popTilt{0%{transform:perspective(520px) rotateX(0deg) scale(.85);opacity:0}100%{transform:perspective(520px) rotateX(16deg)}}
 .pop-win{position:absolute;z-index:40;pointer-events:none;clip-path:inset(-120% -14% 0 -14%)}
-.pop-shadow{position:absolute;left:12%;right:12%;bottom:-2px;height:14px;border-radius:50%;background:radial-gradient(rgba(0,0,0,.45),rgba(0,0,0,0) 70%)}
+.pop-shadow{position:absolute;left:12%;right:12%;bottom:-2px;height:14px;border-radius:50%;background:radial-gradient(rgba(40,20,0,.22),rgba(0,0,0,0) 70%)}
 .pop-fig{position:absolute;left:-8%;right:-8%;bottom:0;transform-origin:50% 100%;will-change:transform;
   animation:popRise .6s cubic-bezier(.2,1.3,.4,1) both,popBreath 2.4s ease-in-out .6s infinite}
-.pop-img{position:absolute;inset:0;background:no-repeat 50% 100%/contain;filter:drop-shadow(0 -1px 0 rgba(255,240,200,.6)) drop-shadow(0 3px 4px rgba(0,0,0,.55))}
+.pop-img{position:absolute;inset:0;background:no-repeat 50% 100%/contain;filter:drop-shadow(0 -1px 0 rgba(255,240,200,.6)) drop-shadow(0 2px 3px rgba(40,20,0,.28))}
 .pop-spawn .pop-fig{animation:popRise .6s cubic-bezier(.2,1.3,.4,1) both,popBreath 2.4s ease-in-out .6s infinite}
 @keyframes popRise{0%{transform:translateY(70%) scale(.9);opacity:0}60%{opacity:1}100%{transform:none}}
 @keyframes popBreath{0%,100%{transform:scale(1,1) translateY(0)}50%{transform:scale(1.015,1.04) translateY(-2px)}}
@@ -52,3 +52,6 @@ html,body{margin:0;height:100%;background:#000;overflow:hidden;font-family:"Ping
 @keyframes pdSweep{from{transform:translateX(-70%)}to{transform:translateX(70%);opacity:0}}
 
 .pop-lv{text-shadow:0 0 2px #000,0 1px 2px #000;font-weight:700}
+
+/* brighter UI: light outline keeps text readable on lighter art without darkening */
+.cc-label{text-shadow:0 1px 1px rgba(0,0,0,.35)}
