@@ -215,10 +215,11 @@ function buildScene(){
     var grid = b.ref('battleNode'); UI.cells = [];
     for (var i = 0; i < 30; i++) { var cell = new CC.Node({n: 'grid' + i, x: 0, y: 0, w: 120, h: 125, ax: .5, ay: .5}, null); grid.addChild(cell, true); UI.cells.push(cell); }
     grid.layout();
-    UI.roleItem = inst('itemRole'); UI.roleItem.ref('monsterRoot').setActive(false); UI.cells[ROLE_CELL].addChild(UI.roleItem);
+    UI.roleItem = inst('itemRole'); UI.roleItem.ref('monsterRoot').setActive(false); UI.cells[G.battle && G.battle.roleIdx != null ? G.battle.roleIdx : ROLE_CELL].addChild(UI.roleItem); UI.roleItem._cell = G.battle && G.battle.roleIdx;
     UI.roleItem.ref('roleSign').setImage(IMG + 'role_create/icon_avatar_' + G.role.prof + '_0.png');
     UI.roleItem.ref('roleSign').el.style.backgroundSize = 'contain';
     UI.monItems = [];
+    UI.petItems = [];
     if (typeof FX !== 'undefined') FX.attach(UI.battleHolder);
     b.ref('labBossMapName').setString('[' + m.name + ']');
     b.ref('bossInfo').setActive(m.boss > 1000);
@@ -256,15 +257,46 @@ function refreshScene(){
       it.ref('monsterIcon').setImage(IMG + 'monster/' + x.cfg.model + '.png'); it.ref('monsterIcon_normal').setActive(false);
       var mn = it.ref('monsterRoot').find('name'); mn.setString((x.boss ? '[BOSS]' : '') + x.cfg.name); mn.setColor(QCOLOR[x.q]); mn.el.classList.add('fx-mon-name');
       it.ref('monsterLevel').setString('Lv.' + x.cfg.lvl);
-      UI.cells[MON_CELLS[i % MON_CELLS.length]].addChild(it);
+      UI.cells[x.idx != null ? x.idx : MON_CELLS[i % MON_CELLS.length]].addChild(it); it._cell = x.idx;
     }
     it.setActive(!x.dead);
     it.ref('monsterHpBar').setProgress(x.hp / x.maxhp); it.ref('monsterTipHp').setString(Math.max(0, Math.ceil(x.hp)) + '/' + x.maxhp);
   });
+  drawPets(); syncPositions();
   for (var j = mons.length; j < UI.monItems.length; j++) if (UI.monItems[j]) { UI.monItems[j].destroy(); UI.monItems[j] = null; }
   var boss = mons.filter(function(x){ return x.boss; })[0], bi = UI.battle.ref('bossInfo');
   if (bi.active) { var hp = UI.battle.ref('bossHP'); if (boss) { hp.setProgress(boss.hp / boss.maxhp); } else { var t = (r.stat['boss_' + mapCfg().boss] || 0) - Date.now(); hp.setProgress(0); var lt = hp.find('labtime'); if (lt) lt.setString(t > 0 ? Math.ceil(t / 1000) + '秒后刷新' : ''); } }
 }
+
+// ---------- 走位: cards follow MOVE indices with a 0.2s tween (ActionTool.MoveBy .2) ----------
+function moveCard(it, idx){
+  if (!it || idx == null || !UI.cells || !UI.cells[idx] || it._cell === idx) return;
+  var from = it.el.getBoundingClientRect(); UI.cells[idx].addChild(it, true); it._cell = idx;
+  var to = it.el.getBoundingClientRect(), k = 750 / (UI.stage && UI.stage.el ? UI.stage.el.getBoundingClientRect().width || 750 : 750);
+  if (from.width && to.width && it.el.animate) it.el.animate([{translate: ((from.left - to.left) * k) + 'px ' + ((from.top - to.top) * k) + 'px'}, {translate: '0px 0px'}], {duration: 200, easing: 'ease-out'});
+}
+function syncPositions(){
+  var b = G.battle; if (!UI.battle || !b || typeof MOVE === 'undefined') return;
+  MOVE.ensure(b); moveCard(UI.roleItem, b.roleIdx);
+  b.mons.forEach(function(x, i){ if (!x.dead) moveCard(UI.monItems[i], x.idx); });
+  (UI.petItems || []).forEach(function(it){ if (it._pet && it._pet.hp > 0) moveCard(it, it._pet.idx); });
+}
+function drawPets(){
+  var b = G.battle, pets = ((b && b._pets) || []).filter(function(p){ return p.hp > 0; }); UI.petItems = UI.petItems || [];
+  UI.petItems = UI.petItems.filter(function(it){ if (pets.indexOf(it._pet) < 0) { it.destroy(); return false; } return true; });
+  pets.forEach(function(p){
+    var it = UI.petItems.filter(function(x){ return x._pet === p; })[0];
+    if (!it) { if (typeof MOVE !== 'undefined') MOVE.ensure(b); if (p.idx == null || !UI.cells) return;
+      it = inst('itemRole'); it._pet = p; UI.petItems.push(it);
+      it.ref('roleRoot').setActive(false); it.ref('monsterRoot').setActive(true);
+      it.ref('monsterBg').setImage(IMG + 'main/img_quality_role.png');
+      it.ref('monsterIcon').setImage(IMG + 'monster/' + p.cfg.model + '.png'); it.ref('monsterIcon_normal').setActive(false);
+      var mn = it.ref('monsterRoot').find('name'); mn.setString(p.name); mn.setColor('#5BE36B'); mn.el.classList.add('fx-mon-name');
+      it.ref('monsterLevel').setString('宝宝'); UI.cells[p.idx].addChild(it); it._cell = p.idx; }
+    it.ref('monsterHpBar').setProgress(p.hp / p.maxhp); it.ref('monsterTipHp').setString(Math.ceil(p.hp) + '/' + p.maxhp);
+  });
+}
+setInterval(function(){ if (UI.pageKey === 'fight') { try { drawPets(); syncPositions(); } catch (e) {} } }, 100);
 
 // ---------- tipStore (NPC shop) ----------
 function openStore(nid, icon){

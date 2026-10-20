@@ -128,7 +128,7 @@ function startBattle(m){
 }
 // DamageTool: 命中 = 90 + hit - evade ; 幸运 = 5*lucky% 取最大攻击 ; 暴击 x1.5
 function roleAttack(b, a){
-  var r=G.role, target=b.mons.filter(function(x){return !x.dead;})[0]; if(!target) return;
+  var r=G.role, target=(typeof MOVE!=='undefined')? MOVE.roleTarget(b) : b.mons.filter(function(x){return !x.dead;})[0]; if(!target) return;
   if(Math.random()*100 >= 90+a.hit-(target.cfg.evade||0)){ log('你的攻击被 '+target.cfg.name+' 闪避'); FXE('miss',{target:target}); return; }
   var lucky = Math.random()*100 < 5*a.lucky;
   var dmg = lucky ? a.atkmax : rnd(a.atkmin, a.atkmax);
@@ -187,7 +187,7 @@ function monsterAttack(b, m, a){
   if(Math.random()*100 < (m.cfg.critical||0)) d=Math.ceil(d*1.5);
   d -= rnd(a.minac, Math.max(a.minac,a.maxac)); d+=Math.max(0,(m.cfg.fixeddamage||0)-a.fixedac); d=Math.ceil(d); if(d<=0) d=1;
   d = H('roleHurt', d, m, a); // [systems] 护盾/免伤
-  r.hp-=d; FXE('hurt',{m:m,d:d}); log('<span style="color:#e77">'+m.cfg.name+' 对你造成 '+d+' 伤害</span>');
+  r.hp-=d; FXE('hurt',{m:m,d:d}); FXE('matk',{m:m}); log('<span style="color:#e77">'+m.cfg.name+' 对你造成 '+d+' 伤害</span>');
   if(r.hp<=0) roleDie();
 }
 function roleDie(){
@@ -219,10 +219,11 @@ function tick(dt){
   eachSkill(function(sc,st,base){ if(sc.triggertype==2 && !H('skillHandled',false,sc,base) && (st.cd||0)<=0 && r.hp<a.maxhp*(sc.parameter1||85)/100 && r.mp>=(sc.spell||0)){ var heal=Math.ceil(a.maxhp*(sc.power2||5)/100+a.atkmax); r.hp=Math.min(a.maxhp,r.hp+heal); r.mp-=sc.spell||0; st.cd=sc.basecd||10; st.exp=(st.exp||0)+1; log('['+sc.name+'] 回复生命 '+heal); FXE('heal',{amount:heal,sc:sc}); } });
   H('tick', dt, b, a, m); // [systems] Buff/召唤兽
   if(G.battle!==b) return;
+  if(typeof MOVE!=='undefined') MOVE.update(b,dt); // [move] 走位
   b.roleT-=dt; if(b.roleT<=0){ b.roleT=a.atkspeed; roleAttack(b,a); }
   b.mons.forEach(function(x){
     if(x.dead){ x.respawn-=dt; if(x.respawn<=0){ var n=spawnMonster(m, m.monster[Math.floor(Math.random()*m.monster.length)]); for(var k in n) x[k]=n[k]; } return; }
-    x.atkT-=dt; if(x.atkT<=0 && G.battle===b){ x.atkT=x.cfg.attack_spd||2.5; monsterAttack(b,x,a); }
+    x.atkT-=dt; if(x.atkT<=0 && G.battle===b && (typeof MOVE==='undefined' || MOVE.monCanAttack(b,x))){ x.atkT=x.cfg.attack_spd||2.5; monsterAttack(b,x,a); }
   });
   if(m.boss>1000 && !b.mons.some(function(x){return x.boss;}) && Date.now()>=(r.stat['boss_'+m.boss]||0)){ var bs=spawnMonster(m,m.boss,true); if(bs){ b.mons.unshift(bs); log('<b class="q5">BOSS '+bs.cfg.name+' 出现了!</b>'); } }
 }

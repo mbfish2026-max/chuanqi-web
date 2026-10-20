@@ -164,12 +164,25 @@ var FX = (function(){
     return NAME_BASE[name];
   }
 
+  // 8-direction attack anims (assets/main/attack_*.anim: back 2px @0.25s, lunge 10px @0.333s, home @0.583s)
+  var DIRV = {up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0], slant_rightup: [1, -1], slant_leftup: [-1, -1], slant_rightdown: [1, 1], slant_leftdown: [-1, 1]};
+  function playAtk(el, key){
+    var v = DIRV[key]; if (!el || !v || !el.animate) return; el.dataset.atk = key;
+    var f = function(k){ return (v[0] * k) + 'px ' + (v[1] * k) + 'px'; };
+    el.animate([{translate: f(0), offset: 0}, {translate: f(-2), offset: .4286}, {translate: f(10), offset: .5714}, {translate: f(0), offset: 1}], {duration: 583, composite: 'add'});
+  }
+  function atkBetween(fromEl, toEl, fromIdx, toIdx){
+    if (typeof MOVE !== 'undefined' && fromIdx != null && toIdx != null) return playAtk(fromEl, MOVE.dirKey(fromIdx, toIdx));
+    var a = centerOf(fromEl), b = centerOf(toEl), dx = Math.sign(Math.round((b.x - a.x) / 60)), dy = Math.sign(Math.round((b.y - a.y) / 60));
+    playAtk(fromEl, ({'0,-1': 'up', '0,1': 'down', '-1,0': 'left', '1,0': 'right', '1,-1': 'slant_rightup', '-1,-1': 'slant_leftup', '1,1': 'slant_rightdown', '-1,1': 'slant_leftdown'})[dx + ',' + dy]);
+  }
   // ---------- events from game.js ----------
   function emit(type, o){
     if (!visible()) return;
     o = o || {};
     var s = centerOf(roleEl());
     if (type === 'attack') {
+      atkBetween(roleEl(), monEl(o.target), G.battle && G.battle.roleIdx, o.target && o.target.idx);
       var t = centerOf(monEl(o.target)), sk = (o.skills || []).filter(function(x){ return dirFor(x); });
       var hit = function(){ var el = monEl(o.target); flashCard(el, o.crit ? 'crit' : 'hit');
         text(t.x, t.y - 20, (o.crit ? '暴击 ' : '') + '-' + o.dmg, {c: o.crit ? '#ffd23f' : '#ffffff', size: o.crit ? 48 : 32, life: o.crit ? 1.2 : .9});
@@ -178,6 +191,7 @@ var FX = (function(){
       else { PROC.slash(s, t, false); setTimeout(hit, 60); }
     } else if (type === 'miss') { var tm = centerOf(monEl(o.target)); text(tm.x, tm.y - 20, '闪避', {c: '#b8c7d9', size: 26}); }
     else if (type === 'hurt') { var r = roleEl(); flashCard(r, 'hit'); text(s.x, s.y - 20, '-' + o.d, {c: '#ff5a4f', size: 30}); var ms = centerOf(monEl(o.m)); burst(s.x, s.y, 8, ['#ff9a8a', '#ffffff'], 160, 3, .35); if (o.d > 0 && o.m && o.m.boss) screenShake(9); }
+    else if (type === 'matk') { atkBetween(monEl(o.m), roleEl(), o.m && o.m.idx, G.battle && G.battle.roleIdx); }
     else if (type === 'dodge') text(s.x, s.y - 20, '闪避', {c: '#b8c7d9', size: 26});
     else if (type === 'heal') { PROC.heal(s); if (sheets.zhiliaoshu && sheets.zhiliaoshu.ok) sprite('zhiliaoshu', s.x, s.y, {scale: 1.3}); text(s.x, s.y - 30, '+' + o.amount, {c: '#5dff7a', size: 34, life: 1.2}); }
     else if (type === 'kill') { var tk = centerOf(monEl(o.m)); burst(tk.x, tk.y, o.m.boss ? 70 : 26, o.m.q >= 4 ? ['#ffd24d', '#ff8a00', '#fff'] : ['#ffffff', '#d9c7a3', '#8f7c5a'], o.m.boss ? 420 : 240, 5, .7); ring(tk.x, tk.y, 10, o.m.boss ? 180 : 90, 'rgba(255,240,200,.9)', .4, 6); if (o.m.boss) { screenShake(22); screenFlash('#ffd24d', .35); } }
@@ -294,6 +308,6 @@ var FX = (function(){
 
   // demo/test helper: FX.demo('leidianshu')
   function demo(dir){ var s = centerOf(roleEl()), m = G.battle && G.battle.mons.filter(function(x){ return !x.dead; })[0], t = centerOf(monEl(m)); playSkill(dir, s, t, function(){ flashCard(monEl(m), 'crit'); text(t.x, t.y - 20, '暴击 -' + (500 + Math.floor(Math.random() * 500)), {c: '#ffd23f', size: 48, life: 1.4}); }); }
-  return {attach: attach, emit: emit, preload: preload, hookLog: hookLog, demo: demo, procedural: PROC, SKILL_DIR: SKILL_DIR, _sheets: sheets,
+  return {playAtk: playAtk, attach: attach, emit: emit, preload: preload, hookLog: hookLog, demo: demo, procedural: PROC, SKILL_DIR: SKILL_DIR, _sheets: sheets,
     stats: function(){ return {parts: parts.length, anims: anims.length, texts: texts.length}; }};
 })();
