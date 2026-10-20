@@ -533,6 +533,7 @@ PAGES.main_fuli = function(p){
 
 // ---------- role create (role_create.prefab) ----------
 function showCreate(){
+  if (window.Systems && Systems.audio) Systems.audio.playBgm('music_create');
   var p = inst('role_create'); CC.mount(p, UI.layerMain); UI.create = p;
   p.ref('btnBack').setActive(false);
   var sel = 1, btns = p.ref('professionBtn'), view = p.ref('professionView');
@@ -596,9 +597,16 @@ function startMain(){ buildMain(); }
   loadConfigs().then(function(){
     bar.setProgress(1); ld.ref('labPercent').setString('100.00%');
     ld.ref('loadNode').setActive(false); ld.ref('btnStart').setActive(true); ld.findDeep('label').setActive(true);
+    if (window.Systems && Systems.audio) Systems.audio.playBgm('music_login');
     function go(){
       ld.destroy();
-      if (load()) { var off = offlineReward(); enterMap(G.role.mapId); startMain(); if (off) showOffline(off); }
+      function enterGame(){
+        if (!G.role) return;
+        if (window.Systems && Systems.audio) { Systems.audio.playSfx('game_start'); Systems.audio.stopBgm(); }
+        var off = offlineReward(); enterMap(G.role.mapId); startMain(); if (off) showOffline(off);
+      }
+      if (window._rolesBoot) window._rolesBoot(enterGame, showCreate);
+      else if (load()) enterGame();
       else showCreate();
       var last = performance.now(), lastSave = 0, lastUi = 0;
       setInterval(function(){ if (!G.role || !UI.main) return; var now = performance.now(), dt = (now - last) / 1000; last = now; tick(Math.min(dt, 2));
@@ -629,6 +637,9 @@ function startMain(){ buildMain(); }
         if (q.tip === 'remake') { var eq = b.filter(isEquip)[0] || G.role.equip[5]; if (eq) { if (eq.q < 2) eq.q = 3; tipRemake(eq); } }
         if (q.tip === 'smith') tipBlacksmith();
         if (q.tip === 'fuse') tipFuse(1);
+        if (q.tip === 'yyshop') { showPage('main_role'); UI.roleTab = 'yyshop'; if (UI.page) drawRoleTab(UI.page); }
+        if (q.tip === 'guide' && window._guideStart) { if (G.role) { G.role.guideStage = 0; } window._guideForce = true; window._guideStart(); }
+        if (q.tip === 'roles' && window._rolesBoot) { /* 角色列表需无 seed */ }
         if (q.tip === 'week') { UI.fuliMode = 'week'; showPage('main_fuli'); }
         if (q.tip === 'exchange') { showPage('main_fuli'); UI.page.ref('btnExchange').el.click(); }
         if (q.tip === 'boss') { UI.fight.ref('bossNode').setActive(true); fillBoss(); }

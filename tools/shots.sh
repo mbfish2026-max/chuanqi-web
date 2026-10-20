@@ -40,3 +40,5 @@ shot settings_recycle "?seed=1&map=1003&settings=recycle" 3800
 shot settings_afk "?seed=1&map=1003&settings=afk" 3800
 shot settings_skill "?seed=1&map=1003&settings=skill" 4000
 shot settings_game "?seed=1&map=1003&settings=game" 3800
+shot p2_yyshop "?seed=1&page=main_role&tip=yyshop" 2500
+shot p2_guide "?seed=1&tip=guide&noguide=0" 2500

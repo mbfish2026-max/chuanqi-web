@@ -78,7 +78,7 @@
     refreshDrugRow('magic','magicRevert','magicName','magicPrecent');
     refreshDrugRow('special','specialRevert','specialName','specialPrecent');
 
-    bindToggle('soundSwitch', function(){ return !!st.sound; }, function(v){ st.sound=v; });
+    bindToggle('soundSwitch', function(){ return !!st.sound; }, function(v){ st.sound=v; if(Systems.audio) Systems.audio.setEnabled(v); });
 
     closeBtn(p, p.ref('btnClose'));
     var bs = p.findDeep('btnSave');
@@ -157,7 +157,7 @@
         body.appendChild(toggleRow('自动合击', function(){ return !!(hi && hi.auto); }, function(v){ if(Systems.hero.setAuto) Systems.hero.setAuto(v); }));
       }
     } else if(tab==='game'){
-      body.appendChild(toggleRow('游戏音效', function(){return !!st.sound;}, function(v){st.sound=v;}));
+      body.appendChild(toggleRow('游戏音效', function(){return !!st.sound;}, function(v){st.sound=v; if(Systems.audio) Systems.audio.setEnabled(v);}));
       body.appendChild(toggleRow('伤害数字', function(){return st.game.dmgNumbers!==false;}, function(v){st.game.dmgNumbers=v;}));
       body.appendChild(toggleRow('屏幕震动', function(){return st.game.screenShake!==false;}, function(v){st.game.screenShake=v;}));
       body.appendChild(toggleRow('高特效质量', function(){return st.game.fxQuality!==0;}, function(v){st.game.fxQuality=v?1:0;}));
