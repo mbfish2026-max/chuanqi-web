@@ -1,0 +1,356 @@
+{
+  "1": {
+    "id": 3001
+  },
+  "2": {
+    "id": 3002,
+    "shopname": "药店",
+    "name": "小量金创药",
+    "items": 100010,
+    "oncenum": 200,
+    "currencytype": 1,
+    "price": -10
+  },
+  "3": {
+    "id": 3002,
+    "shopname": "药店",
+    "name": "小量魔法药",
+    "items": 100020,
+    "oncenum": 200,
+    "currencytype": 1,
+    "price": -10
+  },
+  "4": {
+    "id": 3002,
+    "shopname": "药店",
+    "name": "中量金创药",
+    "items": 100011,
+    "oncenum": 200,
+    "currencytype": 1,
+    "price": -20
+  },
+  "5": {
+    "id": 3002,
+    "shopname": "药店",
+    "name": "中量魔法药",
+    "items": 100021,
+    "oncenum": 200,
+    "currencytype": 1,
+    "price": -20
+  },
+  "6": {
+    "id": 3002,
+    "shopname": "药店",
+    "name": "强效金创药",
+    "items": 100012,
+    "oncenum": 200,
+    "currencytype": 1,
+    "price": -50
+  },
+  "7": {
+    "id": 3002,
+    "shopname": "药店",
+    "name": "强效魔法药",
+    "items": 100022,
+    "oncenum": 200,
+    "currencytype": 1,
+    "price": -50
+  },
+  "8": {
+    "id": 3002,
+    "shopname": "药店",
+    "name": "弱效太阳水",
+    "items": 100030,
+    "oncenum": 200,
+    "currencytype": 1,
+    "price": -1000
+  },
+  "9": {
+    "id": 3003,
+    "shopname": "铁匠"
+  },
+  "10": {
+    "id": 3004,
+    "shopname": "书店",
+    "name": "火球术",
+    "items": 104001,
+    "oncenum": 200,
+    "currencytype": 1,
+    "price": -8
+  },
+  "11": {
+    "id": 3004,
+    "shopname": "书店",
+    "name": "治愈术",
+    "items": 104002,
+    "oncenum": 200,
+    "currencytype": 1,
+    "price": -5
+  },
+  "12": {
+    "id": 3004,
+    "shopname": "书店",
+    "name": "基本剑术",
+    "items": 104003,
+    "oncenum": 200,
+    "currencytype": 1,
+    "price": -5
+  },
+  "13": {
+    "id": 3004,
+    "shopname": "书店",
+    "name": "精神力战法",
+    "items": 104004,
+    "oncenum": 200,
+    "currencytype": 1,
+    "price": -10
+  },
+  "14": {
+    "id": 3004,
+    "shopname": "书店",
+    "name": "大火球",
+    "items": 104005,
+    "oncenum": 200,
+    "currencytype": 1,
+    "price": -10
+  },
+  "15": {
+    "id": 3004,
+    "shopname": "书店",
+    "name": "书页",
+    "items": 104034,
+    "oncenum": 200,
+    "currencytype": 2,
+    "price": -1,
+    "maxnum": 99999999999
+  },
+  "16": {
+    "id": 3005,
+    "shopname": "铁匠",
+    "name": "装备",
+    "oncenum": 200,
+    "currencytype": 1,
+    "price": -1
+  },
+  "17": {
+    "id": 3005,
+    "shopname": "铁匠",
+    "name": "装备",
+    "oncenum": 200,
+    "currencytype": 1,
+    "price": -1
+  },
+  "18": {
+    "id": 3005,
+    "shopname": "铁匠",
+    "name": "装备",
+    "oncenum": 200,
+    "currencytype": 1,
+    "price": -1
+  },
+  "19": {
+    "id": 3006,
+    "shopname": "金币商店",
+    "name": "弱效太阳水",
+    "items": 100030,
+    "oncenum": 200,
+    "currencytype": 1,
+    "price": -1000,
+    "offprice": 0.8,
+    "maxnum": 9999999920
+  },
+  "20": {
+    "id": 3006,
+    "shopname": "金币商店",
+    "name": "太阳水",
+    "items": 100031,
+    "oncenum": 200,
+    "currencytype": 1,
+    "price": -1500,
+    "maxnum": 9999999920
+  },
+  "21": {
+    "id": 3006,
+    "shopname": "金币商店",
+    "name": "强效太阳水",
+    "items": 100032,
+    "oncenum": 200,
+    "currencytype": 1,
+    "price": -2000,
+    "maxnum": 9999999920
+  },
+  "22": {
+    "id": 3006,
+    "shopname": "金币商店",
+    "name": "技能丹",
+    "items": 103033,
+    "oncenum": 200,
+    "currencytype": 1,
+    "price": -2000,
+    "maxnum": 99999999300
+  },
+  "23": {
+    "id": 3006,
+    "shopname": "金币商店",
+    "name": "洗练石",
+    "items": 103034,
+    "oncenum": 200,
+    "currencytype": 1,
+    "price": -8000,
+    "offprice": 0.5,
+    "maxnum": 99999999100
+  },
+  "24": {
+    "id": 3006,
+    "shopname": "金币商店",
+    "name": "书页",
+    "items": 104034,
+    "oncenum": 200,
+    "currencytype": 1,
+    "price": -4000,
+    "offprice": 0.65,
+    "maxnum": 99999999200
+  },
+  "25": {
+    "id": 3006,
+    "shopname": "金币商店",
+    "name": "3级残卷",
+    "items": 104103,
+    "oncenum": 200,
+    "currencytype": 1,
+    "price": -10000,
+    "maxnum": 999999992
+  },
+  "26": {
+    "id": 3006,
+    "shopname": "金币商店",
+    "name": "4级残卷",
+    "items": 104104,
+    "oncenum": 200,
+    "currencytype": 1,
+    "price": -20000,
+    "maxnum": 999999992
+  },
+  "27": {
+    "id": 3006,
+    "shopname": "金币商店",
+    "name": "5级残卷",
+    "items": 104105,
+    "oncenum": 200,
+    "currencytype": 1,
+    "price": -40000,
+    "maxnum": 999999992
+  },
+  "28": {
+    "id": 3006,
+    "shopname": "金币商店",
+    "name": "6级残卷",
+    "items": 104106,
+    "oncenum": 200,
+    "currencytype": 1,
+    "price": -80000,
+    "maxnum": 999999992
+  },
+  "29": {
+    "id": 3007,
+    "shopname": "元宝商店",
+    "name": "弱效太阳水",
+    "items": 100030,
+    "oncenum": 200,
+    "currencytype": 2,
+    "price": -10,
+    "offprice": 0.8,
+    "maxnum": 9999999920
+  },
+  "30": {
+    "id": 3007,
+    "shopname": "元宝商店",
+    "name": "太阳水",
+    "items": 100031,
+    "oncenum": 200,
+    "currencytype": 2,
+    "price": -2,
+    "maxnum": 9999999920
+  },
+  "31": {
+    "id": 3007,
+    "shopname": "元宝商店",
+    "name": "强效太阳水",
+    "items": 100032,
+    "oncenum": 200,
+    "currencytype": 2,
+    "price": -4,
+    "maxnum": 9999999920
+  },
+  "32": {
+    "id": 3007,
+    "shopname": "元宝商店",
+    "name": "技能丹",
+    "items": 103033,
+    "oncenum": 200,
+    "currencytype": 2,
+    "price": -1,
+    "maxnum": 999999999999
+  },
+  "33": {
+    "id": 3007,
+    "shopname": "元宝商店",
+    "name": "洗练石",
+    "items": 103034,
+    "oncenum": 200,
+    "currencytype": 2,
+    "price": -4,
+    "offprice": 0.5,
+    "maxnum": 99999999300
+  },
+  "34": {
+    "id": 3007,
+    "shopname": "元宝商店",
+    "name": "书页",
+    "items": 104034,
+    "oncenum": 200,
+    "currencytype": 2,
+    "price": -2,
+    "maxnum": 99999999200
+  },
+  "35": {
+    "id": 3007,
+    "shopname": "元宝商店",
+    "name": "3级残卷",
+    "items": 104103,
+    "oncenum": 200,
+    "currencytype": 2,
+    "price": -5,
+    "maxnum": 999999994
+  },
+  "36": {
+    "id": 3007,
+    "shopname": "元宝商店",
+    "name": "4级残卷",
+    "items": 104104,
+    "oncenum": 200,
+    "currencytype": 2,
+    "price": -10,
+    "maxnum": 999999994
+  },
+  "37": {
+    "id": 3007,
+    "shopname": "元宝商店",
+    "name": "5级残卷",
+    "items": 104105,
+    "oncenum": 200,
+    "currencytype": 2,
+    "price": -20,
+    "maxnum": 999999994
+  },
+  "38": {
+    "id": 3007,
+    "shopname": "元宝商店",
+    "name": "6级残卷",
+    "items": 104106,
+    "oncenum": 200,
+    "currencytype": 2,
+    "price": -40,
+    "maxnum": 999999994
+  }
+}

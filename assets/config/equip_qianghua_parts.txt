@@ -1,0 +1,62 @@
+{
+  "1": {
+    "name": "武器",
+    "id": 5,
+    "minatk": 1,
+    "maxatk": 2
+  },
+  "2": {
+    "name": "衣服",
+    "id": 10,
+    "minac": 1,
+    "maxac": 2
+  },
+  "3": {
+    "name": "手镯",
+    "id": 24,
+    "minac": 0,
+    "maxac": 1
+  },
+  "4": {
+    "name": "手镯",
+    "id": 25,
+    "minac": 0,
+    "maxac": 1
+  },
+  "5": {
+    "name": "戒指",
+    "id": 22,
+    "minatk": 0,
+    "maxatk": 1
+  },
+  "6": {
+    "name": "戒指",
+    "id": 23,
+    "minatk": 0,
+    "maxatk": 1
+  },
+  "7": {
+    "name": "头盔",
+    "id": 15,
+    "minac": 0,
+    "maxac": 1
+  },
+  "8": {
+    "name": "项链",
+    "id": 20,
+    "minatk": 0,
+    "maxatk": 1
+  },
+  "9": {
+    "name": "鞋子",
+    "id": 62,
+    "minac": 0,
+    "maxac": 1
+  },
+  "10": {
+    "name": "腰带",
+    "id": 64,
+    "minatk": 0,
+    "maxatk": 1
+  }
+}

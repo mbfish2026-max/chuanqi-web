@@ -1,0 +1,2722 @@
+{
+  "1": {
+    "id": 100101,
+    "name": "基本剑术加成",
+    "isshow": false,
+    "bufftype": 1,
+    "offline": false,
+    "isoverlay": false,
+    "zs": 10
+  },
+  "2": {
+    "id": 100102,
+    "name": "基本剑术加成",
+    "isshow": false,
+    "bufftype": 1,
+    "offline": false,
+    "isoverlay": false,
+    "zs": 20
+  },
+  "3": {
+    "id": 100103,
+    "name": "基本剑术加成",
+    "isshow": false,
+    "bufftype": 1,
+    "offline": false,
+    "isoverlay": false,
+    "zs": 30
+  },
+  "4": {
+    "id": 100104,
+    "name": "基本剑术加成",
+    "isshow": false,
+    "bufftype": 1,
+    "offline": false,
+    "isoverlay": false,
+    "zs": 40
+  },
+  "5": {
+    "id": 100105,
+    "name": "基本剑术加成",
+    "isshow": false,
+    "bufftype": 1,
+    "offline": false,
+    "isoverlay": false,
+    "addhp": 5,
+    "zs": 50
+  },
+  "6": {
+    "id": 100106,
+    "name": "基本剑术加成",
+    "isshow": false,
+    "bufftype": 1,
+    "offline": false,
+    "isoverlay": false,
+    "addhp": 6,
+    "zs": 60
+  },
+  "7": {
+    "id": 100107,
+    "name": "基本剑术加成",
+    "isshow": false,
+    "bufftype": 1,
+    "offline": false,
+    "isoverlay": false,
+    "addhp": 7,
+    "zs": 70
+  },
+  "8": {
+    "id": 100108,
+    "name": "基本剑术加成",
+    "isshow": false,
+    "bufftype": 1,
+    "offline": false,
+    "isoverlay": false,
+    "addhp": 8,
+    "zs": 80
+  },
+  "9": {
+    "id": 100109,
+    "name": "基本剑术加成",
+    "isshow": false,
+    "bufftype": 1,
+    "offline": false,
+    "isoverlay": false,
+    "addhp": 9,
+    "zs": 90
+  },
+  "10": {
+    "id": 100110,
+    "name": "基本剑术加成",
+    "isshow": false,
+    "bufftype": 1,
+    "offline": false,
+    "isoverlay": false,
+    "addhp": 10,
+    "zs": 100
+  },
+  "11": {
+    "id": 100201,
+    "name": "精神战力法",
+    "isshow": false,
+    "bufftype": 1,
+    "offline": false,
+    "isoverlay": false,
+    "zs": 10,
+    "ds": 10
+  },
+  "12": {
+    "id": 100202,
+    "name": "精神战力法",
+    "isshow": false,
+    "bufftype": 1,
+    "offline": false,
+    "isoverlay": false,
+    "zs": 20,
+    "ds": 20
+  },
+  "13": {
+    "id": 100203,
+    "name": "精神战力法",
+    "isshow": false,
+    "bufftype": 1,
+    "offline": false,
+    "isoverlay": false,
+    "zs": 30,
+    "ds": 30
+  },
+  "14": {
+    "id": 100204,
+    "name": "精神战力法",
+    "isshow": false,
+    "bufftype": 1,
+    "offline": false,
+    "isoverlay": false,
+    "zs": 40,
+    "ds": 40
+  },
+  "15": {
+    "id": 100205,
+    "name": "精神战力法",
+    "isshow": false,
+    "bufftype": 1,
+    "offline": false,
+    "isoverlay": false,
+    "addmp": 5,
+    "zs": 50,
+    "ds": 50
+  },
+  "16": {
+    "id": 100206,
+    "name": "精神战力法",
+    "isshow": false,
+    "bufftype": 1,
+    "offline": false,
+    "isoverlay": false,
+    "addmp": 6,
+    "zs": 60,
+    "ds": 60
+  },
+  "17": {
+    "id": 100207,
+    "name": "精神战力法",
+    "isshow": false,
+    "bufftype": 1,
+    "offline": false,
+    "isoverlay": false,
+    "addmp": 7,
+    "zs": 70,
+    "ds": 70
+  },
+  "18": {
+    "id": 100208,
+    "name": "精神战力法",
+    "isshow": false,
+    "bufftype": 1,
+    "offline": false,
+    "isoverlay": false,
+    "addmp": 8,
+    "zs": 80,
+    "ds": 80
+  },
+  "19": {
+    "id": 100209,
+    "name": "精神战力法",
+    "isshow": false,
+    "bufftype": 1,
+    "offline": false,
+    "isoverlay": false,
+    "addmp": 9,
+    "zs": 90,
+    "ds": 90
+  },
+  "20": {
+    "id": 100210,
+    "name": "精神战力法",
+    "isshow": false,
+    "bufftype": 1,
+    "offline": false,
+    "isoverlay": false,
+    "addmp": 10,
+    "zs": 100,
+    "ds": 100
+  },
+  "21": {
+    "id": 100301,
+    "name": "半月流血",
+    "icon": "buff13",
+    "isshow": true,
+    "bufftype": 2,
+    "duration": 5,
+    "interval": 1,
+    "offline": false,
+    "isoverlay": false,
+    "hp": -25,
+    "special": [
+      1,
+      35
+    ]
+  },
+  "22": {
+    "id": 100302,
+    "name": "半月-流血",
+    "icon": "buff13",
+    "isshow": true,
+    "bufftype": 2,
+    "duration": 5,
+    "interval": 1,
+    "offline": false,
+    "isoverlay": false,
+    "hp": -45,
+    "special": [
+      1,
+      37
+    ]
+  },
+  "23": {
+    "id": 100303,
+    "name": "半月-流血",
+    "icon": "buff13",
+    "isshow": true,
+    "bufftype": 2,
+    "duration": 5,
+    "interval": 1,
+    "offline": false,
+    "isoverlay": false,
+    "hp": -65,
+    "special": [
+      1,
+      39
+    ]
+  },
+  "24": {
+    "id": 100304,
+    "name": "半月-流血",
+    "icon": "buff13",
+    "isshow": true,
+    "bufftype": 2,
+    "duration": 5,
+    "interval": 1,
+    "offline": false,
+    "isoverlay": false,
+    "hp": -85,
+    "special": [
+      1,
+      41
+    ]
+  },
+  "25": {
+    "id": 100305,
+    "name": "半月-流血",
+    "icon": "buff13",
+    "isshow": true,
+    "bufftype": 2,
+    "duration": 5,
+    "interval": 1,
+    "offline": false,
+    "isoverlay": false,
+    "hp": -105,
+    "special": [
+      1,
+      45
+    ]
+  },
+  "26": {
+    "id": 100306,
+    "name": "半月-流血",
+    "icon": "buff13",
+    "isshow": true,
+    "bufftype": 2,
+    "duration": 5,
+    "interval": 1,
+    "offline": false,
+    "isoverlay": false,
+    "hp": -125,
+    "special": [
+      1,
+      48
+    ]
+  },
+  "27": {
+    "id": 100307,
+    "name": "半月-流血",
+    "icon": "buff13",
+    "isshow": true,
+    "bufftype": 2,
+    "duration": 5,
+    "interval": 1,
+    "offline": false,
+    "isoverlay": false,
+    "hp": -145,
+    "special": [
+      1,
+      51
+    ]
+  },
+  "28": {
+    "id": 100308,
+    "name": "半月-流血",
+    "icon": "buff13",
+    "isshow": true,
+    "bufftype": 2,
+    "duration": 5,
+    "interval": 1,
+    "offline": false,
+    "isoverlay": false,
+    "hp": -165,
+    "special": [
+      1,
+      54
+    ]
+  },
+  "29": {
+    "id": 100309,
+    "name": "半月-流血",
+    "icon": "buff13",
+    "isshow": true,
+    "bufftype": 2,
+    "duration": 5,
+    "interval": 1,
+    "offline": false,
+    "isoverlay": false,
+    "hp": -185,
+    "special": [
+      1,
+      57
+    ]
+  },
+  "30": {
+    "id": 100310,
+    "name": "半月-流血",
+    "icon": "buff13",
+    "isshow": true,
+    "bufftype": 2,
+    "duration": 5,
+    "interval": 1,
+    "offline": false,
+    "isoverlay": false,
+    "hp": -205,
+    "special": [
+      1,
+      65
+    ]
+  },
+  "31": {
+    "id": 100311,
+    "name": "半月-流血",
+    "icon": "buff13",
+    "isshow": true,
+    "bufftype": 2,
+    "duration": 5,
+    "interval": 1,
+    "offline": false,
+    "isoverlay": false,
+    "hp": -225,
+    "special": [
+      1,
+      70
+    ]
+  },
+  "32": {
+    "id": 100312,
+    "name": "半月-流血",
+    "icon": "buff13",
+    "isshow": true,
+    "bufftype": 2,
+    "duration": 5,
+    "interval": 1,
+    "offline": false,
+    "isoverlay": false,
+    "hp": -245,
+    "special": [
+      1,
+      73
+    ]
+  },
+  "33": {
+    "id": 100313,
+    "name": "半月-流血",
+    "icon": "buff13",
+    "isshow": true,
+    "bufftype": 2,
+    "duration": 5,
+    "interval": 1,
+    "offline": false,
+    "isoverlay": false,
+    "hp": -265,
+    "special": [
+      1,
+      76
+    ]
+  },
+  "34": {
+    "id": 100314,
+    "name": "半月-流血",
+    "icon": "buff13",
+    "isshow": true,
+    "bufftype": 2,
+    "duration": 5,
+    "interval": 1,
+    "offline": false,
+    "isoverlay": false,
+    "hp": -285,
+    "special": [
+      1,
+      79
+    ]
+  },
+  "35": {
+    "id": 100315,
+    "name": "半月-流血",
+    "icon": "buff13",
+    "isshow": true,
+    "bufftype": 2,
+    "duration": 5,
+    "interval": 1,
+    "offline": false,
+    "isoverlay": false,
+    "hp": -305,
+    "special": [
+      1,
+      85
+    ]
+  },
+  "36": {
+    "id": 100316,
+    "name": "半月-流血",
+    "icon": "buff13",
+    "isshow": true,
+    "bufftype": 2,
+    "duration": 5,
+    "interval": 1,
+    "offline": false,
+    "isoverlay": false,
+    "hp": -325,
+    "special": [
+      1,
+      88
+    ]
+  },
+  "37": {
+    "id": 100317,
+    "name": "半月-流血",
+    "icon": "buff13",
+    "isshow": true,
+    "bufftype": 2,
+    "duration": 5,
+    "interval": 1,
+    "offline": false,
+    "isoverlay": false,
+    "hp": -345,
+    "special": [
+      1,
+      91
+    ]
+  },
+  "38": {
+    "id": 100318,
+    "name": "半月-流血",
+    "icon": "buff13",
+    "isshow": true,
+    "bufftype": 2,
+    "duration": 5,
+    "interval": 1,
+    "offline": false,
+    "isoverlay": false,
+    "hp": -365,
+    "special": [
+      1,
+      94
+    ]
+  },
+  "39": {
+    "id": 100319,
+    "name": "半月-流血",
+    "icon": "buff13",
+    "isshow": true,
+    "bufftype": 2,
+    "duration": 5,
+    "interval": 1,
+    "offline": false,
+    "isoverlay": false,
+    "hp": -385,
+    "special": [
+      1,
+      97
+    ]
+  },
+  "40": {
+    "id": 100320,
+    "name": "半月-流血",
+    "icon": "buff13",
+    "isshow": true,
+    "bufftype": 2,
+    "duration": 5,
+    "interval": 1,
+    "offline": false,
+    "isoverlay": false,
+    "hp": -405,
+    "special": [
+      1,
+      100
+    ]
+  },
+  "41": {
+    "id": 100401,
+    "name": "真气护体",
+    "icon": "buff12",
+    "isshow": true,
+    "bufftype": 1,
+    "duration": 20,
+    "offline": false,
+    "isoverlay": false,
+    "special": [
+      4,
+      5
+    ],
+    "ac": 5
+  },
+  "42": {
+    "id": 100402,
+    "name": "真气护体",
+    "icon": "buff12",
+    "isshow": true,
+    "bufftype": 1,
+    "duration": 20,
+    "offline": false,
+    "isoverlay": false,
+    "special": [
+      4,
+      6
+    ],
+    "ac": 10
+  },
+  "43": {
+    "id": 100403,
+    "name": "真气护体",
+    "icon": "buff12",
+    "isshow": true,
+    "bufftype": 1,
+    "duration": 20,
+    "offline": false,
+    "isoverlay": false,
+    "special": [
+      4,
+      7
+    ],
+    "ac": 15
+  },
+  "44": {
+    "id": 100404,
+    "name": "真气护体",
+    "icon": "buff12",
+    "isshow": true,
+    "bufftype": 1,
+    "duration": 20,
+    "offline": false,
+    "isoverlay": false,
+    "special": [
+      4,
+      8
+    ],
+    "ac": 20
+  },
+  "45": {
+    "id": 100405,
+    "name": "真气护体",
+    "icon": "buff12",
+    "isshow": true,
+    "bufftype": 1,
+    "duration": 20,
+    "offline": false,
+    "isoverlay": false,
+    "special": [
+      4,
+      9
+    ],
+    "ac": 25
+  },
+  "46": {
+    "id": 100406,
+    "name": "真气护体",
+    "icon": "buff12",
+    "isshow": true,
+    "bufftype": 1,
+    "duration": 20,
+    "offline": false,
+    "isoverlay": false,
+    "special": [
+      4,
+      10
+    ],
+    "ac": 30
+  },
+  "47": {
+    "id": 100407,
+    "name": "真气护体",
+    "icon": "buff12",
+    "isshow": true,
+    "bufftype": 1,
+    "duration": 20,
+    "offline": false,
+    "isoverlay": false,
+    "special": [
+      4,
+      11
+    ],
+    "ac": 35
+  },
+  "48": {
+    "id": 100408,
+    "name": "真气护体",
+    "icon": "buff12",
+    "isshow": true,
+    "bufftype": 1,
+    "duration": 20,
+    "offline": false,
+    "isoverlay": false,
+    "special": [
+      4,
+      12
+    ],
+    "ac": 40
+  },
+  "49": {
+    "id": 100409,
+    "name": "真气护体",
+    "icon": "buff12",
+    "isshow": true,
+    "bufftype": 1,
+    "duration": 20,
+    "offline": false,
+    "isoverlay": false,
+    "special": [
+      4,
+      13
+    ],
+    "ac": 45
+  },
+  "50": {
+    "id": 100410,
+    "name": "真气护体",
+    "icon": "buff12",
+    "isshow": true,
+    "bufftype": 1,
+    "duration": 20,
+    "offline": false,
+    "isoverlay": false,
+    "special": [
+      4,
+      15
+    ],
+    "ac": 50
+  },
+  "51": {
+    "id": 100501,
+    "name": "真气护体-回血",
+    "icon": "buff06",
+    "isshow": false,
+    "bufftype": 1,
+    "duration": 1,
+    "interval": 1,
+    "offline": false,
+    "isoverlay": false,
+    "hppercent": 5
+  },
+  "52": {
+    "id": 100502,
+    "name": "真气护体-回血",
+    "icon": "buff06",
+    "isshow": false,
+    "bufftype": 1,
+    "duration": 1,
+    "interval": 1,
+    "offline": false,
+    "isoverlay": false,
+    "hppercent": 10
+  },
+  "53": {
+    "id": 100503,
+    "name": "真气护体-回血",
+    "icon": "buff06",
+    "isshow": false,
+    "bufftype": 1,
+    "duration": 1,
+    "interval": 1,
+    "offline": false,
+    "isoverlay": false,
+    "hppercent": 15
+  },
+  "54": {
+    "id": 100504,
+    "name": "真气护体-回血",
+    "icon": "buff06",
+    "isshow": false,
+    "bufftype": 1,
+    "duration": 1,
+    "interval": 1,
+    "offline": false,
+    "isoverlay": false,
+    "hppercent": 20
+  },
+  "55": {
+    "id": 100601,
+    "name": "烈火-灼烧",
+    "icon": "buff05",
+    "isshow": true,
+    "bufftype": 2,
+    "duration": 3,
+    "interval": 1,
+    "offline": false,
+    "isoverlay": false,
+    "hp": -40,
+    "special": [
+      1,
+      100
+    ]
+  },
+  "56": {
+    "id": 100602,
+    "name": "烈火-灼烧",
+    "icon": "buff05",
+    "isshow": true,
+    "bufftype": 2,
+    "duration": 3,
+    "interval": 1,
+    "offline": false,
+    "isoverlay": false,
+    "hp": -64,
+    "special": [
+      1,
+      110
+    ]
+  },
+  "57": {
+    "id": 100603,
+    "name": "烈火-灼烧",
+    "icon": "buff05",
+    "isshow": true,
+    "bufftype": 2,
+    "duration": 3,
+    "interval": 1,
+    "offline": false,
+    "isoverlay": false,
+    "hp": -88,
+    "special": [
+      1,
+      120
+    ]
+  },
+  "58": {
+    "id": 100604,
+    "name": "烈火-灼烧",
+    "icon": "buff05",
+    "isshow": true,
+    "bufftype": 2,
+    "duration": 5,
+    "interval": 1,
+    "offline": false,
+    "isoverlay": false,
+    "hp": -112,
+    "special": [
+      1,
+      130
+    ]
+  },
+  "59": {
+    "id": 100605,
+    "name": "烈火-灼烧",
+    "icon": "buff05",
+    "isshow": true,
+    "bufftype": 2,
+    "duration": 5,
+    "interval": 1,
+    "offline": false,
+    "isoverlay": false,
+    "hp": -136,
+    "special": [
+      1,
+      140
+    ]
+  },
+  "60": {
+    "id": 100901,
+    "name": "野蛮冲撞昏迷",
+    "icon": "buff04",
+    "isshow": true,
+    "bufftype": 2,
+    "probability": 30,
+    "duration": 3,
+    "isoverlay": false,
+    "effect": "ef_1009"
+  },
+  "61": {
+    "id": 100902,
+    "name": "野蛮冲撞昏迷",
+    "icon": "buff04",
+    "isshow": true,
+    "bufftype": 2,
+    "probability": 30,
+    "duration": 4,
+    "isoverlay": false
+  },
+  "62": {
+    "id": 100903,
+    "name": "野蛮冲撞昏迷",
+    "icon": "buff04",
+    "isshow": true,
+    "bufftype": 2,
+    "probability": 30,
+    "duration": 5,
+    "isoverlay": false
+  },
+  "63": {
+    "id": 200101,
+    "name": "火球术",
+    "isshow": false,
+    "bufftype": 1,
+    "offline": false,
+    "isoverlay": false,
+    "fs": 10
+  },
+  "64": {
+    "id": 200102,
+    "name": "火球术",
+    "isshow": false,
+    "bufftype": 1,
+    "offline": false,
+    "isoverlay": false,
+    "fs": 20
+  },
+  "65": {
+    "id": 200103,
+    "name": "火球术",
+    "isshow": false,
+    "bufftype": 1,
+    "offline": false,
+    "isoverlay": false,
+    "fs": 30
+  },
+  "66": {
+    "id": 200104,
+    "name": "火球术",
+    "isshow": false,
+    "bufftype": 1,
+    "offline": false,
+    "isoverlay": false,
+    "fs": 40
+  },
+  "67": {
+    "id": 200105,
+    "name": "火球术",
+    "isshow": false,
+    "bufftype": 1,
+    "offline": false,
+    "isoverlay": false,
+    "addmp": 5,
+    "fs": 50
+  },
+  "68": {
+    "id": 200106,
+    "name": "火球术",
+    "isshow": false,
+    "bufftype": 1,
+    "offline": false,
+    "isoverlay": false,
+    "addmp": 6,
+    "fs": 60
+  },
+  "69": {
+    "id": 200107,
+    "name": "火球术",
+    "isshow": false,
+    "bufftype": 1,
+    "offline": false,
+    "isoverlay": false,
+    "addmp": 7,
+    "fs": 70
+  },
+  "70": {
+    "id": 200108,
+    "name": "火球术",
+    "isshow": false,
+    "bufftype": 1,
+    "offline": false,
+    "isoverlay": false,
+    "addmp": 8,
+    "fs": 80
+  },
+  "71": {
+    "id": 200109,
+    "name": "火球术",
+    "isshow": false,
+    "bufftype": 1,
+    "offline": false,
+    "isoverlay": false,
+    "addmp": 9,
+    "fs": 90
+  },
+  "72": {
+    "id": 200110,
+    "name": "火球术",
+    "isshow": false,
+    "bufftype": 1,
+    "offline": false,
+    "isoverlay": false,
+    "addmp": 10,
+    "fs": 100
+  },
+  "73": {
+    "id": 200201,
+    "name": "雷电术",
+    "isshow": true,
+    "bufftype": 2,
+    "isoverlay": false,
+    "ac2": -10
+  },
+  "74": {
+    "id": 200301,
+    "name": "火墙1",
+    "icon": "buff05",
+    "isshow": true,
+    "bufftype": 2,
+    "duration": 5,
+    "interval": 1,
+    "isoverlay": false,
+    "hp": -30,
+    "special": [
+      2,
+      40
+    ],
+    "effect": "ef_2003"
+  },
+  "75": {
+    "id": 200302,
+    "name": "火墙2",
+    "icon": "buff05",
+    "isshow": true,
+    "bufftype": 2,
+    "duration": 5,
+    "interval": 1,
+    "isoverlay": false,
+    "hp": -48,
+    "special": [
+      2,
+      42
+    ],
+    "effect": "ef_2003"
+  },
+  "76": {
+    "id": 200303,
+    "name": "火墙3",
+    "icon": "buff05",
+    "isshow": true,
+    "bufftype": 2,
+    "duration": 5,
+    "interval": 1,
+    "isoverlay": false,
+    "hp": -63,
+    "special": [
+      2,
+      44
+    ],
+    "effect": "ef_2003"
+  },
+  "77": {
+    "id": 200304,
+    "name": "火墙4",
+    "icon": "buff05",
+    "isshow": true,
+    "bufftype": 2,
+    "duration": 5,
+    "interval": 1,
+    "isoverlay": false,
+    "hp": -85,
+    "special": [
+      2,
+      46
+    ],
+    "effect": "ef_2003"
+  },
+  "78": {
+    "id": 200305,
+    "name": "火墙5",
+    "icon": "buff05",
+    "isshow": true,
+    "bufftype": 2,
+    "duration": 5,
+    "interval": 1,
+    "isoverlay": false,
+    "hp": -110,
+    "special": [
+      2,
+      50
+    ],
+    "effect": "ef_2003"
+  },
+  "79": {
+    "id": 200306,
+    "name": "火墙6",
+    "icon": "buff05",
+    "isshow": true,
+    "bufftype": 2,
+    "duration": 5,
+    "interval": 1,
+    "isoverlay": false,
+    "hp": -135,
+    "special": [
+      2,
+      52
+    ],
+    "effect": "ef_2003"
+  },
+  "80": {
+    "id": 200307,
+    "name": "火墙7",
+    "icon": "buff05",
+    "isshow": true,
+    "bufftype": 2,
+    "duration": 5,
+    "interval": 1,
+    "isoverlay": false,
+    "hp": -160,
+    "special": [
+      2,
+      54
+    ],
+    "effect": "ef_2003"
+  },
+  "81": {
+    "id": 200308,
+    "name": "火墙8",
+    "icon": "buff05",
+    "isshow": true,
+    "bufftype": 2,
+    "duration": 5,
+    "interval": 1,
+    "isoverlay": false,
+    "hp": -185,
+    "special": [
+      2,
+      56
+    ],
+    "effect": "ef_2003"
+  },
+  "82": {
+    "id": 200309,
+    "name": "火墙9",
+    "icon": "buff05",
+    "isshow": true,
+    "bufftype": 2,
+    "duration": 5,
+    "interval": 1,
+    "isoverlay": false,
+    "hp": -210,
+    "special": [
+      2,
+      58
+    ],
+    "effect": "ef_2003"
+  },
+  "83": {
+    "id": 200310,
+    "name": "火墙10",
+    "icon": "buff05",
+    "isshow": true,
+    "bufftype": 2,
+    "duration": 5,
+    "interval": 1,
+    "isoverlay": false,
+    "hp": -220,
+    "special": [
+      2,
+      60
+    ],
+    "effect": "ef_2003"
+  },
+  "84": {
+    "id": 200311,
+    "name": "火墙11",
+    "icon": "buff05",
+    "isshow": true,
+    "bufftype": 2,
+    "duration": 5,
+    "interval": 1,
+    "isoverlay": false,
+    "hp": -235,
+    "special": [
+      2,
+      62
+    ],
+    "effect": "ef_2003"
+  },
+  "85": {
+    "id": 200312,
+    "name": "火墙12",
+    "icon": "buff05",
+    "isshow": true,
+    "bufftype": 2,
+    "duration": 5,
+    "interval": 1,
+    "isoverlay": false,
+    "hp": -250,
+    "special": [
+      2,
+      64
+    ],
+    "effect": "ef_2003"
+  },
+  "86": {
+    "id": 200313,
+    "name": "火墙13",
+    "icon": "buff05",
+    "isshow": true,
+    "bufftype": 2,
+    "duration": 5,
+    "interval": 1,
+    "isoverlay": false,
+    "hp": -265,
+    "special": [
+      2,
+      66
+    ],
+    "effect": "ef_2003"
+  },
+  "87": {
+    "id": 200314,
+    "name": "火墙14",
+    "icon": "buff05",
+    "isshow": true,
+    "bufftype": 2,
+    "duration": 5,
+    "interval": 1,
+    "isoverlay": false,
+    "hp": -280,
+    "special": [
+      2,
+      68
+    ],
+    "effect": "ef_2003"
+  },
+  "88": {
+    "id": 200315,
+    "name": "火墙15",
+    "icon": "buff05",
+    "isshow": true,
+    "bufftype": 2,
+    "duration": 5,
+    "interval": 1,
+    "isoverlay": false,
+    "hp": -300,
+    "special": [
+      2,
+      70
+    ],
+    "effect": "ef_2003"
+  },
+  "89": {
+    "id": 200316,
+    "name": "火墙16",
+    "icon": "buff05",
+    "isshow": true,
+    "bufftype": 2,
+    "duration": 5,
+    "interval": 1,
+    "isoverlay": false,
+    "hp": -330,
+    "special": [
+      2,
+      72
+    ],
+    "effect": "ef_2003"
+  },
+  "90": {
+    "id": 200317,
+    "name": "火墙17",
+    "icon": "buff05",
+    "isshow": true,
+    "bufftype": 2,
+    "duration": 5,
+    "interval": 1,
+    "isoverlay": false,
+    "hp": -360,
+    "special": [
+      2,
+      74
+    ],
+    "effect": "ef_2003"
+  },
+  "91": {
+    "id": 200318,
+    "name": "火墙18",
+    "icon": "buff05",
+    "isshow": true,
+    "bufftype": 2,
+    "duration": 5,
+    "interval": 1,
+    "isoverlay": false,
+    "hp": -390,
+    "special": [
+      2,
+      76
+    ],
+    "effect": "ef_2003"
+  },
+  "92": {
+    "id": 200319,
+    "name": "火墙19",
+    "icon": "buff05",
+    "isshow": true,
+    "bufftype": 2,
+    "duration": 5,
+    "interval": 1,
+    "isoverlay": false,
+    "hp": -420,
+    "special": [
+      2,
+      78
+    ],
+    "effect": "ef_2003"
+  },
+  "93": {
+    "id": 200320,
+    "name": "火墙20",
+    "icon": "buff05",
+    "isshow": true,
+    "bufftype": 2,
+    "duration": 5,
+    "interval": 1,
+    "isoverlay": false,
+    "hp": -450,
+    "special": [
+      2,
+      80
+    ],
+    "effect": "ef_2003"
+  },
+  "94": {
+    "id": 200401,
+    "name": "诱惑之光",
+    "isshow": true,
+    "bufftype": 1,
+    "isoverlay": false
+  },
+  "95": {
+    "id": 200501,
+    "name": "魔法盾",
+    "icon": "buff11",
+    "isshow": true,
+    "bufftype": 1,
+    "isoverlay": false,
+    "special": [
+      2,
+      50
+    ],
+    "shiled": 200,
+    "effect": "ef_2005"
+  },
+  "96": {
+    "id": 200502,
+    "name": "魔法盾",
+    "icon": "buff11",
+    "isshow": true,
+    "bufftype": 1,
+    "isoverlay": false,
+    "special": [
+      2,
+      50
+    ],
+    "shiled": 300,
+    "effect": "ef_2005"
+  },
+  "97": {
+    "id": 200503,
+    "name": "魔法盾",
+    "icon": "buff11",
+    "isshow": true,
+    "bufftype": 1,
+    "isoverlay": false,
+    "special": [
+      2,
+      50
+    ],
+    "shiled": 400,
+    "effect": "ef_2005"
+  },
+  "98": {
+    "id": 200504,
+    "name": "魔法盾",
+    "icon": "buff11",
+    "isshow": true,
+    "bufftype": 1,
+    "isoverlay": false,
+    "special": [
+      2,
+      50
+    ],
+    "shiled": 500,
+    "effect": "ef_2005"
+  },
+  "99": {
+    "id": 200505,
+    "name": "魔法盾",
+    "icon": "buff11",
+    "isshow": true,
+    "bufftype": 1,
+    "isoverlay": false,
+    "special": [
+      2,
+      50
+    ],
+    "shiled": 600,
+    "effect": "ef_2005"
+  },
+  "100": {
+    "id": 200506,
+    "name": "魔法盾",
+    "icon": "buff11",
+    "isshow": true,
+    "bufftype": 1,
+    "isoverlay": false,
+    "special": [
+      2,
+      50
+    ],
+    "shiled": 700,
+    "effect": "ef_2005"
+  },
+  "101": {
+    "id": 200507,
+    "name": "魔法盾",
+    "icon": "buff11",
+    "isshow": true,
+    "bufftype": 1,
+    "isoverlay": false,
+    "special": [
+      2,
+      50
+    ],
+    "shiled": 800,
+    "effect": "ef_2005"
+  },
+  "102": {
+    "id": 200508,
+    "name": "魔法盾",
+    "icon": "buff11",
+    "isshow": true,
+    "bufftype": 1,
+    "isoverlay": false,
+    "special": [
+      2,
+      50
+    ],
+    "shiled": 900,
+    "effect": "ef_2005"
+  },
+  "103": {
+    "id": 200509,
+    "name": "魔法盾",
+    "icon": "buff11",
+    "isshow": true,
+    "bufftype": 1,
+    "isoverlay": false,
+    "special": [
+      2,
+      50
+    ],
+    "shiled": 1000,
+    "effect": "ef_2005"
+  },
+  "104": {
+    "id": 200510,
+    "name": "魔法盾",
+    "icon": "buff11",
+    "isshow": true,
+    "bufftype": 1,
+    "isoverlay": false,
+    "special": [
+      2,
+      50
+    ],
+    "shiled": 1100,
+    "effect": "ef_2005"
+  },
+  "105": {
+    "id": 200511,
+    "name": "魔法盾",
+    "icon": "buff11",
+    "isshow": true,
+    "bufftype": 1,
+    "isoverlay": false,
+    "special": [
+      2,
+      50
+    ],
+    "shiled": 1200,
+    "effect": "ef_2005"
+  },
+  "106": {
+    "id": 200512,
+    "name": "魔法盾",
+    "icon": "buff11",
+    "isshow": true,
+    "bufftype": 1,
+    "isoverlay": false,
+    "special": [
+      2,
+      50
+    ],
+    "shiled": 1300,
+    "effect": "ef_2005"
+  },
+  "107": {
+    "id": 200513,
+    "name": "魔法盾",
+    "icon": "buff11",
+    "isshow": true,
+    "bufftype": 1,
+    "isoverlay": false,
+    "special": [
+      2,
+      50
+    ],
+    "shiled": 1400,
+    "effect": "ef_2005"
+  },
+  "108": {
+    "id": 200514,
+    "name": "魔法盾",
+    "icon": "buff11",
+    "isshow": true,
+    "bufftype": 1,
+    "isoverlay": false,
+    "special": [
+      2,
+      50
+    ],
+    "shiled": 1500,
+    "effect": "ef_2005"
+  },
+  "109": {
+    "id": 200515,
+    "name": "魔法盾",
+    "icon": "buff11",
+    "isshow": true,
+    "bufftype": 1,
+    "isoverlay": false,
+    "special": [
+      2,
+      50
+    ],
+    "shiled": 1600,
+    "effect": "ef_2005"
+  },
+  "110": {
+    "id": 200516,
+    "name": "魔法盾",
+    "icon": "buff11",
+    "isshow": true,
+    "bufftype": 1,
+    "isoverlay": false,
+    "special": [
+      2,
+      50
+    ],
+    "shiled": 1700,
+    "effect": "ef_2005"
+  },
+  "111": {
+    "id": 200517,
+    "name": "魔法盾",
+    "icon": "buff11",
+    "isshow": true,
+    "bufftype": 1,
+    "isoverlay": false,
+    "special": [
+      2,
+      50
+    ],
+    "shiled": 1800,
+    "effect": "ef_2005"
+  },
+  "112": {
+    "id": 200518,
+    "name": "魔法盾",
+    "icon": "buff11",
+    "isshow": true,
+    "bufftype": 1,
+    "isoverlay": false,
+    "special": [
+      2,
+      50
+    ],
+    "shiled": 1900,
+    "effect": "ef_2005"
+  },
+  "113": {
+    "id": 200519,
+    "name": "魔法盾",
+    "icon": "buff11",
+    "isshow": true,
+    "bufftype": 1,
+    "isoverlay": false,
+    "special": [
+      2,
+      50
+    ],
+    "shiled": 2000,
+    "effect": "ef_2005"
+  },
+  "114": {
+    "id": 200520,
+    "name": "魔法盾",
+    "icon": "buff11",
+    "isshow": true,
+    "bufftype": 1,
+    "isoverlay": false,
+    "special": [
+      2,
+      50
+    ],
+    "shiled": 2100,
+    "effect": "ef_2005"
+  },
+  "115": {
+    "id": 200601,
+    "name": "法术精通",
+    "icon": "buff10",
+    "isshow": true,
+    "bufftype": 1,
+    "isoverlay": false
+  },
+  "116": {
+    "id": 200701,
+    "name": "冰咆哮",
+    "isshow": true,
+    "bufftype": 2,
+    "duration": 3,
+    "isoverlay": false,
+    "state": 1,
+    "effect": "ef_2007"
+  },
+  "117": {
+    "id": 300201,
+    "name": "治愈术",
+    "icon": "buff06",
+    "isshow": true,
+    "bufftype": 1,
+    "duration": 12,
+    "interval": 1,
+    "isoverlay": false,
+    "hp": 3,
+    "special": [
+      3,
+      1
+    ]
+  },
+  "118": {
+    "id": 300202,
+    "name": "治愈术",
+    "icon": "buff06",
+    "isshow": true,
+    "bufftype": 1,
+    "duration": 12,
+    "interval": 1,
+    "isoverlay": false,
+    "hp": 3,
+    "special": [
+      3,
+      1.1
+    ]
+  },
+  "119": {
+    "id": 300203,
+    "name": "治愈术3",
+    "icon": "buff06",
+    "isshow": true,
+    "bufftype": 1,
+    "duration": 12,
+    "interval": 1,
+    "isoverlay": false,
+    "hp": 3,
+    "special": [
+      3,
+      1.2
+    ]
+  },
+  "120": {
+    "id": 300204,
+    "name": "治愈术4",
+    "icon": "buff06",
+    "isshow": true,
+    "bufftype": 1,
+    "duration": 12,
+    "interval": 1,
+    "isoverlay": false,
+    "hp": 3,
+    "special": [
+      3,
+      1.3
+    ]
+  },
+  "121": {
+    "id": 300205,
+    "name": "治愈术5",
+    "icon": "buff06",
+    "isshow": true,
+    "bufftype": 1,
+    "duration": 12,
+    "interval": 1,
+    "isoverlay": false,
+    "hp": 5,
+    "special": [
+      3,
+      1.5
+    ]
+  },
+  "122": {
+    "id": 300206,
+    "name": "治愈术6",
+    "icon": "buff06",
+    "isshow": true,
+    "bufftype": 1,
+    "duration": 12,
+    "interval": 1,
+    "isoverlay": false,
+    "hp": 5,
+    "special": [
+      3,
+      1.6
+    ]
+  },
+  "123": {
+    "id": 300207,
+    "name": "治愈术7",
+    "icon": "buff06",
+    "isshow": true,
+    "bufftype": 1,
+    "duration": 12,
+    "interval": 1,
+    "isoverlay": false,
+    "hp": 5,
+    "special": [
+      3,
+      1.7
+    ]
+  },
+  "124": {
+    "id": 300208,
+    "name": "治愈术8",
+    "icon": "buff06",
+    "isshow": true,
+    "bufftype": 1,
+    "duration": 12,
+    "interval": 1,
+    "isoverlay": false,
+    "hp": 5,
+    "special": [
+      3,
+      1.8
+    ]
+  },
+  "125": {
+    "id": 300209,
+    "name": "治愈术9",
+    "icon": "buff06",
+    "isshow": true,
+    "bufftype": 1,
+    "duration": 12,
+    "interval": 1,
+    "isoverlay": false,
+    "hp": 5,
+    "special": [
+      3,
+      1.9
+    ]
+  },
+  "126": {
+    "id": 300210,
+    "name": "治愈术10",
+    "icon": "buff06",
+    "isshow": true,
+    "bufftype": 1,
+    "duration": 12,
+    "interval": 1,
+    "isoverlay": false,
+    "hp": 10,
+    "special": [
+      3,
+      2
+    ]
+  },
+  "127": {
+    "id": 300211,
+    "name": "治愈术11",
+    "icon": "buff06",
+    "isshow": true,
+    "bufftype": 1,
+    "duration": 12,
+    "interval": 1,
+    "isoverlay": false,
+    "hp": 10,
+    "special": [
+      3,
+      2.1
+    ]
+  },
+  "128": {
+    "id": 300212,
+    "name": "治愈术12",
+    "icon": "buff06",
+    "isshow": true,
+    "bufftype": 1,
+    "duration": 12,
+    "interval": 1,
+    "isoverlay": false,
+    "hp": 10,
+    "special": [
+      3,
+      2.2
+    ]
+  },
+  "129": {
+    "id": 300213,
+    "name": "治愈术13",
+    "icon": "buff06",
+    "isshow": true,
+    "bufftype": 1,
+    "duration": 12,
+    "interval": 1,
+    "isoverlay": false,
+    "hp": 10,
+    "special": [
+      3,
+      2.3
+    ]
+  },
+  "130": {
+    "id": 300214,
+    "name": "治愈术14",
+    "icon": "buff06",
+    "isshow": true,
+    "bufftype": 1,
+    "duration": 12,
+    "interval": 1,
+    "isoverlay": false,
+    "hp": 10,
+    "special": [
+      3,
+      2.4
+    ]
+  },
+  "131": {
+    "id": 300215,
+    "name": "治愈术15",
+    "icon": "buff06",
+    "isshow": true,
+    "bufftype": 1,
+    "duration": 12,
+    "interval": 1,
+    "isoverlay": false,
+    "hp": 15,
+    "special": [
+      3,
+      2.5
+    ]
+  },
+  "132": {
+    "id": 300216,
+    "name": "治愈术16",
+    "icon": "buff06",
+    "isshow": true,
+    "bufftype": 1,
+    "duration": 12,
+    "interval": 1,
+    "isoverlay": false,
+    "hp": 15,
+    "special": [
+      3,
+      2.6
+    ]
+  },
+  "133": {
+    "id": 300217,
+    "name": "治愈术17",
+    "icon": "buff06",
+    "isshow": true,
+    "bufftype": 1,
+    "duration": 12,
+    "interval": 1,
+    "isoverlay": false,
+    "hp": 15,
+    "special": [
+      3,
+      2.7
+    ]
+  },
+  "134": {
+    "id": 300218,
+    "name": "治愈术18",
+    "icon": "buff06",
+    "isshow": true,
+    "bufftype": 1,
+    "duration": 12,
+    "interval": 1,
+    "isoverlay": false,
+    "hp": 15,
+    "special": [
+      3,
+      2.8
+    ]
+  },
+  "135": {
+    "id": 300219,
+    "name": "治愈术19",
+    "icon": "buff06",
+    "isshow": true,
+    "bufftype": 1,
+    "duration": 12,
+    "interval": 1,
+    "isoverlay": false,
+    "hp": 21,
+    "special": [
+      3,
+      2.9
+    ]
+  },
+  "136": {
+    "id": 300220,
+    "name": "治愈术20",
+    "icon": "buff06",
+    "isshow": true,
+    "bufftype": 1,
+    "duration": 12,
+    "interval": 1,
+    "isoverlay": false,
+    "hp": 20,
+    "special": [
+      3,
+      3
+    ]
+  },
+  "137": {
+    "id": 300401,
+    "name": "施毒术1级",
+    "icon": "buff08",
+    "isshow": true,
+    "bufftype": 2,
+    "duration": 5,
+    "interval": 1,
+    "isoverlay": false,
+    "hp": -36,
+    "special": [
+      3,
+      30
+    ],
+    "effect": "ef_3004"
+  },
+  "138": {
+    "id": 300402,
+    "name": "施毒术2级",
+    "icon": "buff08",
+    "isshow": true,
+    "bufftype": 2,
+    "duration": 5,
+    "interval": 1,
+    "isoverlay": false,
+    "hp": -60,
+    "special": [
+      3,
+      32
+    ]
+  },
+  "139": {
+    "id": 300403,
+    "name": "施毒术3级",
+    "icon": "buff08",
+    "isshow": true,
+    "bufftype": 2,
+    "duration": 5,
+    "interval": 1,
+    "isoverlay": false,
+    "hp": -80,
+    "special": [
+      3,
+      34
+    ],
+    "effect": "ef_3004"
+  },
+  "140": {
+    "id": 300404,
+    "name": "施毒术4级",
+    "icon": "buff08",
+    "isshow": true,
+    "bufftype": 2,
+    "duration": 5,
+    "interval": 1,
+    "isoverlay": false,
+    "hp": -111,
+    "special": [
+      3,
+      36
+    ]
+  },
+  "141": {
+    "id": 300405,
+    "name": "施毒术5级",
+    "icon": "buff08",
+    "isshow": true,
+    "bufftype": 2,
+    "duration": 5,
+    "interval": 1,
+    "isoverlay": false,
+    "hp": -133,
+    "special": [
+      3,
+      38
+    ],
+    "effect": "ef_3004"
+  },
+  "142": {
+    "id": 300406,
+    "name": "施毒术6级",
+    "icon": "buff08",
+    "isshow": true,
+    "bufftype": 2,
+    "duration": 5,
+    "interval": 1,
+    "isoverlay": false,
+    "hp": -157,
+    "special": [
+      3,
+      40
+    ]
+  },
+  "143": {
+    "id": 300407,
+    "name": "施毒术7级",
+    "icon": "buff08",
+    "isshow": true,
+    "bufftype": 2,
+    "duration": 5,
+    "interval": 1,
+    "isoverlay": false,
+    "hp": -182,
+    "special": [
+      3,
+      42
+    ],
+    "effect": "ef_3004"
+  },
+  "144": {
+    "id": 300408,
+    "name": "施毒术8级",
+    "icon": "buff08",
+    "isshow": true,
+    "bufftype": 2,
+    "duration": 5,
+    "interval": 1,
+    "isoverlay": false,
+    "hp": -206,
+    "special": [
+      3,
+      44
+    ]
+  },
+  "145": {
+    "id": 300409,
+    "name": "施毒术9级",
+    "icon": "buff08",
+    "isshow": true,
+    "bufftype": 2,
+    "duration": 5,
+    "interval": 1,
+    "isoverlay": false,
+    "hp": -231,
+    "special": [
+      3,
+      46
+    ],
+    "effect": "ef_3004"
+  },
+  "146": {
+    "id": 300410,
+    "name": "施毒术10级",
+    "icon": "buff08",
+    "isshow": true,
+    "bufftype": 2,
+    "duration": 5,
+    "interval": 1,
+    "isoverlay": false,
+    "hp": -255,
+    "special": [
+      3,
+      48
+    ]
+  },
+  "147": {
+    "id": 300411,
+    "name": "施毒术11级",
+    "icon": "buff08",
+    "isshow": true,
+    "bufftype": 2,
+    "duration": 5,
+    "interval": 1,
+    "isoverlay": false,
+    "hp": -280,
+    "special": [
+      3,
+      50
+    ],
+    "effect": "ef_3004"
+  },
+  "148": {
+    "id": 300412,
+    "name": "施毒术12级",
+    "icon": "buff08",
+    "isshow": true,
+    "bufftype": 2,
+    "duration": 5,
+    "interval": 1,
+    "isoverlay": false,
+    "hp": -304,
+    "special": [
+      3,
+      52
+    ]
+  },
+  "149": {
+    "id": 300413,
+    "name": "施毒术13级",
+    "icon": "buff08",
+    "isshow": true,
+    "bufftype": 2,
+    "duration": 5,
+    "interval": 1,
+    "isoverlay": false,
+    "hp": -329,
+    "special": [
+      3,
+      54
+    ],
+    "effect": "ef_3004"
+  },
+  "150": {
+    "id": 300414,
+    "name": "施毒术14级",
+    "icon": "buff08",
+    "isshow": true,
+    "bufftype": 2,
+    "duration": 5,
+    "interval": 1,
+    "isoverlay": false,
+    "hp": -353,
+    "special": [
+      3,
+      56
+    ]
+  },
+  "151": {
+    "id": 300415,
+    "name": "施毒术15级",
+    "icon": "buff08",
+    "isshow": true,
+    "bufftype": 2,
+    "duration": 5,
+    "interval": 1,
+    "isoverlay": false,
+    "hp": -378,
+    "special": [
+      3,
+      58
+    ],
+    "effect": "ef_3004"
+  },
+  "152": {
+    "id": 300416,
+    "name": "施毒术16级",
+    "icon": "buff08",
+    "isshow": true,
+    "bufftype": 2,
+    "duration": 5,
+    "interval": 1,
+    "isoverlay": false,
+    "hp": -402,
+    "special": [
+      3,
+      60
+    ],
+    "effect": "ef_3004"
+  },
+  "153": {
+    "id": 300417,
+    "name": "施毒术17级",
+    "icon": "buff08",
+    "isshow": true,
+    "bufftype": 2,
+    "duration": 5,
+    "interval": 1,
+    "isoverlay": false,
+    "hp": -427,
+    "special": [
+      3,
+      62
+    ]
+  },
+  "154": {
+    "id": 300418,
+    "name": "施毒术18级",
+    "icon": "buff08",
+    "isshow": true,
+    "bufftype": 2,
+    "duration": 5,
+    "interval": 1,
+    "isoverlay": false,
+    "hp": -451,
+    "special": [
+      3,
+      64
+    ],
+    "effect": "ef_3004"
+  },
+  "155": {
+    "id": 300419,
+    "name": "施毒术19级",
+    "icon": "buff08",
+    "isshow": true,
+    "bufftype": 2,
+    "duration": 5,
+    "interval": 1,
+    "isoverlay": false,
+    "hp": -476,
+    "special": [
+      3,
+      66
+    ]
+  },
+  "156": {
+    "id": 300420,
+    "name": "施毒术20级",
+    "icon": "buff08",
+    "isshow": true,
+    "bufftype": 2,
+    "duration": 5,
+    "interval": 1,
+    "isoverlay": false,
+    "hp": -532,
+    "special": [
+      3,
+      68
+    ]
+  },
+  "157": {
+    "id": 300601,
+    "name": "隐身术",
+    "icon": "buff02",
+    "isshow": true,
+    "bufftype": 1,
+    "duration": 5,
+    "isoverlay": false,
+    "special": [
+      3,
+      68
+    ],
+    "Injuryfree": 30
+  },
+  "158": {
+    "id": 300701,
+    "name": "神圣战甲术1",
+    "icon": "buff02",
+    "isshow": true,
+    "bufftype": 1,
+    "duration": 30,
+    "isoverlay": false,
+    "special": [
+      3,
+      1
+    ],
+    "ac": 10
+  },
+  "159": {
+    "id": 300702,
+    "name": "神圣战甲术2",
+    "icon": "buff02",
+    "isshow": true,
+    "bufftype": 1,
+    "duration": 30,
+    "isoverlay": false,
+    "special": [
+      3,
+      1
+    ],
+    "ac": 14
+  },
+  "160": {
+    "id": 300703,
+    "name": "神圣战甲术3",
+    "icon": "buff02",
+    "isshow": true,
+    "bufftype": 1,
+    "duration": 30,
+    "isoverlay": false,
+    "special": [
+      3,
+      1
+    ],
+    "ac": 18
+  },
+  "161": {
+    "id": 300704,
+    "name": "神圣战甲术4",
+    "icon": "buff02",
+    "isshow": true,
+    "bufftype": 1,
+    "duration": 30,
+    "isoverlay": false,
+    "special": [
+      3,
+      1
+    ],
+    "ac": 22
+  },
+  "162": {
+    "id": 300705,
+    "name": "神圣战甲术5",
+    "icon": "buff02",
+    "isshow": true,
+    "bufftype": 1,
+    "duration": 30,
+    "isoverlay": false,
+    "special": [
+      3,
+      1
+    ],
+    "ac": 40,
+    "maxhp2": 5
+  },
+  "163": {
+    "id": 300706,
+    "name": "神圣战甲术6",
+    "icon": "buff02",
+    "isshow": true,
+    "bufftype": 1,
+    "duration": 30,
+    "isoverlay": false,
+    "special": [
+      3,
+      1
+    ],
+    "ac": 45,
+    "maxhp2": 5
+  },
+  "164": {
+    "id": 300707,
+    "name": "神圣战甲术7",
+    "icon": "buff02",
+    "isshow": true,
+    "bufftype": 1,
+    "duration": 30,
+    "isoverlay": false,
+    "special": [
+      3,
+      1
+    ],
+    "ac": 50,
+    "maxhp2": 5
+  },
+  "165": {
+    "id": 300708,
+    "name": "神圣战甲术8",
+    "icon": "buff02",
+    "isshow": true,
+    "bufftype": 1,
+    "duration": 30,
+    "isoverlay": false,
+    "special": [
+      3,
+      1
+    ],
+    "ac": 55,
+    "maxhp2": 5
+  },
+  "166": {
+    "id": 300709,
+    "name": "神圣战甲术9",
+    "icon": "buff02",
+    "isshow": true,
+    "bufftype": 1,
+    "duration": 30,
+    "isoverlay": false,
+    "special": [
+      3,
+      1
+    ],
+    "ac": 65,
+    "maxhp2": 5
+  },
+  "167": {
+    "id": 300710,
+    "name": "神圣战甲术10",
+    "icon": "buff02",
+    "isshow": true,
+    "bufftype": 1,
+    "duration": 30,
+    "isoverlay": false,
+    "special": [
+      3,
+      1.5
+    ],
+    "ac": 71,
+    "maxhp2": 10
+  },
+  "168": {
+    "id": 300711,
+    "name": "神圣战甲术11",
+    "icon": "buff02",
+    "isshow": true,
+    "bufftype": 1,
+    "duration": 30,
+    "isoverlay": false,
+    "special": [
+      3,
+      1.5
+    ],
+    "ac": 77,
+    "maxhp2": 10
+  },
+  "169": {
+    "id": 300712,
+    "name": "神圣战甲术12",
+    "icon": "buff02",
+    "isshow": true,
+    "bufftype": 1,
+    "duration": 30,
+    "isoverlay": false,
+    "special": [
+      3,
+      1.5
+    ],
+    "ac": 83,
+    "maxhp2": 10
+  },
+  "170": {
+    "id": 300713,
+    "name": "神圣战甲术13",
+    "icon": "buff02",
+    "isshow": true,
+    "bufftype": 1,
+    "duration": 30,
+    "isoverlay": false,
+    "special": [
+      3,
+      1.5
+    ],
+    "ac": 89,
+    "maxhp2": 10
+  },
+  "171": {
+    "id": 300714,
+    "name": "神圣战甲术14",
+    "icon": "buff02",
+    "isshow": true,
+    "bufftype": 1,
+    "duration": 30,
+    "isoverlay": false,
+    "special": [
+      3,
+      1.5
+    ],
+    "ac": 95,
+    "maxhp2": 10
+  },
+  "172": {
+    "id": 300715,
+    "name": "神圣战甲术15",
+    "icon": "buff02",
+    "isshow": true,
+    "bufftype": 1,
+    "duration": 30,
+    "isoverlay": false,
+    "special": [
+      3,
+      1.5
+    ],
+    "ac": 110,
+    "maxhp2": 15
+  },
+  "173": {
+    "id": 300716,
+    "name": "神圣战甲术16",
+    "icon": "buff02",
+    "isshow": true,
+    "bufftype": 1,
+    "duration": 30,
+    "isoverlay": false,
+    "special": [
+      3,
+      2
+    ],
+    "ac": 120,
+    "maxhp2": 15
+  },
+  "174": {
+    "id": 300717,
+    "name": "神圣战甲术17",
+    "icon": "buff02",
+    "isshow": true,
+    "bufftype": 1,
+    "duration": 30,
+    "isoverlay": false,
+    "special": [
+      3,
+      2
+    ],
+    "ac": 130,
+    "maxhp2": 15
+  },
+  "175": {
+    "id": 300718,
+    "name": "神圣战甲术18",
+    "icon": "buff02",
+    "isshow": true,
+    "bufftype": 1,
+    "duration": 30,
+    "isoverlay": false,
+    "special": [
+      3,
+      2
+    ],
+    "ac": 140,
+    "maxhp2": 15
+  },
+  "176": {
+    "id": 300719,
+    "name": "神圣战甲术19",
+    "icon": "buff02",
+    "isshow": true,
+    "bufftype": 1,
+    "duration": 30,
+    "isoverlay": false,
+    "special": [
+      3,
+      2
+    ],
+    "ac": 150,
+    "maxhp2": 15
+  },
+  "177": {
+    "id": 300720,
+    "name": "神圣战甲术20",
+    "icon": "buff02",
+    "isshow": true,
+    "bufftype": 1,
+    "duration": 30,
+    "isoverlay": false,
+    "special": [
+      3,
+      2
+    ],
+    "ac": 160,
+    "maxhp2": 20
+  },
+  "178": {
+    "id": 300801,
+    "name": "无极真气1",
+    "icon": "buff01",
+    "isshow": true,
+    "bufftype": 1,
+    "duration": 6,
+    "isoverlay": false,
+    "zs2": 28,
+    "atkspped": 28,
+    "effect": "ef_3008"
+  },
+  "179": {
+    "id": 300802,
+    "name": "无极真气2",
+    "icon": "buff01",
+    "isshow": true,
+    "bufftype": 1,
+    "duration": 6,
+    "isoverlay": false,
+    "zs2": 30,
+    "atkspped": 30,
+    "effect": "ef_3008"
+  },
+  "180": {
+    "id": 300803,
+    "name": "无极真气3",
+    "icon": "buff01",
+    "isshow": true,
+    "bufftype": 1,
+    "duration": 6,
+    "isoverlay": false,
+    "zs2": 32,
+    "atkspped": 32,
+    "effect": "ef_3008"
+  },
+  "181": {
+    "id": 300804,
+    "name": "无极真气4",
+    "icon": "buff01",
+    "isshow": true,
+    "bufftype": 1,
+    "duration": 6,
+    "isoverlay": false,
+    "zs2": 34,
+    "atkspped": 34,
+    "effect": "ef_3008"
+  },
+  "182": {
+    "id": 300805,
+    "name": "无极真气5",
+    "icon": "buff01",
+    "isshow": true,
+    "bufftype": 1,
+    "duration": 8,
+    "isoverlay": false,
+    "zs2": 40,
+    "atkspped": 40,
+    "effect": "ef_3008"
+  },
+  "183": {
+    "id": 300806,
+    "name": "无极真气6",
+    "icon": "buff01",
+    "isshow": true,
+    "bufftype": 1,
+    "duration": 8,
+    "isoverlay": false,
+    "zs2": 43,
+    "atkspped": 43,
+    "effect": "ef_3008"
+  },
+  "184": {
+    "id": 300807,
+    "name": "无极真气7",
+    "icon": "buff01",
+    "isshow": true,
+    "bufftype": 1,
+    "duration": 8,
+    "isoverlay": false,
+    "zs2": 46,
+    "atkspped": 46,
+    "effect": "ef_3008"
+  },
+  "185": {
+    "id": 300808,
+    "name": "无极真气8",
+    "icon": "buff01",
+    "isshow": true,
+    "bufftype": 1,
+    "duration": 8,
+    "isoverlay": false,
+    "zs2": 49,
+    "atkspped": 49,
+    "effect": "ef_3008"
+  },
+  "186": {
+    "id": 300809,
+    "name": "无极真气9",
+    "icon": "buff01",
+    "isshow": true,
+    "bufftype": 1,
+    "duration": 8,
+    "isoverlay": false,
+    "zs2": 52,
+    "atkspped": 52,
+    "effect": "ef_3008"
+  },
+  "187": {
+    "id": 300810,
+    "name": "无极真气10",
+    "icon": "buff01",
+    "isshow": true,
+    "bufftype": 1,
+    "duration": 10,
+    "isoverlay": false,
+    "zs2": 60,
+    "atkspped": 60,
+    "effect": "ef_3008"
+  },
+  "188": {
+    "id": 300811,
+    "name": "无极真气11",
+    "icon": "buff01",
+    "isshow": true,
+    "bufftype": 1,
+    "duration": 10,
+    "isoverlay": false,
+    "zs2": 65,
+    "atkspped": 65,
+    "effect": "ef_3008"
+  },
+  "189": {
+    "id": 300812,
+    "name": "无极真气12",
+    "icon": "buff01",
+    "isshow": true,
+    "bufftype": 1,
+    "duration": 10,
+    "isoverlay": false,
+    "zs2": 70,
+    "atkspped": 70,
+    "effect": "ef_3008"
+  },
+  "190": {
+    "id": 300813,
+    "name": "无极真气13",
+    "icon": "buff01",
+    "isshow": true,
+    "bufftype": 1,
+    "duration": 10,
+    "isoverlay": false,
+    "zs2": 75,
+    "atkspped": 75,
+    "effect": "ef_3008"
+  },
+  "191": {
+    "id": 300814,
+    "name": "无极真气14",
+    "icon": "buff01",
+    "isshow": true,
+    "bufftype": 1,
+    "duration": 10,
+    "isoverlay": false,
+    "zs2": 80,
+    "atkspped": 80,
+    "effect": "ef_3008"
+  },
+  "192": {
+    "id": 300815,
+    "name": "无极真气15",
+    "icon": "buff01",
+    "isshow": true,
+    "bufftype": 1,
+    "duration": 12,
+    "isoverlay": false,
+    "zs2": 90,
+    "atkspped": 90,
+    "effect": "ef_3008"
+  },
+  "193": {
+    "id": 300816,
+    "name": "无极真气16",
+    "icon": "buff01",
+    "isshow": true,
+    "bufftype": 1,
+    "duration": 12,
+    "isoverlay": false,
+    "zs2": 100,
+    "atkspped": 100,
+    "effect": "ef_3008"
+  },
+  "194": {
+    "id": 300817,
+    "name": "无极真气17",
+    "icon": "buff01",
+    "isshow": true,
+    "bufftype": 1,
+    "duration": 12,
+    "isoverlay": false,
+    "zs2": 110,
+    "atkspped": 110,
+    "effect": "ef_3008"
+  },
+  "195": {
+    "id": 300818,
+    "name": "无极真气18",
+    "icon": "buff01",
+    "isshow": true,
+    "bufftype": 1,
+    "duration": 12,
+    "isoverlay": false,
+    "zs2": 120,
+    "atkspped": 120,
+    "effect": "ef_3008"
+  },
+  "196": {
+    "id": 300819,
+    "name": "无极真气19",
+    "icon": "buff01",
+    "isshow": true,
+    "bufftype": 1,
+    "duration": 12,
+    "isoverlay": false,
+    "zs2": 130,
+    "atkspped": 130,
+    "effect": "ef_3008"
+  },
+  "197": {
+    "id": 300820,
+    "name": "无极真气20",
+    "icon": "buff01",
+    "isshow": true,
+    "bufftype": 1,
+    "duration": 15,
+    "isoverlay": false,
+    "zs2": 150,
+    "atkspped": 150,
+    "effect": "ef_3008"
+  }
+}
