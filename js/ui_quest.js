@@ -9,7 +9,7 @@
 
   function buildBtn(){
     if (!UI.battle || !QS()) return; var host = UI.battle.el, old = host.querySelector('.quest-btn'); if (old) old.remove();
-    var b = el('div', BTN + 'position:absolute;right:14px;bottom:64px;z-index:30;width:92px;height:52px;line-height:52px;pointer-events:auto;', '任务'); b.className = 'quest-btn';
+    var b = el('div', BTN + 'position:absolute;right:14px;top:14px;z-index:30;width:92px;height:52px;line-height:52px;pointer-events:auto;', '任务'); b.className = 'quest-btn';
     var d = el('div', DOT); b.appendChild(d); b.onclick = function(){ questPanel(); }; host.appendChild(b); UI.questBtn = {btn: b, dot: d};
   }
   function refreshBtn(){ if (!UI.battle || !QS() || !G.role) return; if (!UI.questBtn || !UI.questBtn.btn.isConnected) buildBtn(); if (UI.questBtn) UI.questBtn.dot.style.display = QS().red().any ? '' : 'none'; }

@@ -21,7 +21,9 @@ var FX = (function(){
     }).catch(function(){ s.failed = true; });
     return s;
   }
-  function preload(){ Object.keys(SKILL_DIR).forEach(function(k){ loadSheet(SKILL_DIR[k]); }); }
+  // 预载全部技能 + 合击 sheet, 首次合击不再走程序化兜底
+  var HEJI_DIRS = ['heji_pohunzhan', 'heji_pixingzhan', 'heji_leitingyiji', 'heji_huolongqiyan', 'heji_shihunzhaoze', 'heji_morishenpan'];
+  function preload(){ Object.keys(SKILL_DIR).forEach(function(k){ loadSheet(SKILL_DIR[k]); }); HEJI_DIRS.forEach(loadSheet); }
 
   // ---------- canvas / geometry ----------
   function attach(holderNode){

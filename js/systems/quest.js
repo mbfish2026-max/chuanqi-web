@@ -31,7 +31,8 @@
     if(!q || !q.ver){ q=r.quest={ver:0, cnt:{}, daily:null, ach:{}}; }
     if(q.ver<1){ // v0 -> v1: 用已有存档数据回填累计进度
       var k=0; for(var id in (r.kills||{})) k+=r.kills[id]; q.cnt.kill=Math.max(q.cnt.kill||0,k);
-      q.cnt.equip=q.cnt.equip||Object.keys(r.equip||{}).length; q.ver=1;
+      if(k>0||(G.role&&G.role.level>1)) q.cnt.equip=q.cnt.equip||Object.keys(r.equip||{}).length; // 新角色初始装备不算穿戴
+      q.ver=1;
     }
     if(!r.ver || r.ver<1) r.ver=1;
     var t=S.today(S.now());
