@@ -27,3 +27,7 @@ shot hero_field "?seed=1&map=1003&hero=2" 5000
 shot hero_panel "?seed=1&map=1003&hero=2&panel=1" 4500
 shot hero_heji "?seed=1&map=1003&hero=2&heji=1&hejiwait=1800" 4650
 shot hero_unlock "?seed=3&map=1003&hero=0&panel=1&herowait=1500" 3800
+shot quest_btn "?seed=1&map=1003&qdemo=1&quest=0" 4000
+shot quest_main "?seed=1&map=1003&quest=main" 3800
+shot quest_daily "?seed=1&map=1003&quest=daily&qdemo=1" 3800
+shot quest_ach "?seed=1&map=1003&quest=ach&qdemo=1" 3800

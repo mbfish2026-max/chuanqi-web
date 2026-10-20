@@ -5,7 +5,7 @@ const store={};
 const ctx={console, Math, Date, JSON, Promise, setTimeout, localStorage:{getItem:k=>store[k]||null,setItem:(k,v)=>store[k]=v,removeItem:k=>delete store[k]},
   fetch:u=>Promise.resolve({text:()=>Promise.resolve(fs.readFileSync(path.join(root,u),'utf8'))}), toast:()=>{}, location:{reload(){}}};
 ctx.globalThis=ctx; ctx.window=ctx; vm.createContext(ctx);
-['js/data.js','js/game.js','js/move.js','js/systems/core.js','js/systems/fuli.js','js/systems/equip.js','js/systems/smith.js','js/systems/lilian.js','js/systems/buff.js','js/systems/hero.js']
+['js/data.js','js/game.js','js/move.js','js/systems/core.js','js/systems/fuli.js','js/systems/equip.js','js/systems/smith.js','js/systems/lilian.js','js/systems/buff.js','js/systems/hero.js','js/systems/quest.js']
   .forEach(f=>vm.runInContext(fs.readFileSync(path.join(root,f),'utf8'),ctx,{filename:f}));
 let fails=0; const ok=(c,m)=>{ console.log((c?'PASS ':'FAIL ')+m); if(!c) fails++; };
 const R=s=>vm.runInContext(s,ctx);
@@ -101,6 +101,28 @@ R('loadConfigs()').then(()=>{
   ok(S.hero.info().combo.name==='末日审判','道+道 = 末日审判');
   R('save()'); const sv=JSON.parse(store['cq_web_save_v1']); ok(sv.role.hero && sv.role.hero.prof===3,'英雄写入存档');
   const combos=[[1,1],[1,2],[1,3],[2,2],[2,3],[3,3]].map(([a,b])=>a+'+'+b+'='+S.hero.comboFor(a,b).name).join(' '); console.log('  combos:',combos);
+  // ---------- 任务系统 ----------
+  S._fakeNow=new Date(2026,9,21,10).getTime();
+  R("newRole('任务',1)"); const Q=S.quest, qr=G.role;
+  ok(qr.quest && qr.quest.ver===1 && qr.ver>=1,'quest 存档初始化 ver=1');
+  ok(Q.main().length>0 && Q.main()[0].id,'主线 = 原版 task 链: '+Q.main().map(x=>x.name).join(','));
+  ok(Q.daily().length===6 && !Q.red().daily,'每日任务 6 条, 初始无红点');
+  R('enterMap(CFG.map.list.filter(function(m){return m.type==2;})[0].id)'); G.role.level=40;
+  for(let i=0;i<4000 && (qr.quest.daily.cnt.kill||0)<100;i++) R('tick(0.1)');
+  ok((qr.quest.daily.cnt.kill||0)>=100,'击杀事件计数 '+qr.quest.daily.cnt.kill);
+  ok(Q.red().daily && Q.red().any,'可领取时红点');
+  const g0=qr.gold; console.log('  claimDaily:',Q.claimDaily('d_kill')); ok(qr.gold>=g0+5000 && Q.activity()===20,'每日奖励+活跃度20');
+  ok(Q.claimDaily('d_kill')==='已领取','不可重复领取'); ok(Q.claimDaily('d_boss')==='未完成','未完成不可领');
+  console.log('  chest:',Q.openChest(1)); ok(Q.openChest(2).indexOf('活跃度不足')===0,'活跃度宝箱门槛');
+  qr.equip[5]=qr.equip[5]||R('createStuff(CFG.item.list.find(function(x){return x.type==2&&x.stdmode==5;}).id,1,1)'); qr.gold=1e7;
+  for(let i=0;i<3;i++) R('enhance(5)'); ok(qr.quest.daily.cnt.enhance===3,'强化事件 (enhance 包装)');
+  ok(Q.achievements().find(x=>x.id==='lv_10').canClaim,'等级成就可领'); console.log('  ach:',Q.claimAch('lv_10'));
+  ok(Q.achievements().find(x=>x.id==='kill_100').canClaim,'击杀成就可领');
+  const yb0=qr.yuanbao; Q.claimAch('kill_100'); ok(qr.yuanbao===yb0+20,'成就元宝');
+  S._fakeNow=new Date(2026,9,22,0,0,1).getTime(); ok(Q.activity()===0 && !qr.quest.daily.cnt.kill && qr.quest.cnt.kill>=100,'本地 0 点重置每日, 累计保留');
+  delete qr.quest; qr.kills={1001:57}; Q.state(); ok(qr.quest.cnt.kill===57,'旧存档迁移回填击杀数');
+  console.log('  sign:',S.fuli.sign()); ok(qr.quest.daily.cnt.sign===1,'签到事件');
+  S._fakeNow=0;
   R('save()'); ok(!!store['cq_web_save_v1'],'存档成功');
   console.log(fails? fails+' FAILED':'ALL PASSED'); process.exit(fails?1:0);
 }).catch(e=>{ console.error(e); process.exit(2); });

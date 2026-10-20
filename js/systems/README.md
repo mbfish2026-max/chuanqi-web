@@ -43,3 +43,12 @@
 API: `Systems.hero.has() / canUnlock() / unlock(prof,name) / info() / attr() / equip(uid) / unequip(slot) / setMode('attack'|'follow'|'rest') / setAuto(bool) / heji() / rage() → {rage,max,ready,cd} / unit() / comboFor(p1,p2) / COMBO`
 事件: `FXE('heji', {name, fx, key, hits:[{m,d}], total, manual})`, `FXE('heroatk', {unit, target, dmg, crit, skill})`, `FXE('herodie')`。fx.js 会先找 `assets/fx/<fx>/sheet.png`, 找不到就用程序生成的特效; `FX.registerHeji(dir, fn(s, h, targets))` 可以替换某个合击的程序特效。
 截图参数: `?seed=1&map=1003&hero=<prof|0>[&panel=1][&heji=1][&rage=1]`
+
+## 任务系统 (js/systems/quest.js, UI: js/ui_quest.js)
+- 主线: 原版 task.txt 任务链 (ItemTask eTaskType 1~11, 按章节 id/1000), 复用 game.js currentTasks/claimTask; 第 4 章起未开放 (同历练)
+- 每日任务 (原版无, 设计): 6 条, 本地 0 点重置; 完成领取得活跃度, 活跃度 20/50/80/100 宝箱
+- 成就 (原版无, 设计): 击杀/等级/BOSS/强化/穿戴 分阶
+- 事件: kill 钩子 + 包装全局 enhance / equipItem / Systems.fuli.sign / Systems.lilian.claim; `Systems.quest.emit(ev,n)` 可供其他系统上报
+- 存档: role.quest {ver:1,...}; v0→v1 迁移用 role.kills 回填累计击杀; role.ver 至少为 1
+- API: main()/claimMain(id), daily()/claimDaily(id), activity()/chests()/openChest(id), achievements()/claimAch(id), red()
+- 截图: `?quest=main|daily|ach&qdemo=1`
