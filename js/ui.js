@@ -218,7 +218,7 @@ function buildScene(){
     UI.roleItem = inst('itemRole'); UI.roleItem.ref('monsterRoot').setActive(false); UI.cells[G.battle && G.battle.roleIdx != null ? G.battle.roleIdx : ROLE_CELL].addChild(UI.roleItem); UI.roleItem._cell = G.battle && G.battle.roleIdx;
     UI.roleItem.ref('roleSign').setImage(IMG + 'role_create/icon_avatar_' + G.role.prof + '_0.png');
     UI.roleItem.ref('roleSign').el.style.backgroundSize = 'contain';
-    if (typeof POP !== 'undefined') POP.attach(UI.roleItem, UI.roleItem.ref('roleSign'), 'role_' + G.role.prof, IMG + 'role_create/icon_avatar_' + G.role.prof + '_0.png', {rise: 1.7});
+    if (typeof POP !== 'undefined') POP.attach(UI.roleItem, UI.roleItem.ref('roleSign'), 'icon_avatar_' + G.role.prof + '_0', IMG + 'role_create/icon_avatar_' + G.role.prof + '_0.png', {rise: 1.7});
     UI.monItems = [];
     UI.petItems = [];
     if (typeof FX !== 'undefined') FX.attach(UI.battleHolder);
