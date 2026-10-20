@@ -197,7 +197,7 @@ function refreshLog(){
   var view = UI.fight.findDeep('sysMsg').find('view'), content = view.find('content');
   if (UI.logShown === G.logs.length && UI.logLast === G.logs[G.logs.length - 1]) return;
   content.removeAllChildren();
-  G.logs.slice(-30).forEach(function(s){ var it = inst('sysMsg'), lab = it.ref('labMsg'); lab.lbW = 700; lab.el.style.whiteSpace = 'normal'; lab.el.style.fontSize = '22px'; lab.el.style.lineHeight = '28px'; lab.el.innerHTML = s; lab.place(); content.addChild(it); });
+  G.logs.slice(-30).forEach(function(s){ var it = inst('sysMsg'), lab = it.ref('labMsg'); lab.lbW = 700; lab.el.style.whiteSpace = 'normal'; lab.el.style.fontSize = '22px'; lab.el.style.color = '#EADFC8'; lab.el.style.lineHeight = '28px'; lab.el.innerHTML = s; lab.place(); content.addChild(it); });
   UI.logShown = G.logs.length; UI.logLast = G.logs[G.logs.length - 1];
   view.el.scrollTop = 1e6;
 }
