@@ -66,7 +66,7 @@ var FX = (function(){
     // branch
     var k = 3 + Math.floor(Math.random() * 4), b = pts[k]; bolts.push({pts: [b, [b[0] + (Math.random() - .5) * 90, b[1] + 40 + Math.random() * 50]], c: col, life: life * .7, max: life * .7, thin: true});
   }
-  function text(x, y, str, o){ texts.push({x: x + (o.dx != null ? o.dx : (Math.random() - .5) * 30), y: y, str: str, c: o.c || '#fff', size: o.size || 30, life: o.life || 1.0, max: o.life || 1.0, vy: o.vy || -70, pop: 0}); }
+  function text(x, y, str, o){ if(window.CQ_FX_FLAGS && CQ_FX_FLAGS.dmg && !CQ_FX_FLAGS.dmg()) return; texts.push({x: x + (o.dx != null ? o.dx : (Math.random() - .5) * 30), y: y, str: str, c: o.c || '#fff', size: o.size || 30, life: o.life || 1.0, max: o.life || 1.0, vy: o.vy || -70, pop: 0}); }
   function sprite(dir, x, y, o){
     var s = loadSheet(dir); if (!s.ok) return false;
     o = o || {}; anims.push({s: s, x: x, y: y, t: 0, scale: o.scale || 1.4, rot: o.rot || 0, tx: o.tx, ty: o.ty, dur: o.dur, done: o.done});
@@ -77,7 +77,7 @@ var FX = (function(){
     if (!el) return; el.classList.remove('fx-hit', 'fx-hit-crit'); void el.offsetWidth; el.classList.add(kind === 'crit' ? 'fx-hit-crit' : 'fx-hit');
     clearTimeout(el._fxT); el._fxT = setTimeout(function(){ el.classList.remove('fx-hit', 'fx-hit-crit'); }, 260);
   }
-  function screenShake(v){ shake = Math.max(shake, v); }
+  function screenShake(v){ if(window.CQ_FX_FLAGS && CQ_FX_FLAGS.shake && !CQ_FX_FLAGS.shake()) return; shake = Math.max(shake, v); }
   function screenFlash(c, a){ flashC = c; flashA = Math.max(flashA, a); }
 
   // ---------- procedural skill effects ----------

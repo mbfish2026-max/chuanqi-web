@@ -4,14 +4,14 @@ const root=path.join(__dirname,'..'); const store={};
 const ctx={console, Math, Date, JSON, Promise, setTimeout, localStorage:{getItem:k=>store[k]||null,setItem:(k,v)=>store[k]=v,removeItem:k=>delete store[k]},
   fetch:u=>Promise.resolve({text:()=>Promise.resolve(fs.readFileSync(path.join(root,u),'utf8'))}), toast:()=>{}, location:{reload(){}}};
 ctx.globalThis=ctx; ctx.window=ctx; vm.createContext(ctx);
-['js/data.js','js/game.js','js/move.js','js/systems/core.js','js/systems/fuli.js','js/systems/equip.js','js/systems/smith.js','js/systems/lilian.js','js/systems/buff.js','js/systems/hero.js','js/systems/lootdata/tc.js','js/systems/lootdata/uniques.js','js/systems/lootdata/sets.js','js/systems/loot.js']
+['js/data.js','js/game.js','js/move.js','js/systems/core.js','js/systems/fuli.js','js/systems/equip.js','js/systems/smith.js','js/systems/lilian.js','js/systems/buff.js','js/systems/hero.js','js/systems/lootdata/tc.js','js/systems/lootdata/uniques.js','js/systems/lootdata/sets.js','js/systems/loot.js','js/systems/settings.js']
   .forEach(f=>vm.runInContext(fs.readFileSync(path.join(root,f),'utf8'),ctx,{filename:f}));
 let fails=0; const ok=(c,m)=>{ console.log((c?'PASS ':'FAIL ')+m); if(!c) fails++; };
 const R=s=>vm.runInContext(s,ctx);
 R('loadConfigs()').then(()=>{
   const S=ctx.Systems, G=R('G'), L=S.loot;
   R("newRole('装备',1)"); const r=G.role;
-  ok(r.ver===2 && r.essence===0, '新角色 role.ver=2');
+  ok(r.ver>=2 && r.essence===0, '新角色 role.ver>=2 got '+r.ver);
   // 部位校验
   const sm=new Set(R('CFG.item.list').filter(c=>c.type==2&&c.id<200000).map(c=>c.stdmode));
   ok([5,10,15,20,22,24,62,64].every(x=>sm.has(x)) && !sm.has(23) && !sm.has(25), 'stdmode 部位: 22/24 存在, 23/25 仅作第二槽');
@@ -62,8 +62,8 @@ R('loadConfigs()').then(()=>{
   S.bag.sort(); const eqs=r.bag.filter(s=>R('cfg("item",'+s.id+')').type==2); ok(eqs.every((s,i)=>!i||eqs[i-1].q>=s.q), '整理: 装备品质降序');
   // 存档迁移
   const old={name:'旧',prof:1,level:40,exp:0,gold:0,yuanbao:0,bag:[{uid:'a',id:105034,count:1,q:5,ench:0,attr:{},nonsuch:0},{uid:'b',id:110013,count:1,q:4,ench:0,attr:{},nonsuch:0}],equip:{},skills:{},kills:{},stat:{},tasksDone:{}};
-  store['cq_web_save_v1']=JSON.stringify({role:old,settings:{}}); ok(R('load()') && G.role.ver===2, '旧存档 (无 ver) 迁移到 ver 2, key 仍为 cq_web_save_v1');
+  store['cq_web_save_v1']=JSON.stringify({role:old,settings:{}}); ok(R('load()') && G.role.ver>=2, '旧存档 (无 ver) 迁移到 ver>=2, key 仍为 cq_web_save_v1');
   ok(G.role.bag[0].uq===105034 && G.role.bag[1].set==='shengzhan' && G.role.bag[0].lock===false && G.role.lootCfg, '迁移: 暗金/套装标记 + lock/lootCfg');
-  R('save()'); ok(JSON.parse(store['cq_web_save_v1']).role.ver===2, '存档写入 ver');
+  R('save()'); ok(JSON.parse(store['cq_web_save_v1']).role.ver>=2, '存档写入 ver>=2');
   console.log(fails? fails+' FAILED':'ALL PASSED'); process.exit(fails?1:0);
 }).catch(e=>{ console.error(e); process.exit(2); });

@@ -67,3 +67,10 @@ API: `Systems.hero.has() / canUnlock() / unlock(prof,name) / info() / attr() / e
 - 光柱: FXE('drop',{m,q,name,uq,set}) → fx.js dropBeam
 - 存档: role.ver=2 (key 仍为 cq_web_save_v1), 迁移 MIG[1] 补字段并标记旧存档里的暗金/套装
 - 截图: `?seed=1&map=1003&eq=tip|set|salvage|beam`, `?seed=1&page=main_role&eq=bag`
+
+## 设置 (js/systems/settings.js, UI: js/ui_settings.js)
+- 原版 `role_setup` 全量：回收(非本职业/极品/白绿蓝紫)、回复(生命/魔法/特殊+阈值%+选药 tipSetup)、音效
+- 网页增补：挂机(自动战斗/技能/走位/分解拾取/背包满停)、技能自动施放开关、游戏(伤害数字/震屏/特效质量)
+- 持久化 `role.settings`，`role.ver>=3`；与 `lootCfg` / `G.settings.autoDrug` 同步
+- 行为钩：替换 `autoDrug`、过滤 `skillCands`、包装 `roleAttack`/`MOVE.update`/`loot.shouldAuto`、`CQ_FX_FLAGS` 控 fx.js
+- 入口：战斗 `btnSetup`、背包「分」、`?settings=recycle|afk|skill|game`；测试 `node tools/test_settings.js`

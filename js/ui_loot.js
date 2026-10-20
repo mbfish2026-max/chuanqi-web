@@ -81,24 +81,8 @@
     if (!b._salv) { var sb = cloneNode(b.ref('btnSort'), b.ref('btnSort').parent); sb.noWidget = true; sb.x = -40; sb.place(); sb.find('name').setString('分'); sb.on(function(){ tipSalvage(); }); b._salv = sb; }
   };
 
-  // ---------- 原版 role_setup "回收设置" → 自动分解规则 ----------
-  window.tipSalvage = function(){
-    var p = popup('role_setup'), cf = L.cfg();
-    closeBtn(p, p.ref('btnClose'));
-    var note = p.findDeep('img_bg1').find('label'); if (note) note.setString('※分解得精华(5精华=1洗练石)，锁定/套装/暗金保留  精华 ' + (G.role.essence || 0));
-    var map = {noProfession: ['offProf'], eNonsuch: ['keepNonsuch', true], eWhite: [1], eGreen: [2], eBule: [3], ePurple: [4]};
-    Object.keys(map).forEach(function(ref){ var t = p.ref(ref); if (!t) return; var k = map[ref][0], inv = map[ref][1];
-      t.children.forEach(function(ch){ if (ch.lb && ch.el.textContent === '自动回收') ch.setString('自动分解'); });
-      var get = function(){ var v = typeof k === 'number' ? cf.auto[k] : cf[k]; return inv ? !v : !!v; };
-      var cm = t.find('checkmark'); cm.setActive(get());
-      t.on(function(){ var v = !get(); if (typeof k === 'number') cf.auto[k] = v; else cf[k] = inv ? !v : v; cm.setActive(get()); });
-    });
-    var life = p.ref('lifeRevert'); if (life) { var lc = life.find('checkmark'); lc.setActive(!!G.settings.autoDrug); life.on(function(){ G.settings.autoDrug = !G.settings.autoDrug; lc.setActive(G.settings.autoDrug); }); }
-    var bs = p.findDeep('btnSave');
-    if (bs) { bs.on(function(){ save(); closePopup(p); msg('OK:设置已保存'); });
-      var all = cloneNode(bs, bs.parent); all.x = bs.x + 220; all.place(); all.find('label').setString('一键分解'); all.on(function(){ save(); closePopup(p); msg(L.salvageAll()); });
-      bs.x -= 120; bs.place(); all.x = bs.x + 240; all.place(); }
-  };
+  // ---------- 回收/设置入口：完整接线在 ui_settings.js ----------
+  window.tipSalvage = function(){ if (typeof openSettings === 'function') openSettings('recycle'); else toast('设置模块未加载'); };
   // 开发入口: ?eq=tip|set|salvage|bag 用于截图
   var q = /[?&]eq=(\w+)/.exec(location.search);
   if (q) var iv = setInterval(function(){ if (!G.role || !UI.main) return; clearInterval(iv); var r = G.role; r.level = Math.max(r.level, 60);

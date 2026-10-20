@@ -145,7 +145,7 @@ function initFight(){
   f.ref('btnGM').setActive(false);
   f.ref('btnMap').on(function(){ showPage('main_map'); });
   f.ref('btnMapDesc').on(function(){ tipMapDesc(mapCfg()); });
-  f.ref('btnSetup').on(function(){ G.settings.autoDrug = !G.settings.autoDrug; save(); toast('自动吃药：' + (G.settings.autoDrug ? '开启' : '关闭')); });
+  f.ref('btnSetup').on(function(){ if (typeof openSettings === 'function') openSettings('recycle'); else { G.settings.autoDrug = !G.settings.autoDrug; save(); toast('自动吃药：' + (G.settings.autoDrug ? '开启' : '关闭')); } });
   f.ref('btnBoss').on(function(){ var b = f.ref('bossNode'); b.setActive(!b.active); if (b.active) fillBoss(); });
   f.ref('btnCloseBoss').on(function(){ f.ref('bossNode').setActive(false); });
   // the 9 itemMap cells live under mapNode/mapLayout in the prefab

@@ -36,3 +36,7 @@ shot eq_tip_set "?seed=1&map=1003&eq=set" 3500
 shot eq_salvage "?seed=1&map=1003&eq=salvage" 3500
 shot eq_bag "?seed=1&page=main_role&eq=bag" 3500
 shot eq_beam "?seed=1&map=1003&eq=beam" 4200
+shot settings_recycle "?seed=1&map=1003&settings=recycle" 3800
+shot settings_afk "?seed=1&map=1003&settings=afk" 3800
+shot settings_skill "?seed=1&map=1003&settings=skill" 4000
+shot settings_game "?seed=1&map=1003&settings=game" 3800
