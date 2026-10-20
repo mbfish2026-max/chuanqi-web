@@ -218,6 +218,7 @@ function buildScene(){
     UI.roleItem = inst('itemRole'); UI.roleItem.ref('monsterRoot').setActive(false); UI.cells[G.battle && G.battle.roleIdx != null ? G.battle.roleIdx : ROLE_CELL].addChild(UI.roleItem); UI.roleItem._cell = G.battle && G.battle.roleIdx;
     UI.roleItem.ref('roleSign').setImage(IMG + 'role_create/icon_avatar_' + G.role.prof + '_0.png');
     UI.roleItem.ref('roleSign').el.style.backgroundSize = 'contain';
+    if (typeof POP !== 'undefined') POP.attach(UI.roleItem, UI.roleItem.ref('roleSign'), 'role_' + G.role.prof, IMG + 'role_create/icon_avatar_' + G.role.prof + '_0.png', {rise: 1.7});
     UI.monItems = [];
     UI.petItems = [];
     if (typeof FX !== 'undefined') FX.attach(UI.battleHolder);
@@ -255,11 +256,14 @@ function refreshScene(){
       it.ref('roleRoot').setActive(false); it.ref('monsterRoot').setActive(true);
       it.ref('monsterBg').setImage(IMG + 'main/img_quality_' + x.q + '.png');
       it.ref('monsterIcon').setImage(IMG + 'monster/' + x.cfg.model + '.png'); it.ref('monsterIcon_normal').setActive(false);
+      if (typeof POP !== 'undefined') POP.attach(it, it.ref('monsterIcon'), x.cfg.model, IMG + 'monster/' + x.cfg.model + '.png', {rise: x.boss ? 1.6 : 1.45});
       var mn = it.ref('monsterRoot').find('name'); mn.setString((x.boss ? '[BOSS]' : '') + x.cfg.name); mn.setColor(QCOLOR[x.q]); mn.el.classList.add('fx-mon-name');
       it.ref('monsterLevel').setString('Lv.' + x.cfg.lvl);
       UI.cells[x.idx != null ? x.idx : MON_CELLS[i % MON_CELLS.length]].addChild(it); it._cell = x.idx;
     }
-    it.setActive(!x.dead);
+    if (x.dead && it.active && typeof POP !== 'undefined' && it._pop) { if (!it._dying) { it._dying = true; POP.die(it, function(){ it._dying = false; if (x.dead) it.setActive(false); }); } }
+    else if (!x.dead && !it.active) { it.setActive(true); if (typeof POP !== 'undefined') POP.attach(it, it.ref('monsterIcon'), x.cfg.model, IMG + 'monster/' + x.cfg.model + '.png', {rise: x.boss ? 1.6 : 1.45}); }
+    else if (!it._dying) it.setActive(!x.dead);
     it.ref('monsterHpBar').setProgress(x.hp / x.maxhp); it.ref('monsterTipHp').setString(Math.max(0, Math.ceil(x.hp)) + '/' + x.maxhp);
   });
   drawPets(); syncPositions();
@@ -292,7 +296,7 @@ function drawPets(){
       it.ref('monsterBg').setImage(IMG + 'main/img_quality_role.png');
       it.ref('monsterIcon').setImage(IMG + 'monster/' + p.cfg.model + '.png'); it.ref('monsterIcon_normal').setActive(false);
       var mn = it.ref('monsterRoot').find('name'); mn.setString(p.name); mn.setColor('#5BE36B'); mn.el.classList.add('fx-mon-name');
-      it.ref('monsterLevel').setString('宝宝'); UI.cells[p.idx].addChild(it); it._cell = p.idx; }
+      it.ref('monsterLevel').setString('宝宝'); if (typeof POP !== 'undefined') POP.attach(it, it.ref('monsterIcon'), p.cfg.model, IMG + 'monster/' + p.cfg.model + '.png'); UI.cells[p.idx].addChild(it); it._cell = p.idx; }
     it.ref('monsterHpBar').setProgress(p.hp / p.maxhp); it.ref('monsterTipHp').setString(Math.ceil(p.hp) + '/' + p.maxhp);
   });
 }

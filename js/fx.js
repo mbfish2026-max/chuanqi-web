@@ -71,6 +71,7 @@ var FX = (function(){
     return true;
   }
   function flashCard(el, kind){
+    if (typeof POP !== 'undefined') POP.hit(el, kind === 'crit');
     if (!el) return; el.classList.remove('fx-hit', 'fx-hit-crit'); void el.offsetWidth; el.classList.add(kind === 'crit' ? 'fx-hit-crit' : 'fx-hit');
     clearTimeout(el._fxT); el._fxT = setTimeout(function(){ el.classList.remove('fx-hit', 'fx-hit-crit'); }, 260);
   }
@@ -167,7 +168,7 @@ var FX = (function(){
   // 8-direction attack anims (assets/main/attack_*.anim: back 2px @0.25s, lunge 10px @0.333s, home @0.583s)
   var DIRV = {up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0], slant_rightup: [1, -1], slant_leftup: [-1, -1], slant_rightdown: [1, 1], slant_leftdown: [-1, 1]};
   function playAtk(el, key){
-    var v = DIRV[key]; if (!el || !v || !el.animate) return; el.dataset.atk = key;
+    var v = DIRV[key]; if (!el || !v || !el.animate) return; el.dataset.atk = key; if (typeof POP !== 'undefined') POP.atk(el);
     var f = function(k){ return (v[0] * k) + 'px ' + (v[1] * k) + 'px'; };
     el.animate([{translate: f(0), offset: 0}, {translate: f(-2), offset: .4286}, {translate: f(10), offset: .5714}, {translate: f(0), offset: 1}], {duration: 583, composite: 'add'});
   }

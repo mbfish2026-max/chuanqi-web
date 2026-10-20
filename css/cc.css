@@ -14,9 +14,31 @@ html,body{margin:0;height:100%;background:#000;overflow:hidden;font-family:"Ping
 
 /* ---- FX / readability ---- */
 .fx-mon-name{font-weight:700!important;text-shadow:0 0 2px #000,1px 1px 0 #000,-1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000,0 0 6px rgba(0,0,0,.8)!important;-webkit-text-stroke:.5px rgba(0,0,0,.6)}
-.fx-hit{filter:brightness(2.2) saturate(.4) drop-shadow(0 0 8px #fff);transform:translateX(3px)}
-.fx-hit-crit{filter:brightness(2.6) sepia(.6) saturate(3) hue-rotate(-15deg) drop-shadow(0 0 14px #ffb300);transform:scale(1.08)}
-.fx-poison{filter:sepia(.5) hue-rotate(60deg) saturate(2.2) drop-shadow(0 0 8px rgba(80,255,80,.8))}
-.fx-frozen{filter:saturate(.3) brightness(1.15) hue-rotate(170deg) drop-shadow(0 0 8px rgba(150,220,255,.95))}
-.fx-burn{filter:drop-shadow(0 0 10px rgba(255,120,0,.95)) brightness(1.1)}
+.fx-hit{filter:brightness(2.2) saturate(.4) drop-shadow(0 0 8px #fff);translate:3px 0}
+.fx-hit-crit{filter:brightness(2.6) sepia(.6) saturate(3) hue-rotate(-15deg) drop-shadow(0 0 14px #ffb300);scale:1.08}
+.fx-poison>*{filter:sepia(.5) hue-rotate(60deg) saturate(2.2) drop-shadow(0 0 8px rgba(80,255,80,.8))}
+.fx-frozen>*{filter:saturate(.3) brightness(1.15) hue-rotate(170deg) drop-shadow(0 0 8px rgba(150,220,255,.95))}
+.fx-burn>*{filter:drop-shadow(0 0 10px rgba(255,120,0,.95)) brightness(1.1)}
 .fx-canvas{image-rendering:auto}
+
+/* ---- pop-out unit cards (js/popcard.js); transform/opacity only for 60fps ---- */
+.pop-tilt{transform:perspective(520px) rotateX(16deg);transform-origin:50% 100%}
+.pop-spawn .pop-tilt{animation:popTilt .55s cubic-bezier(.2,1.4,.4,1)}
+@keyframes popTilt{0%{transform:perspective(520px) rotateX(0deg) scale(.85);opacity:0}100%{transform:perspective(520px) rotateX(16deg)}}
+.pop-win{position:absolute;z-index:40;pointer-events:none;clip-path:inset(-120% -14% 0 -14%)}
+.pop-shadow{position:absolute;left:12%;right:12%;bottom:-2px;height:14px;border-radius:50%;background:radial-gradient(rgba(0,0,0,.45),rgba(0,0,0,0) 70%)}
+.pop-fig{position:absolute;left:-8%;right:-8%;bottom:0;transform-origin:50% 100%;will-change:transform;
+  animation:popRise .6s cubic-bezier(.2,1.3,.4,1) both,popBreath 2.4s ease-in-out .6s infinite}
+.pop-img{position:absolute;inset:0;background:no-repeat 50% 100%/contain;filter:drop-shadow(0 -1px 0 rgba(255,240,200,.6)) drop-shadow(0 3px 4px rgba(0,0,0,.55))}
+.pop-spawn .pop-fig{animation:popRise .6s cubic-bezier(.2,1.3,.4,1) both,popBreath 2.4s ease-in-out .6s infinite}
+@keyframes popRise{0%{transform:translateY(70%) scale(.9);opacity:0}60%{opacity:1}100%{transform:none}}
+@keyframes popBreath{0%,100%{transform:scale(1,1) translateY(0)}50%{transform:scale(1.015,1.04) translateY(-2px)}}
+.pop-fig.pop-atk{animation:popAtk .58s ease-out}
+@keyframes popAtk{0%{transform:none}40%{transform:translateY(3px) scale(.97,.95)}57%{transform:translateY(-12px) scale(1.12)}100%{transform:none}}
+.pop-fig.pop-hit{animation:popHit .36s ease-out}.pop-fig.pop-hit .pop-img{filter:brightness(2.4) saturate(.3)}
+.pop-fig.pop-hitc{animation:popHit .36s ease-out}.pop-fig.pop-hitc .pop-img{filter:brightness(2.2) sepia(.8) saturate(4) hue-rotate(-20deg)}
+@keyframes popHit{0%{transform:translateX(0) rotate(0)}25%{transform:translate(5px,2px) rotate(5deg) scale(.95)}55%{transform:translate(-3px,0) rotate(-2deg)}100%{transform:none}}
+.pop-dying .pop-tilt{animation:popCardOut .5s ease-in forwards}.pop-dying .cc-label{transition:opacity .4s;opacity:0}
+.pop-dying .pop-fig{animation:popSink .5s ease-in forwards}
+@keyframes popSink{to{transform:translateY(85%) scale(.9);opacity:0}}
+@keyframes popCardOut{to{transform:perspective(520px) rotateX(40deg) scale(.9);opacity:0}}
