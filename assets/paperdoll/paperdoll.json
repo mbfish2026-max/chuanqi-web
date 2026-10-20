@@ -1,0 +1,249 @@
+{
+ "1": {
+  "canvas": [
+   720,
+   1280
+  ],
+  "layers": [
+   "body",
+   "armor",
+   "helmet",
+   "weapon"
+  ],
+  "base": {
+   "body": "body.png"
+  },
+  "note": "战士(prof=1)，原版仅男性形象；无披风/盾牌部位。所有图层同画布、同姿势、脚底贴底边、水平居中。",
+  "tiers": {
+   "armor": [
+    {
+     "tier": "cloth",
+     "file": "armor_cloth.png",
+     "minLevel": 1,
+     "itemIds": [
+      110001,
+      205002
+     ],
+     "names": [
+      "布衣",
+      "新人布衣"
+     ]
+    },
+    {
+     "tier": "light",
+     "file": "armor_light.png",
+     "minLevel": 12,
+     "itemIds": [
+      110002
+     ],
+     "names": [
+      "轻型盔甲"
+     ]
+    },
+    {
+     "tier": "medium",
+     "file": "armor_medium.png",
+     "minLevel": 19,
+     "itemIds": [
+      110003
+     ],
+     "names": [
+      "中型盔甲"
+     ]
+    },
+    {
+     "tier": "heavy",
+     "file": "armor_heavy.png",
+     "minLevel": 25,
+     "itemIds": [
+      110004,
+      110007,
+      110010
+     ],
+     "names": [
+      "重盔甲",
+      "战神盔甲",
+      "天魔神甲"
+     ]
+    },
+    {
+     "tier": "supreme",
+     "file": "armor_supreme.png",
+     "minLevel": 55,
+     "itemIds": [
+      110013,
+      110016,
+      110019
+     ],
+     "names": [
+      "圣战宝甲",
+      "雷霆战甲",
+      "至尊战袍"
+     ]
+    }
+   ],
+   "weapon": [
+    {
+     "tier": "wood",
+     "file": "weapon_wood.png",
+     "minLevel": 1,
+     "itemIds": [
+      105001,
+      105002,
+      105003,
+      105004,
+      205001
+     ],
+     "names": [
+      "木剑",
+      "匕首",
+      "短剑",
+      "乌木剑",
+      "新人木剑"
+     ]
+    },
+    {
+     "tier": "iron",
+     "file": "weapon_iron.png",
+     "minLevel": 9,
+     "itemIds": [
+      105005,
+      105006,
+      105007,
+      105008,
+      105009,
+      105010,
+      105011,
+      105012,
+      105013,
+      105033,
+      105017,
+      105014,
+      105042,
+      105044,
+      105036
+     ],
+     "names": [
+      "青铜剑",
+      "铁剑",
+      "八荒",
+      "海魂",
+      "半月",
+      "修罗",
+      "偃月",
+      "降魔",
+      "命运之刃",
+      "命运之刃",
+      "祈祷之刃",
+      "炼狱",
+      "凌风",
+      "斩马刀",
+      "倚天剑"
+     ]
+    },
+    {
+     "tier": "caijue",
+     "file": "weapon_caijue.png",
+     "minLevel": 31,
+     "itemIds": [
+      105018,
+      105021,
+      105022,
+      105025,
+      205003
+     ],
+     "names": [
+      "井中月",
+      "赤血魔剑",
+      "裁决之杖",
+      "霸者之刃",
+      "黄金裁决"
+     ]
+    },
+    {
+     "tier": "tulong",
+     "file": "weapon_tulong.png",
+     "minLevel": 34,
+     "itemIds": [
+      105034,
+      105026,
+      105029,
+      105030,
+      105040
+     ],
+     "names": [
+      "屠龙",
+      "怒斩",
+      "逍遥之刃",
+      "开天",
+      "至尊屠龙"
+     ]
+    }
+   ],
+   "helmet": [
+    {
+     "tier": "basic",
+     "file": "helmet_basic.png",
+     "minLevel": 1,
+     "itemIds": [
+      115001,
+      115002,
+      115017
+     ],
+     "names": [
+      "头盔",
+      "青铜头盔",
+      "斗笠"
+     ]
+    },
+    {
+     "tier": "skull",
+     "file": "helmet_skull.png",
+     "minLevel": 14,
+     "itemIds": [
+      115003,
+      115004,
+      115005,
+      115006,
+      115007,
+      115008,
+      115009,
+      115010
+     ],
+     "names": [
+      "魔法头盔",
+      "道士头盔",
+      "祈祷头盔",
+      "骷髅头盔",
+      "神秘头盔",
+      "道士头盔0",
+      "记忆头盔",
+      "黑铁头盔"
+     ]
+    },
+    {
+     "tier": "holy",
+     "file": "helmet_holy.png",
+     "minLevel": 59,
+     "itemIds": [
+      115011
+     ],
+     "names": [
+      "圣战头盔"
+     ]
+    },
+    {
+     "tier": "thunder",
+     "file": "helmet_thunder.png",
+     "minLevel": 69,
+     "itemIds": [
+      115014
+     ],
+     "names": [
+      "雷霆战盔"
+     ]
+    }
+   ]
+  }
+ }
+}
