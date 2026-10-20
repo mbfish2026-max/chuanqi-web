@@ -52,3 +52,16 @@ API: `Systems.hero.has() / canUnlock() / unlock(prof,name) / info() / attr() / e
 - 存档: role.quest {ver:1,...}; v0→v1 迁移用 role.kills 回填累计击杀; role.ver 至少为 1
 - API: main()/claimMain(id), daily()/claimDaily(id), activity()/chests()/openChest(id), achievements()/claimAch(id), red()
 - 截图: `?quest=main|daily|ach&qdemo=1`
+
+## 装备系统改造 (js/systems/loot.js, UI: js/ui_loot.js, 测试: tools/test_loot.js)
+- 部位: 已对照 GameKeys.eWeaponPart + item.txt 核实 5武器 10衣服 15头盔 20项链 22/23戒指 24/25手镯 62鞋 64腰带 (文档对戒指/手镯的猜测是反的)
+- 品质: c=floor((base-floor((ilvl-qlvl)/div))*128) → MF 递减 MF*F/(MF+F) (F 250/500/600) → 下限 min → 怪物品质系数 c*f/1024; 判定 橙→紫→蓝→绿, floor(rnd*c)<128. 替换掉落表里的 gailv (BOSS 前两档必橙保留)
+- 每怪 TC: 按怪 q1-5 的 picks/nodrop/equip 权重, 装备基底取 needlevel∈[lvl-12,lvl+3] 的可穿部位; 掉落写入 s.il (ilvl)
+- 词缀: 同 code 不重复 (洗练也排除锁定词条的 code); alvl 门槛限制词缀等级档
+- 暗金 (q5 + 固定词条 s.uq): 屠龙/裁决之杖/骨玉权杖/龙纹剑/嗜魂法杖/倚天剑/井中月/血饮/无极棍/怒斩/开天/镇天/玄天/至尊屠龙; 倚天剑 GM 行在运行时修正为 50 级底子
+- 套装 (q4 + s.set): 战神/魔神/幽灵/圣战/法神/天尊/雷霆/烈焰/光芒, 2/3/5 件加成, 走 attr 钩子
+- 分解得精华 (白1 绿3 蓝6 紫6 套装12 暗金15), 5 精华换 1 洗练石; 自动分解规则 role.lootCfg (原版 role_setup 回收设置面板); 锁定阻止分解/出售/回收
+- 整理: 道具在前, 装备按 品质→暗金/套装→部位→等级→名称; 对比: Systems.loot.compare(uid) (背包格升级箭头 + tipEquip 对比块)
+- 光柱: FXE('drop',{m,q,name,uq,set}) → fx.js dropBeam
+- 存档: role.ver=2 (key 仍为 cq_web_save_v1), 迁移 MIG[1] 补字段并标记旧存档里的暗金/套装
+- 截图: `?seed=1&map=1003&eq=tip|set|salvage|beam`, `?seed=1&page=main_role&eq=bag`

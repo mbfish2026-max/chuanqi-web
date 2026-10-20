@@ -172,7 +172,8 @@ function rollDrop(m){
       if(idx>0){ var list=c['item'+idx]; if(!list||!list.length) continue;
         var id=list[Math.floor(Math.random()*list.length)], ic=cfg('item',id); if(!ic) continue;
         var q = ic.type==2 ? (m.q==5 && idx<=2 ? 5 : (c['gailv'+idx] ? randomIndex(c['gailv'+idx])+1 : 1)) : ic.quality;
-        var s=createStuff(id,1,q); if(!s) continue;
+        q=H('dropQuality', q, ic, m, c, idx); // [loot] 品质判定公式
+        var s=createStuff(id,1,q); if(!s) continue; H('dropItem', s, ic, m); // [loot] 暗金/套装
         var ex=res.item.filter(function(x){return x.id==id && ic.type!=2;})[0]; if(ex) ex.count++; else res.item.push(s);
       }
     }
@@ -292,7 +293,7 @@ function claimTask(id){ var t=cfg('task',id), p=taskProgress(t); if(!p||p[0]<p[1
 
 // ---------- 存档 ----------
 function save(){ if(!G.role) return; G.role.lastSave=Date.now(); try{ localStorage.setItem(SAVE_KEY, JSON.stringify({role:G.role, settings:G.settings})); }catch(e){} }
-function load(){ try{ var d=JSON.parse(localStorage.getItem(SAVE_KEY)); if(d&&d.role){ G.role=d.role; G.settings=d.settings||G.settings; return true; } }catch(e){} return false; }
+function load(){ try{ var d=JSON.parse(localStorage.getItem(SAVE_KEY)); if(d&&d.role){ G.role=d.role; G.settings=d.settings||G.settings; H('loaded', G.role); return true; } }catch(e){} return false; }
 function resetSave(){ localStorage.removeItem(SAVE_KEY); location.reload(); }
 // 离线收益 (TipOffline 简化: 离线时长 * 当前地图怪物平均经验)
 function offlineReward(){

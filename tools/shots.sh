@@ -31,3 +31,8 @@ shot quest_btn "?seed=1&map=1003&qdemo=1&quest=0" 4000
 shot quest_main "?seed=1&map=1003&quest=main" 3800
 shot quest_daily "?seed=1&map=1003&quest=daily&qdemo=1" 3800
 shot quest_ach "?seed=1&map=1003&quest=ach&qdemo=1" 3800
+shot eq_tip_unique "?seed=1&map=1003&eq=tip" 3500
+shot eq_tip_set "?seed=1&map=1003&eq=set" 3500
+shot eq_salvage "?seed=1&map=1003&eq=salvage" 3500
+shot eq_bag "?seed=1&page=main_role&eq=bag" 3500
+shot eq_beam "?seed=1&map=1003&eq=beam" 4200

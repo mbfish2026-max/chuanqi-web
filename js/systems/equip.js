@@ -9,8 +9,11 @@
     {lv:5,quality:[4,4,16,16],cost:1500},{lv:6,quality:[4,4,16,16],cost:1500},{lv:7,quality:[8,8,20,20],cost:3000},{lv:8,quality:[8,8,20,20],cost:3000},{lv:9,quality:[16,16,40,40],cost:5000}];
   var MAX_LOCK = 2;   // TipRemake.affixAttr: 已锁 2 条时其余不可再锁
 
-  function affixPool(c){
+  // [loot] 词缀等级门槛 alvl (EQUIP_SYSTEM §2.3): ilvl=掉落怪等级, qlvl=装备需求等级
+  function alvlOf(ilvl, qlvl){ return ilvl < 99 - qlvl/2 ? ilvl - qlvl/2 : 2*ilvl - 99; }
+  function affixPool(c, ilvl){
     var lvl = 10*Math.floor(c.needlevel/10)+10; if(c.needlevel%10==0) lvl -= 10;   // Stuff.setAffixData
+    if(ilvl){ var cap = Math.max(10, 10*Math.ceil(alvlOf(ilvl, c.needlevel)/10)); if(cap < lvl) lvl = cap; }
     return (CFG.equip_cizhui||{list:[]}).list.filter(function(x){ return x.lvl==lvl && (!x.position || !x.position.length || x.position.indexOf(c.stdmode)!=-1); });
   }
   function rollAffix(pool){
@@ -21,7 +24,12 @@
     } else lo=hi=Math.ceil(Math.random()*e.maxvalue*100)/100;
     return {id:e.id, code:e.code, minValue:lo, maxValue:hi, isPer:z.vtype};
   }
-  function genAffix(s, c){ var pool=affixPool(c), out=[]; if(!pool.length) return out; for(var i=0;i<(AFFIX_CNT[s.q]||0);i++) out.push(rollAffix(pool)); return out; }
+  // [loot] 同组(同 code)词缀不叠加: 已有/锁定 code 从池中剔除 (EQUIP_SYSTEM §2.3 group)
+  function genAffix(s, c, keep){ var pool=affixPool(c, s.il), out=[], used={};
+    (keep||[]).forEach(function(x){ if(x) used[x.code]=1; });
+    for(var i=(keep||[]).filter(Boolean).length;i<(AFFIX_CNT[s.q]||0);i++){ var p=pool.filter(function(x){ return !used[x.code]; }); if(!p.length) break;
+      var a=rollAffix(p); used[a.code]=1; out.push(a); }
+    return out; }
 
   S.on('createStuff', function(s, c){ if(c.type==2 && !s.affix) s.affix = genAffix(s, c); });
 
@@ -65,6 +73,7 @@
 
   var pending = {};   // uid -> {affix, locks}
   S.equip = {
+    genAffix: genAffix, alvlOf: alvlOf,
     applyAffixes: applyAffixes,   // 英雄装备复用
     affixes: function(uid){ var f=S.findStuff(uid); if(!f||!f.s.affix) return []; return f.s.affix.map(function(x){ return {text:affixText(x), quality:affixQuality(x), raw:x}; }); },
     affixText: affixText,
@@ -83,7 +92,7 @@
       if(r.gold < cost.gold) return '金币不足';
       if(countItem(S.ITEM_STONE) < cost.stone) return '洗练石不足 (需要 '+cost.stone+')';
       r.gold -= cost.gold; consumeItem(S.ITEM_STONE, cost.stone); r.stat.remake++;
-      var na = genAffix(s, c); locks.forEach(function(i){ if(s.affix[i]) na[i]=s.affix[i]; });
+      var kept = locks.map(function(i){ return s.affix[i]; }), fresh = genAffix(s, c, kept), na = s.affix.map(function(x, i){ return locks.indexOf(i)!=-1 ? x : fresh.shift(); }).filter(Boolean);
       pending[uid] = na; save();
       return S.ok('洗练完成, 新属性: '+na.map(affixText).join(' / '));
     },
