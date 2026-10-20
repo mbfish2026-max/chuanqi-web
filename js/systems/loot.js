@@ -78,7 +78,10 @@
 
   // ---------- 每怪掉落 TC ----------
   var basesCache = null;
-  function bases(){ if(basesCache) return basesCache; basesCache = CFG.item.list.filter(function(c){ return c.type==2 && WEAR.indexOf(c.stdmode)!=-1 && c.needlevel>0 && c.price>0 && c.id<200000; }); return basesCache; }
+  // 基底池 = 原版 drop.txt 出现过的装备 ∪ 暗金 ∪ 套装件 (item.txt 里还有 55 件原版不掉落、也没有图标的底子, 如 凌风/破魂/祈福项链, 不进 TC)
+  function origPool(){ var ids={}; ((CFG.drop&&CFG.drop.list)||[]).forEach(function(t){ for(var k in t) if(/^item\d+$/.test(k) && Array.isArray(t[k])) t[k].forEach(function(id){ ids[id]=1; }); });
+    for(var u in UNIQUES) ids[u]=1; for(var z in SET_OF) ids[z]=1; return ids; }
+  function bases(){ if(basesCache) return basesCache; var pool=origPool(); basesCache = CFG.item.list.filter(function(c){ return c.type==2 && WEAR.indexOf(c.stdmode)!=-1 && c.needlevel>0 && c.price>0 && c.id<200000 && pool[c.id]; }); return basesCache; }
   function tcPick(m, rnd){ rnd=rnd||Math.random; var t=TC[m.q]||TC[1], L=(m.cfg&&m.cfg.lvl)||1, out=[];
     for(var p=0;p<t.picks;p++){ if(Math.floor(rnd()*(t.nd+t.eq)) < t.nd) continue;
       var list=bases().filter(function(c){ return c.needlevel<=L+3 && c.needlevel>=L-12; }); if(!list.length) continue;
@@ -149,7 +152,7 @@
 
   S.loot = {
     VER:VER, UNIQUES:UNIQUES, SETS:SETS, SET_OF:SET_OF, TC:TC, RATIO:RATIO, ANAME:ANAME, _ilvl:0, _killing:null, tcOff:false,
-    chance:chance, rollQuality:rollQuality, mfEff:mfEff, tcPick:tcPick, finalize:finalize, makeUnique:makeUnique, label:label,
+    chance:chance, rollQuality:rollQuality, bases:bases, mfEff:mfEff, tcPick:tcPick, finalize:finalize, makeUnique:makeUnique, label:label,
     setCounts:setCounts, setBonus:setBonus, compare:compare, salvage:salvage, salvageAll:salvageAll, essOf:essOf, exchangeStone:exchangeStone,
     cfg:cfgL, shouldAuto:shouldAuto, migrate:migrate,
     setAuto:function(q, on){ cfgL().auto[q]=!!on; save(); return S.ok(); },
