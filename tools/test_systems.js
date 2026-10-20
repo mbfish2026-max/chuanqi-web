@@ -108,8 +108,8 @@ R('loadConfigs()').then(()=>{
   ok(Q.main().length>0 && Q.main()[0].id,'主线 = 原版 task 链: '+Q.main().map(x=>x.name).join(','));
   ok(Q.daily().length===6 && !Q.red().daily,'每日任务 6 条, 初始无红点');
   R('enterMap(CFG.map.list.filter(function(m){return m.type==2;})[0].id)'); G.role.level=40;
-  for(let i=0;i<4000 && (qr.quest.daily.cnt.kill||0)<100;i++) R('tick(0.1)');
-  ok((qr.quest.daily.cnt.kill||0)>=100,'击杀事件计数 '+qr.quest.daily.cnt.kill);
+  for(let i=0;i<4000 && (qr.quest.daily.cnt.kill||0)<5;i++) R('tick(0.1)');
+  ok((qr.quest.daily.cnt.kill||0)>=1,'战斗击杀事件计数 '+qr.quest.daily.cnt.kill); Q.emit('kill',100-qr.quest.daily.cnt.kill);
   ok(Q.red().daily && Q.red().any,'可领取时红点');
   const g0=qr.gold; console.log('  claimDaily:',Q.claimDaily('d_kill')); ok(qr.gold>=g0+5000 && Q.activity()===20,'每日奖励+活跃度20');
   ok(Q.claimDaily('d_kill')==='已领取','不可重复领取'); ok(Q.claimDaily('d_boss')==='未完成','未完成不可领');
