@@ -28,12 +28,14 @@ function createStuff(id, count, quality){
       while(p-->0){ s.attr[keys[Math.floor(Math.random()*4)]]++; }
     }
   }
+  H('createStuff', s, c); // [systems] 词缀
   return s;
 }
 function stuffCfg(s){ return cfg('item', s.id); }
 function isEquip(s){ var c=stuffCfg(s); return c && c.type==2; }
 function addItem(s){
   var r=G.role, c=stuffCfg(s); if(!c) return;
+  if(H('addItem', false, s, c)) return false; // [systems] 金币/元宝道具折算、背包上限
   if(c.stdmode==98){ var n=parseInt(c.name)||1; r.yuanbao+=n*s.count; return; }
   if(c.type!=2){ for(var i=0;i<r.bag.length;i++){ if(r.bag[i].id==s.id){ r.bag[i].count+=s.count; return; } } }
   if(c.type==2 && s.q>=4){ r.stat['equipq'+s.q]=(r.stat['equipq'+s.q]||0)+1; }
@@ -73,6 +75,7 @@ function calcAttr(){
   });
   // 被动技能 (如 基本剑法: 攻击+N, 精神战力法: 攻击/道术+N)
   eachSkill(function(sc){ if(sc.triggertype===0 && !sc.gailv){ var m=/(\d+)点/.exec(sc.describe||''); if(m){ a['min'+atk]+=+m[1]; a['max'+atk]+=+m[1]; } } });
+  H('attr', a, r); // [systems] 词缀/Buff
   a.atkmin=a['min'+atk]; a.atkmax=Math.max(a['max'+atk],a.atkmin);
   return a;
 }
@@ -129,18 +132,20 @@ function roleAttack(b, a){
   if(Math.random()*100 >= 90+a.hit-(target.cfg.evade||0)){ log('你的攻击被 '+target.cfg.name+' 闪避'); return; }
   var lucky = Math.random()*100 < 5*a.lucky;
   var dmg = lucky ? a.atkmax : rnd(a.atkmin, a.atkmax);
-  var used=null;
+  var used=null, usedSc=[];
   // 主动技能: 按优先级挑选可用 (cd 就绪 & 蓝够)
   var cands=[]; eachSkill(function(sc,st,base){ if(sc.triggertype==1 && sc.power2 && (st.cd||0)<=0 && r.mp>=(sc.spell||0)) cands.push([sc,st]); });
   cands.sort(function(x,y){ return (y[0].priority||0)-(x[0].priority||0); });
-  if(cands.length){ var sc=cands[0][0], st=cands[0][1]; dmg = dmg*sc.power2/100 + (sc.atktype==2?0:(sc.power||0)); r.mp-=(sc.spell||0); st.cd=sc.basecd||0; st.exp=(st.exp||0)+1; used=sc.name; }
+  cands = H('skillCands', cands);
+  if(cands.length){ var sc=cands[0][0], st=cands[0][1]; dmg = dmg*sc.power2/100 + (sc.atktype==2?0:(sc.power||0)); r.mp-=(sc.spell||0); st.cd=sc.basecd||0; st.exp=(st.exp||0)+1; used=sc.name; usedSc.push(sc); }
   // 被动概率技能 (攻杀剑法等)
-  eachSkill(function(sc,st){ if(sc.triggertype===0 && sc.gailv && sc.power2 && Math.random()*100<sc.gailv){ dmg=dmg*sc.power2/100+(sc.power||0); st.exp=(st.exp||0)+1; used=(used?used+'+':'')+sc.name; } });
+  eachSkill(function(sc,st){ if(sc.triggertype===0 && sc.gailv && sc.power2 && Math.random()*100<sc.gailv){ dmg=dmg*sc.power2/100+(sc.power||0); st.exp=(st.exp||0)+1; used=(used?used+'+':'')+sc.name; usedSc.push(sc); } });
   var crit = Math.random()*100 < a.critical; if(crit) dmg*=1.5;
   dmg = Math.ceil(dmg - target.ac); var fx=Math.max(0,a.fixeddamage-(target.cfg.fixedac||0)); dmg+=fx; if(dmg<=0) dmg=1;
+  dmg = H('roleDamage', dmg, target, a, usedSc, crit); // [systems] Buff/词缀
   target.hp-=dmg;
   log((used?'['+used+'] ':'')+'你对 <span class="q'+target.q+'">'+target.cfg.name+'</span> 造成 '+dmg+' 伤害'+(crit?' (暴击)':''));
-  if(target.hp<=0) killMonster(b,target);
+  if(target.hp<=0 && !target.dead) killMonster(b,target);
 }
 function killMonster(b, m){
   var r=G.role; m.dead=true; m.hp=0; m.respawn = (m.boss? 0 : (m.cfg.rebirth||3));
@@ -151,6 +156,7 @@ function killMonster(b, m){
   drop.item.forEach(function(s){ var c=stuffCfg(s);
     if(c.type==2 && G.settings.autoSell && s.q<=G.settings.autoSell && !s.nonsuch){ r.gold+=c.sellprice||0; log('自动出售 '+c.name); return; }
     addItem(s); log('获得 <span class="q'+s.q+'">'+(c.type==2?'['+QNAME[s.q]+']':'')+c.name+(s.count>1?' x'+s.count:'')+(s.nonsuch?' (极品+'+s.nonsuch+')':'')+'</span>'); });
+  H('kill', m, b);
   if(m.boss){ r.stat['boss_'+m.cfg.id]=Date.now()+60000*(m.cfg.rebirth||3); b.mons.splice(b.mons.indexOf(m),1); }
 }
 // DropTool.setDropInfo
@@ -174,10 +180,12 @@ function rollDrop(m){
 }
 function monsterAttack(b, m, a){
   var r=G.role;
+  if(H('monsterAttack', false, b, m, a)) return; // [systems] 眩晕/冰冻/召唤兽承伤
   if(Math.random()*100 >= 90+(m.cfg.hit||0)-a.evade){ log(m.cfg.name+' 的攻击被你闪避'); return; }
   var d=rnd(Math.floor(m.zs), Math.max(Math.floor(m.zs),Math.floor(m.zsmax)-1));
   if(Math.random()*100 < (m.cfg.critical||0)) d=Math.ceil(d*1.5);
   d -= rnd(a.minac, Math.max(a.minac,a.maxac)); d+=Math.max(0,(m.cfg.fixeddamage||0)-a.fixedac); d=Math.ceil(d); if(d<=0) d=1;
+  d = H('roleHurt', d, m, a); // [systems] 护盾/免伤
   r.hp-=d; log('<span style="color:#e77">'+m.cfg.name+' 对你造成 '+d+' 伤害</span>');
   if(r.hp<=0) roleDie();
 }
@@ -207,7 +215,9 @@ function tick(dt){
   r.mp=Math.min(a.maxmp, r.mp+a.maxmp*0.005*dt);
   autoDrug(a);
   // 道士治疗术
-  eachSkill(function(sc,st){ if(sc.triggertype==2 && (st.cd||0)<=0 && r.hp<a.maxhp*(sc.parameter1||85)/100 && r.mp>=(sc.spell||0)){ var heal=Math.ceil(a.maxhp*(sc.power2||5)/100+a.atkmax); r.hp=Math.min(a.maxhp,r.hp+heal); r.mp-=sc.spell||0; st.cd=sc.basecd||10; st.exp=(st.exp||0)+1; log('['+sc.name+'] 回复生命 '+heal); } });
+  eachSkill(function(sc,st,base){ if(sc.triggertype==2 && !H('skillHandled',false,sc,base) && (st.cd||0)<=0 && r.hp<a.maxhp*(sc.parameter1||85)/100 && r.mp>=(sc.spell||0)){ var heal=Math.ceil(a.maxhp*(sc.power2||5)/100+a.atkmax); r.hp=Math.min(a.maxhp,r.hp+heal); r.mp-=sc.spell||0; st.cd=sc.basecd||10; st.exp=(st.exp||0)+1; log('['+sc.name+'] 回复生命 '+heal); } });
+  H('tick', dt, b, a, m); // [systems] Buff/召唤兽
+  if(G.battle!==b) return;
   b.roleT-=dt; if(b.roleT<=0){ b.roleT=a.atkspeed; roleAttack(b,a); }
   b.mons.forEach(function(x){
     if(x.dead){ x.respawn-=dt; if(x.respawn<=0){ var n=spawnMonster(m, m.monster[Math.floor(Math.random()*m.monster.length)]); for(var k in n) x[k]=n[k]; } return; }
@@ -244,6 +254,7 @@ function useItem(uid){
   if(c.stdmode==4) return learnFromBook(s.id);
   if(c.stdmode==99){ var lb=cfg('libao', s.id); if(!lb) return '礼包配置缺失';
     if(r.level<(lb.lev||1)) return '需要等级 '+lb.lev;
+    var chk=H('useLibao', null, lb, s); if(chk) return chk; // [systems] 背包空位检查
     removeItem(uid,1); r.gold+=lb.gold||0; r.yuanbao+=lb.yuanbao||0;
     for(var i=1;i<=8;i++){ if(lb['item'+i]){ var it=createStuff(lb['item'+i], lb['num'+i]||1); if(it){ if(stuffCfg(it).type==2){ it.count=1; } addItem(it);} } }
     return 'OK:打开 '+lb.name; }
@@ -271,7 +282,7 @@ function taskProgress(t){
     case 7: return [minEnch(), t.parameter1];
     case 8: return [r.stat.skillLearned||0, t.parameter1];
     case 10: var ch=Math.floor(t.id/1000), all=CFG.task.list.filter(function(x){return Math.floor(x.id/1000)==ch && x.type!=10;}); return [all.filter(function(x){return r.tasksDone[x.id];}).length, all.length];
-    default: return null;
+    default: return H('taskProgress', null, t);
   }
 }
 function currentTasks(){ var r=G.role; var undone=CFG.task.list.filter(function(t){return !r.tasksDone[t.id];}); if(!undone.length) return []; var ch=Math.floor(undone[0].id/1000); return undone.filter(function(t){return Math.floor(t.id/1000)==ch;}); }

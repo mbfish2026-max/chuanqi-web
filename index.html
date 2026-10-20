@@ -2,18 +2,21 @@
 <html lang="zh-CN"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>传奇之旅文字传奇 (Web复刻)</title>
-<link rel="stylesheet" href="style.css"></head>
-<body><div id="app">
- <div id="top"></div>
- <div id="page"></div>
- <div id="nav">
-  <button data-p="fight">战斗</button><button data-p="map">地图</button><button data-p="role">角色</button>
-  <button data-p="bag">背包</button><button data-p="skill">技能</button><button data-p="task">任务</button><button data-p="sys">设置</button>
- </div>
- <div id="modal" class="hide"><div id="modalBox"></div></div>
- <div id="toast"></div>
-</div>
+<link rel="stylesheet" href="css/cc.css"></head>
+<body>
+<div id="stage"></div>
+<script charset="utf-8" src="ui/prefabs.js"></script>
+<script charset="utf-8" src="js/cc.js"></script>
 <script charset="utf-8" src="js/data.js"></script>
 <script charset="utf-8" src="js/game.js"></script>
 <script charset="utf-8" src="js/ui.js"></script>
+<!-- [systems] BEGIN: 游戏系统逻辑 (福利/词缀洗练/铁匠/合成/分解/历练/Buff/召唤兽/背包上限), API: window.Systems -->
+<script charset="utf-8" src="js/systems/core.js"></script>
+<script charset="utf-8" src="js/systems/fuli.js"></script>
+<script charset="utf-8" src="js/systems/equip.js"></script>
+<script charset="utf-8" src="js/systems/smith.js"></script>
+<script charset="utf-8" src="js/systems/lilian.js"></script>
+<script charset="utf-8" src="js/systems/buff.js"></script>
+<!-- [systems] END -->
+<script charset="utf-8" src="js/ui_systems.js"></script>
 </body></html>

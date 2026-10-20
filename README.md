@@ -1,34 +1,36 @@
 # 传奇之旅文字传奇 — 纯 HTML/JS 复刻
 
-无引擎、无构建。运行: `python3 -m http.server 8081` 后访问 http://<host>:8081/ (竖屏手机布局)。
-原工程 `../src` 只读未改动；配置表 (`assets/resources/config/*.txt`, JSON) 与 PNG 美术已复制到 `assets/`。
+无引擎、无构建。运行: `python3 -m http.server 8081` 后访问 http://<host>:8081/ (竖屏, 设计分辨率 750×1334 等比缩放)。
+原工程 `../src` 只读未改动。
 
-文件: `index.html` `style.css` `js/data.js`(加载配置表) `js/game.js`(玩法逻辑) `js/ui.js`(界面)。
+## 结构
+- `tools/convert_prefabs.py` — 解析原 Cocos Creator 2.4 的 `Start.fire` 和 64 个 `*.prefab` (JSON)：节点树、位置/锚点/尺寸/缩放/旋转、
+  cc.Sprite (spriteFrame uuid → .meta → PNG，按 trim/rotated 裁切，含九宫格 border)、cc.Label (文字/字号/行高/颜色/对齐/溢出)、
+  LabelOutline、RichText、Button、Layout、Widget、Mask、ScrollView、ProgressBar、Toggle、EditBox，以及原脚本组件的属性→节点引用。
+  输出 `ui/prefabs.js` 与 `assets/ui/*.png`。
+- `js/cc.js` — 迷你渲染器：把 prefab 树转成绝对定位 DOM (Cocos 坐标 → CSS)，实现 Widget 对齐、Layout(横/竖/网格, 容器自适应)、
+  Sprite SIMPLE/SLICED/TILED/FILLED、进度条、滚动视图、按钮、输入框；`node.ref('labCoin')` 按原脚本属性名取节点。
+- `js/data.js` / `js/game.js` — 配置表加载与核心玩法；`js/systems/*` — 扩展系统 (window.Systems)。
+- `js/ui.js` / `js/ui_systems.js` — 用原 prefab 搭界面并挂接逻辑 (节点名与 Main.js / MainFight.js / MapBattle.js / MainRole.js / RoleBag.js 等一致)。
+- `tools/shots.sh` + `tools/cdp.js` — 无头 Chrome 截图 (输出 ../shots/*.png)。调试参数: `?seed=<职业>&map=<id>&page=<prefab>&tip=<equip|props|store|...>`。
 
-## 已实现 (按原版脚本/数据重写)
-- 创建角色: 战士/法师/道士 (profession.txt)，随机名 (randomname.txt)，初始物品
-- 属性: 基础值 + 等级×成长 (Role.js)，装备/强化/被动技能加成，战力 (CombatTool + cizhui.txt 系数)
-- 地图: map.txt 九宫格移动 + map_info 大地图传送 (战力限制)；安全区/野外
-- 自动挂机战斗: 怪物品质随机 (map.quality) 及品质倍率 (Monster.js)，命中/幸运/暴击/固定伤害 (DamageTool)，攻速、怪物攻速、刷新；BOSS 定时刷新
-- 掉落: drop.txt 完整规则 (DropTool: nodrop/prob/picks/gailv 品质)，金币
-- 装备: 10 个部位穿戴/卸下，品质，极品属性 (bestgailv/points)，强化 (equip_qianghua + parts)
-- 背包: 使用/出售/一键出售/自动出售，药品 (5 秒持续回复, 自动吃药)，礼包 (libao.txt)，元宝道具，回城卷
-- 技能: 技能书学习/升级 (booknum、slevel、熟练度)，被动加攻、概率技能 (攻杀)、主动技能 (cd/耗蓝)、治疗术
-- 升级: levelup.txt 经验表；死亡后回到复活地图
-- 商店: shop.txt 药店/书店/金币/元宝商店
-- 任务: task.txt 章节任务 (等级/击杀/品质装备/战力/强化/学技能/章节完成) 与奖励
-- 存档: localStorage 每 5 秒自动保存；简化离线收益
+## 已实现
+- 界面 (原 prefab): 加载页、创建角色、主界面 (顶栏/底部 6 个导航/血蓝球/经验条)、战斗页 (6×5 格子战场 itemRole、九宫格小地图与连线、系统消息、BOSS 列表)、
+  安全区 NPC (map_neutrally/itemNpc)、角色页 (装备格/属性/背包/强化)、技能页、历练、世界地图 (mapVec 坐标)、福利 (签到/七日/兑换码)、
+  tipEquip / tipProps / tipStore / tipStoreBuy / tipMapDesc / tipOffline / role_die / tipToast / tipRemake / tipBlacksmith / tipFuse / tipFuseItem
+- 玩法: 三职业、属性成长、战力、九宫格与大地图移动、自动挂机战斗 (品质怪、命中/幸运/暴击/固伤)、BOSS 刷新、drop.txt 掉落、装备 10 部位/品质/极品/强化、
+  药品与自动吃药、礼包、技能书学习/升级、升级、商店、任务/历练、存档 (localStorage)、离线收益
+- 扩展系统 (js/systems): 签到/七日/兑换码、词缀与洗练、铁匠锻造、合成、分解/回收、背包容量 (50 格, 可扩)、Buff、召唤兽
 
-## 未实现
-- QuickSDK/XGSdk/登录/充值/广告/HTTP (cpgc.phonecoolgame.com)，特权 (Prerogative)
-- 福利: 签到、兑换码、充值福利 (FuliSign/FuliExchange/FuliRecharge/FuliCoin)
-- 装备词缀与洗练 (equip_cizhui, TipRemake)、合成 (fuse.txt)、分解、铁匠
-- 历练 (lilian.txt)、剧情 (MainStory)、新手引导 (guide.txt)、宠物/召唤 (Partner)、Buff 系统 (buff.txt)
-- 格子地图 A* 走位与技能特效动画 (.anim)、音效
-- 任务类型 9/11 (幸运、洗练) 显示"未实现"
+## 未实现 / 与原版差异
+- QuickSDK/XGSdk/登录/充值/广告/HTTP (cpgc.phonecoolgame.com)，特权；福利页“金币/元宝”(充值) 页签仅显示原界面
+- 战场格子中的 A* 走位、攻击方向动画 (.anim)、技能特效、飘字、音效；怪物位置固定在格子上
+- 新手引导 (guide.txt)、商人 (role_yyshop) 页签 (改为打开回收)
+- Widget 在非 750×1334 比例下按“等比缩放+留黑边”处理，未做原版 fitWidth 的高度拉伸
+- 位图字体 (pingfang/simli .fnt) 用系统字体替代
 
 ## 已知问题
 - 伤害/回复数值为对原逻辑的近似 (技能效果按配置字段简化解析)
-- 背包无容量上限
-- 原版新手礼包数据给予 9999999 金币/元宝 (原配置如此，未修改)
+- 新手礼包原配置给 9999999 金币/元宝；现在加载时被替换为 0 金币 / 0 元宝 + 一个 8级礼包
 - 离线收益为简化公式，非原版 TipOffline 算法
+- 部分弹窗内文字对齐与原版有像素级偏差 (Label 溢出模式近似)
