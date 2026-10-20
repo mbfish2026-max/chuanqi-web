@@ -211,10 +211,12 @@ function buildScene(){
   if (m.type == 2) {
     var b = UI.battle = inst('map_battle'); UI.battleHolder.addChild(b);
     b.ref('mapName').setString(m.name.split('').join('\n'));
+    b.ref('mapName').setColor('#3b2812'); b.ref('mapName').el.style.textShadow = '0 0 3px rgba(255,240,210,.9)';
     b.ref('mapName').el.style.whiteSpace = 'pre'; b.ref('mapName').lbW = null;
     var grid = b.ref('battleNode'); UI.cells = [];
     for (var i = 0; i < 30; i++) { var cell = new CC.Node({n: 'grid' + i, x: 0, y: 0, w: 120, h: 125, ax: .5, ay: .5}, null); grid.addChild(cell, true); UI.cells.push(cell); }
     grid.layout();
+    brightBattleBg(b); UI.cells.forEach(function(c){ c.el.classList.add('bf-cell'); });
     UI.roleItem = inst('itemRole'); UI.roleItem.ref('monsterRoot').setActive(false); UI.cells[G.battle && G.battle.roleIdx != null ? G.battle.roleIdx : ROLE_CELL].addChild(UI.roleItem); UI.roleItem._cell = G.battle && G.battle.roleIdx;
     UI.roleItem.ref('roleSign').setImage(IMG + 'role_create/icon_avatar_' + G.role.prof + '_0.png');
     UI.roleItem.ref('roleSign').el.style.backgroundSize = 'contain';
@@ -238,6 +240,38 @@ function buildScene(){
       it.ref('icon').on(function(){ if (icon === 'img_main_blacksmith' && sys('smith')) tipBlacksmith(); else openStore(id, icon); });
       roles.addChild(it);
     });
+  }
+}
+// Battle ground: img_bg_battle art has RGB ground but near-zero alpha (old grid-overlay alpha kept), so the dark
+// img_bg tile showed through. Render it opaque once via canvas (skipped automatically if the art is already opaque).
+var BF_BG = null;
+function brightBattleBg(b){
+  var n = b.findDeep('img_bg_battle'); if (!n || !n.spEl) return;
+  var src = n.frame && n.frame.src; if (!src) return;
+  function put(cv){ var c = cv.cloneNode(false); c.className = 'bf-bg'; c.getContext('2d').drawImage(cv, 0, 0); n.spEl.style.backgroundImage = 'none'; var old = n.el.querySelector('.bf-bg'); if (old) old.remove(); n.el.insertBefore(c, n.el.firstChild.nextSibling); }
+  if (BF_BG && BF_BG.src === src) { if (BF_BG.cv) put(BF_BG.cv); return; }
+  var chk = new Image(); chk.onload = function(){ var c = document.createElement('canvas'); c.width = 64; c.height = 64; var x = c.getContext('2d'); x.drawImage(chk, 0, 0, 64, 64); var p = x.getImageData(0, 0, 64, 64).data, s2 = 0; for (var k = 3; k < p.length; k += 4) s2 += p[k]; if (s2 / 4096 < 200) go(); }; chk.src = src;
+  function go(){
+  BF_BG = {src: src};
+  // 2D canvas premultiplies alpha (RGB under alpha 0 is lost), so decode unpremultiplied and blit via WebGL with alpha forced to 1
+  fetch(src).then(function(r){ return r.blob(); }).then(function(bl){ return createImageBitmap(bl, {premultiplyAlpha: 'none', colorSpaceConversion: 'none'}); }).then(function(bm){
+    var cv = document.createElement('canvas'); cv.width = bm.width; cv.height = bm.height;
+    var gl = cv.getContext('webgl', {premultipliedAlpha: false, preserveDrawingBuffer: true, alpha: false}); if (!gl) return;
+    function sh(t, c){ var o = gl.createShader(t); gl.shaderSource(o, c); gl.compileShader(o); return o; }
+    var pr = gl.createProgram();
+    gl.attachShader(pr, sh(gl.VERTEX_SHADER, 'attribute vec2 p;varying vec2 u;void main(){u=vec2(p.x*.5+.5,.5-p.y*.5);gl_Position=vec4(p,0,1);}'));
+    gl.attachShader(pr, sh(gl.FRAGMENT_SHADER, 'precision mediump float;varying vec2 u;uniform sampler2D t;uniform float k;void main(){vec4 c=texture2D(t,u);gl_FragColor=vec4(c.rgb*k,1.);}'));
+    gl.linkProgram(pr); gl.useProgram(pr);
+    var bf = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, bf); gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
+    var loc = gl.getAttribLocation(pr, 'p'); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+    gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
+    var tx = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, tx); gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, bm);
+    [gl.TEXTURE_WRAP_S, gl.TEXTURE_WRAP_T].forEach(function(w){ gl.texParameteri(gl.TEXTURE_2D, w, gl.CLAMP_TO_EDGE); }); gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.uniform1f(gl.getUniformLocation(pr, 'k'), 1.0);
+    gl.viewport(0, 0, cv.width, cv.height); gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    var out = document.createElement('canvas'); out.width = cv.width; out.height = cv.height; out.getContext('2d').drawImage(cv, 0, 0);
+    BF_BG.cv = out; if (n.el.isConnected) put(out);
+  }).catch(function(){});
   }
 }
 function refreshScene(){

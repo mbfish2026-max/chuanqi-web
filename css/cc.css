@@ -55,3 +55,8 @@ html,body{margin:0;height:100%;background:#000;overflow:hidden;font-family:"Ping
 
 /* brighter UI: light outline keeps text readable on lighter art without darkening */
 .cc-label{text-shadow:0 1px 1px rgba(0,0,0,.35)}
+
+/* brighter battlefield: opaque ground art + thin light grid, cards stay readable */
+.bf-bg{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none}
+.bf-cell{box-shadow:inset 0 0 0 1px rgba(255,248,225,.22);background:rgba(255,250,235,.05)}
+.pop-card .cc-sp{filter:none}

@@ -10,23 +10,32 @@
     if (!UI.battle || !HS()) return; var host = UI.battle.el, old = host.querySelector('.hero-bar'); if (old) old.remove();
     var bar = el('div', 'position:absolute;left:14px;bottom:10px;z-index:30;display:flex;align-items:center;gap:8px;pointer-events:auto;'); bar.className = 'hero-bar';
     var hb = el('div', BTN + 'width:92px;height:52px;line-height:52px;', '英雄'); hb.onclick = heroPanel;
-    var rw = el('div', 'position:relative;width:220px;height:26px;background:url(' + IMG + 'basics/img_bar_bg.png) center/100% 100%;border-radius:4px;overflow:hidden;');
-    var rf = el('div', 'position:absolute;left:3px;top:4px;bottom:4px;width:0;background:linear-gradient(#ffe27a,#ff8a00 60%,#c14b00);border-radius:3px;transition:width .2s;');
-    var rl = el('div', 'position:absolute;inset:0;font:bold 16px/26px "PingFang SC",sans-serif;color:#fff;text-align:center;text-shadow:0 1px 2px #000;', '怒气');
+    // rage bar: 2x textures shown at 1x; 9-slice insets in image px = 2 x design px
+    var A = 'assets/ui/';
+    var rw = el('div', 'position:relative;width:220px;height:24px;box-sizing:border-box;border-style:solid;border-width:0 12px;border-image:url(' + A + 'hero_rage_bg.png) 0 24 0 24 fill stretch;');
+    var rf = el('div', 'position:absolute;left:-9px;top:3px;height:18px;width:0;box-sizing:border-box;border-style:solid;border-width:0 8px;border-image:url(' + A + 'hero_rage_fill.png) 0 16 0 16 fill stretch;transition:width .2s;');
+    var rl = el('div', 'position:absolute;left:-12px;right:-12px;top:0;font:bold 15px/24px "PingFang SC",sans-serif;color:#fff;text-align:center;text-shadow:0 1px 2px #000,0 0 3px #000;white-space:nowrap;', '怒气');
     rw.appendChild(rf); rw.appendChild(rl);
-    var hj = el('div', BTN + 'width:104px;height:60px;line-height:60px;font-size:26px;', '合击'); hj.onclick = function(){ msg(HS().heji()); };
+    // 合击 button: 104x104 image; name, ready pulse and cooldown sweep drawn by code on top
+    var hj = el('div', 'position:relative;width:104px;height:104px;background:url(' + A + 'btn_heji.png) center/100% 100% no-repeat;cursor:pointer;');
+    var hjCd = el('div', 'position:absolute;inset:8px;border-radius:50%;pointer-events:none;display:none;');
+    var hjT = el('div', 'position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:bold 24px "PingFang SC",sans-serif;color:#fff3c4;text-shadow:0 0 3px #000,0 2px 3px #000,0 0 8px rgba(255,120,0,.8);pointer-events:none;text-align:center;line-height:26px;', '合击');
+    var hjS = el('div', 'position:absolute;left:0;right:0;bottom:14px;font:bold 15px "PingFang SC",sans-serif;color:#fff;text-align:center;text-shadow:0 1px 2px #000;pointer-events:none;', '');
+    hj.appendChild(hjCd); hj.appendChild(hjT); hj.appendChild(hjS); hj.onclick = function(){ msg(HS().heji()); };
     bar.appendChild(hb); bar.appendChild(rw); bar.appendChild(hj); host.appendChild(bar);
-    UI.heroBar = {bar: bar, fill: rf, lab: rl, btn: hj, head: hb};
+    UI.heroBar = {bar: bar, fill: rf, lab: rl, btn: hj, btnText: hjT, btnSub: hjS, btnCd: hjCd, head: hb};
   }
   function refreshBar(){
     var H = HS(); if (!UI.battle) return; if (!UI.heroBar || !UI.heroBar.bar.isConnected) buildBar(); var hb = UI.heroBar; if (!hb) return;
     var info = H.info();
     hb.head.textContent = info ? (info.dead ? '复活' + info.reviveIn : '英雄') : (H.canUnlock() ? '召唤英雄' : '英雄');
-    if (!info) { hb.fill.style.width = '0'; hb.lab.textContent = '英雄 Lv' + H.UNLOCK_LEVEL + ' 开启'; hb.btn.style.filter = 'grayscale(1)'; return; }
-    var r = H.rage(); hb.fill.style.width = 'calc((100% - 6px) * ' + (r.rage / r.max) + ')';
+    if (!info) { hb.fill.style.width = '0'; hb.fill.style.display = 'none'; hb.lab.textContent = '英雄 Lv' + H.UNLOCK_LEVEL + ' 开启'; hb.btn.style.filter = 'grayscale(1)'; return; }
+    var r = H.rage(), pct = r.rage / r.max; hb.fill.style.display = pct > 0 ? '' : 'none'; hb.fill.style.width = Math.max(16, 214 * pct) + 'px';
     hb.lab.textContent = (r.cd > 0 ? '冷却 ' + r.cd + 's  ' : '') + '怒气 ' + r.rage + '/' + r.max;
-    hb.btn.textContent = info.combo.name.length <= 3 ? info.combo.name : '合击';
-    hb.btn.style.filter = r.ready ? 'drop-shadow(0 0 8px #ffcc33)' : 'grayscale(.8) brightness(.8)';
+    var nm = info.combo.name; hb.btnText.innerHTML = nm.length <= 3 ? nm : nm.slice(0, Math.ceil(nm.length / 2)) + '<br>' + nm.slice(Math.ceil(nm.length / 2));
+    hb.btnSub.textContent = r.cd > 0 ? r.cd + 's' : (r.ready ? '' : Math.floor(pct * 100) + '%');
+    if (r.cd > 0) { var f = Math.min(1, r.cd / 30); hb.btnCd.style.display = ''; hb.btnCd.style.background = 'conic-gradient(rgba(0,0,0,.55) ' + (f * 360) + 'deg, transparent 0)'; } else hb.btnCd.style.display = 'none';
+    hb.btn.style.filter = r.ready ? 'drop-shadow(0 0 10px #ffcc33)' : (r.cd > 0 ? 'saturate(.5)' : 'saturate(.75)');
     hb.btn.style.animation = r.ready ? 'heroPulse 1s infinite' : '';
   }
   function heroPanel(){
