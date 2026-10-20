@@ -8,47 +8,14 @@
 (function(S){
   var VER = 2;                                        // role.ver: 1(隐式, 无字段) -> 2 本次
   var WEAR = [5,10,15,20,22,24,62,64];
-  // q1-5 = 白/绿/蓝/紫/橙 ; 对应文档 普通/魔法/稀有/套装/暗金. ItemRatio (文档 §1 表, 来自 D2 ItemRatio.txt)
-  var RATIO = {5:{base:400,div:1,min:6400,F:250}, 4:{base:160,div:2,min:5600,F:500}, 3:{base:100,div:2,min:3200,F:600}, 2:{base:34,div:3,min:192,F:0}};
-  var MFACT = {1:0, 2:150, 3:300, 4:500, 5:800};      // 怪物品质系数 (/1024 折减), 怪 q = 普通..BOSS
-  // 每怪掉落 TC (按怪品质): picks 次, 每次 nodrop:equip 权重; 装备基底按 needlevel ∈ [lvl-12, lvl+3]
-  var TC = {1:{picks:1,nd:94,eq:6}, 2:{picks:1,nd:85,eq:15}, 3:{picks:1,nd:70,eq:30}, 4:{picks:2,nd:55,eq:45}, 5:{picks:3,nd:15,eq:85}};
-  var ESS = {1:1, 2:3, 3:6, 4:6, 5:10}, ESS_SET = 12, ESS_UQ = 15;   // 文档 essOf 映射 (套装 12 / 暗金 15)
+  // 数据表在 js/systems/lootdata/{tc,uniques,sets}.js (须先于本文件加载)
+  var D = S.lootData || {}; if (!D.TC || !D.UNIQUES || !D.SETS) throw new Error('[loot] 缺少 js/systems/lootdata/*.js');
+  var RATIO = D.RATIO, MFACT = D.MFACT, TC = D.TC, ESS = D.ESS, ESS_SET = D.ESS_SET, ESS_UQ = D.ESS_UQ, LVL_WIN = D.LVL_WIN, UNIQUES = D.UNIQUES, SETS = D.SETS, ANAME = D.ANAME;
 
-  // ---------- 暗金(橙)唯一: 固定底子 + 固定词条 (code 同 cizhui: 1 hp,3 zs,4 fs,5 ds,6 ac,8 幸运,11 命中,13 暴击,15 吸血,18 魔法%,24 伤害增幅,26 暴伤) ----------
-  var UNIQUES = {
-    105036:{name:'倚天剑', fx:[[3,10,26],[4,10,26],[5,10,26],[8,3],[13,6]]},
-    105034:{name:'屠龙',   fx:[[3,8,20],[8,2],[24,8],[13,5]]},
-    105022:{name:'裁决之杖', fx:[[3,6,18],[8,1],[26,20],[11,5]]},
-    105023:{name:'骨玉权杖', fx:[[4,6,18],[8,1],[18,10],[24,5]]},
-    105024:{name:'龙纹剑', fx:[[5,6,18],[8,1],[15,3],[13,4]]},
-    105035:{name:'嗜魂法杖', fx:[[4,4,12],[8,1],[15,2],[11,3]]},
-    105018:{name:'井中月', fx:[[3,5,12],[8,1],[11,4]]},
-    105019:{name:'血饮',   fx:[[4,5,12],[8,1],[15,2]]},
-    105020:{name:'无极棍', fx:[[5,5,12],[8,1],[1,150]]},
-    105026:{name:'怒斩',   fx:[[3,10,24],[8,1],[26,25]]},
-    105030:{name:'开天',   fx:[[3,12,30],[8,2],[24,10]]},
-    105031:{name:'镇天',   fx:[[4,12,30],[8,2],[24,10]]},
-    105032:{name:'玄天',   fx:[[5,12,30],[8,2],[24,10]]},
-    105040:{name:'至尊屠龙', fx:[[3,10,28],[8,3],[24,12],[13,6]]}
-  };
   // 倚天剑 105036 在 item.txt 是 GM 测试行 (needlevel 1, 攻防 32000); 运行时修正为 50 级正常底子 (同 2001 新手礼包修正)
   S.on('configsLoaded', function(){ var c=cfg('item',105036); if(c && c.maxzs>=32000){ c.needlevel=50; c.minac=c.maxac=0; c.minzs=28; c.maxzs=70; c.minfs=c.maxfs=c.minds=c.maxds=0; c.price=80000; c.sellprice=80; } });
 
-  // ---------- 套装 (按 item id; 戒指/手镯两件同 id 算 2 件) ----------
-  var SETS = {
-    zhanshen:{name:'战神', ids:[110007,120016,124016,122017,162006], bonus:{2:{maxac:4,maxhp:120}, 3:{maxzs:6,lucky:1}, 5:{adddamage:8,critical:5}}},
-    mozhen:  {name:'魔神', ids:[110008,120017,124017,122018], bonus:{2:{maxac:3,maxhp:100}, 3:{maxfs:6,lucky:1}}},
-    youling: {name:'幽灵', ids:[110009,120018,124018,122019], bonus:{2:{maxac:3,maxhp:110}, 3:{maxds:6,lucky:1}}},
-    shengzhan:{name:'圣战', ids:[110013,115011,120019,122020,124019,164006], bonus:{2:{maxac:6,maxhp:200}, 3:{maxzs:10,lucky:1}, 5:{adddamage:10,critical:6,maxhp:300}}},
-    fashen:  {name:'法神', ids:[110014,115012,120020,122021,124020,162007,164007], bonus:{2:{maxac:5,maxhp:160}, 3:{maxfs:10,lucky:1}, 5:{adddamage:10,critical:6,maxmp:300}}},
-    tianzun: {name:'天尊', ids:[110015,115013,120021,122022,124021,162008,164008], bonus:{2:{maxac:5,maxhp:180}, 3:{maxds:10,lucky:1}, 5:{adddamage:10,critical:6,maxhp:250}}},
-    leiting: {name:'雷霆', ids:[110016,115014,120022,122023,124022,162009,164009], bonus:{2:{maxac:8,maxhp:300}, 3:{maxzs:15,lucky:2}, 5:{adddamage:15,critical:8,crtdamage:20}}},
-    lieyan:  {name:'烈焰', ids:[110017,115015,120023,122024,124023,162010,164010], bonus:{2:{maxac:7,maxhp:240}, 3:{maxfs:15,lucky:2}, 5:{adddamage:15,critical:8,crtdamage:20}}},
-    guangmang:{name:'光芒', ids:[110018,115016,120024,122025,124024,162011,164011], bonus:{2:{maxac:7,maxhp:260}, 3:{maxds:15,lucky:2}, 5:{adddamage:15,critical:8,crtdamage:20}}}
-  };
   var SET_OF = {}; for(var k in SETS) SETS[k].ids.forEach(function(id){ SET_OF[id]=k; });
-  var ANAME = {maxhp:'生命',maxmp:'魔法',maxac:'防御',maxzs:'攻击',maxfs:'魔法攻击',maxds:'道术',lucky:'幸运',adddamage:'伤害增幅%',critical:'暴击',crtdamage:'暴击伤害%'};
 
   function mkFixed(fx){ return fx.map(function(f){ var z=cfg('cizhui',f[0])||{vtype:1}; return {id:0, code:f[0], minValue:f.length>2?f[1]:f[1], maxValue:f.length>2?f[2]:f[1], isPer:z.vtype, fixed:1}; }); }
   function makeUnique(s){ var u=UNIQUES[s.id]; if(!u) return false; s.q=5; s.uq=s.id; s.affix=mkFixed(u.fx); return true; }
@@ -84,7 +51,7 @@
   function bases(){ if(basesCache) return basesCache; var pool=origPool(); basesCache = CFG.item.list.filter(function(c){ return c.type==2 && WEAR.indexOf(c.stdmode)!=-1 && c.needlevel>0 && c.price>0 && c.id<200000 && pool[c.id]; }); return basesCache; }
   function tcPick(m, rnd){ rnd=rnd||Math.random; var t=TC[m.q]||TC[1], L=(m.cfg&&m.cfg.lvl)||1, out=[];
     for(var p=0;p<t.picks;p++){ if(Math.floor(rnd()*(t.nd+t.eq)) < t.nd) continue;
-      var list=bases().filter(function(c){ return c.needlevel<=L+3 && c.needlevel>=L-12; }); if(!list.length) continue;
+      var list=bases().filter(function(c){ return c.needlevel<=L+LVL_WIN[1] && c.needlevel>=L+LVL_WIN[0]; }); if(!list.length) continue;
       var ic=list[Math.floor(rnd()*list.length)]; S.loot._ilvl=L;
       var q=rollQuality(L, ic.needlevel, curMF(), m.q||1, rnd), s=createStuff(ic.id,1,q); S.loot._ilvl=0; if(s) out.push(finalize(s)); }
     return out; }
@@ -151,7 +118,7 @@
   var _newRole = newRole; newRole = function(){ var r=_newRole.apply(this, arguments); r.ver=VER; r.essence=0; return r; };
 
   S.loot = {
-    VER:VER, UNIQUES:UNIQUES, SETS:SETS, SET_OF:SET_OF, TC:TC, RATIO:RATIO, ANAME:ANAME, _ilvl:0, _killing:null, tcOff:false,
+    VER:VER, DATA_FILE:'js/systems/lootdata/{tc,uniques,sets}.js', UNIQUES:UNIQUES, SETS:SETS, SET_OF:SET_OF, TC:TC, RATIO:RATIO, ANAME:ANAME, _ilvl:0, _killing:null, tcOff:false,
     chance:chance, rollQuality:rollQuality, bases:bases, mfEff:mfEff, tcPick:tcPick, finalize:finalize, makeUnique:makeUnique, label:label,
     setCounts:setCounts, setBonus:setBonus, compare:compare, salvage:salvage, salvageAll:salvageAll, essOf:essOf, exchangeStone:exchangeStone,
     cfg:cfgL, shouldAuto:shouldAuto, migrate:migrate,

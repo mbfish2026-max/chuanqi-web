@@ -54,6 +54,8 @@ API: `Systems.hero.has() / canUnlock() / unlock(prof,name) / info() / attr() / e
 - 截图: `?quest=main|daily|ach&qdemo=1`
 
 ## 装备系统改造 (js/systems/loot.js, UI: js/ui_loot.js, 测试: tools/test_loot.js)
+- 数据表 (独立文件, 先于 loot.js 加载, 写入 Systems.lootData): js/systems/lootdata/tc.js (ItemRatio/怪物品质系数/每怪 TC/等级窗口/分解精华), uniques.js (暗金/专属), sets.js (套装 2/3/5 件加成); 调数值只改这三个文件
+- 掉率模拟: `node tools/sim_loot.js [seed] [kills]` (mulberry32 固定种子, 默认 20261021×20000 杀/行); TC 基底池 = 原版 drop.txt 装备 ∪ 暗金 ∪ 套装件; 图标缺失时 ui_loot.js 用部位剪影兜底
 - 部位: 已对照 GameKeys.eWeaponPart + item.txt 核实 5武器 10衣服 15头盔 20项链 22/23戒指 24/25手镯 62鞋 64腰带 (文档对戒指/手镯的猜测是反的)
 - 品质: c=floor((base-floor((ilvl-qlvl)/div))*128) → MF 递减 MF*F/(MF+F) (F 250/500/600) → 下限 min → 怪物品质系数 c*f/1024; 判定 橙→紫→蓝→绿, floor(rnd*c)<128. 替换掉落表里的 gailv (BOSS 前两档必橙保留)
 - 每怪 TC: 按怪 q1-5 的 picks/nodrop/equip 权重, 装备基底取 needlevel∈[lvl-12,lvl+3] 的可穿部位; 掉落写入 s.il (ilvl)
