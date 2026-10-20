@@ -1,7 +1,7 @@
 // 原版配置表加载 (assets/resources/config/*.txt, JSON 格式)
 var CFG = {};
 var TABLES = ['item','monster','map','map_info','skill','drop','profession','levelup','shop','task','libao','equip_qianghua','equip_qianghua_parts','cizhui','randomname','qiandao_m',
-  /* systems */ 'qiandao_w','duihunma','fuse','lilian','buff','equip_cizhui'];
+  /* systems */ 'qiandao_w','duihunma','fuse','lilian','buff','equip_cizhui','chongzhi'];
 function loadConfigs(){
   return Promise.all(TABLES.map(function(n){
     return fetch('assets/config/'+n+'.txt').then(function(r){return r.text()}).then(function(t){

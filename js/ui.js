@@ -564,15 +564,14 @@ function showCreate(){
 }
 
 // ---------- death / offline ----------
-var _roleDie = roleDie;
-roleDie = function(){ _roleDie(); if (!UI.main) return; var p = popup('role_die'); p.findDeep('btnVideo').setActive(false); p.findDeep('btnLocal').setActive(false);
-  p.findDeep('btnCity').on(function(){ closePopup(p); }); p.findDeep('layout').layout(); };
+// 完整流程由 js/systems/{die,offline}.js + js/ui_{die,offline}.js 接管；此处仅占位，避免旧「直接回城/简化离线」逻辑抢跑
 function showOffline(off){
+  if (window._showOfflineImpl) return window._showOfflineImpl(off);
   var p = popup('tipOffline');
   p.ref('labTime').setString(('0' + Math.floor(off.sec / 3600)).slice(-2) + '小时' + ('0' + Math.floor(off.sec / 60) % 60).slice(-2) + '分钟');
-  p.ref('labHour').setString('8小时'); p.ref('labExp').setString(fmtNum(off.exp)); p.ref('labCoin').setString(fmtNum(off.gold));
-  p.findDeep('btnVideo').setActive(false); p.findDeep('btnMulti').setActive(false); p.findDeep('btnNode').layout();
-  p.findDeep('btnFree').on(function(){ closePopup(p); }); closeBtn(p, 'img_close');
+  p.ref('labHour').setString((off.limitHour || 6) + '小时'); p.ref('labExp').setString(fmtNum(off.exp)); p.ref('labCoin').setString(fmtNum(off.gold));
+  p.findDeep('btnNode') && p.findDeep('btnNode').layout && p.findDeep('btnNode').layout();
+  closeBtn(p, 'img_close');
 }
 
 // ---------- loop ----------
@@ -618,8 +617,8 @@ function startMain(){ buildMain(); }
         if (q.tip === 'equip') { var e = b.filter(isEquip)[0]; if (e) tipEquip(e); }
         if (q.tip === 'props') { var pr = b.filter(function(s){ return !isEquip(s); })[0]; if (pr) tipProps(pr); }
         if (q.tip === 'store') openStore(3002, 'img_main_drugstore');
-        if (q.tip === 'offline') showOffline({sec: 3700, exp: 12345, gold: 678});
-        if (q.tip === 'die') roleDie();
+        if (q.tip === 'offline') { /* ui_offline.js 用真实算法弹窗 */ }
+        if (q.tip === 'die') { /* ui_die.js 弹完整死亡 UI */ }
         if (q.fx && typeof FX !== 'undefined') { // ?fx=leidianshu,huoqiu  or  ?fx=all  (demo casts for screenshots)
           var list = q.fx === 'all' ? Object.keys(FX.SKILL_DIR).map(function(k){ return FX.SKILL_DIR[k]; }) : q.fx.split(',');
           if (q.nosheet) Object.keys(FX._sheets).forEach(function(k){ FX._sheets[k].ok = false; });

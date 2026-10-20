@@ -135,7 +135,89 @@ function fuseItem(x, done){
   p.ref('btnFuse').on(function(){ closePopup(p); msg(FU.fuse(x.id, n)); if (done) done(); });
 }
 
-// ---- 历练 main_story (itemStory chapters + itemTask) ----
+// ---- 历练 main_story (ItemStory + ItemTask，对齐原版领取文案/进度/章节图) ----
+function storyPage(p){
+  var L = S_().lilian; if (!L) return false;
+  var content = p.ref('storylist').find('view/content'); content.removeAllChildren();
+  content.d.ly = content.d.ly && content.d.ly.t ? content.d.ly : {t: 2, rs: 1, sy: 10, pt: 0, pb: 10, pl: 0, pr: 0, sx: 0};
+  var cur = L.current();
+  // 默认展开当前章；若有可领取优先保持展开
+  if (UI.storyOpenId == null && cur) UI.storyOpenId = cur.id;
+  L.chapters().forEach(function(c){
+    var it = inst('itemStory');
+    var open = !c.locked && UI.storyOpenId === c.id;
+    it.ref('uiRoot').setActive(!c.locked); it.ref('lilianlock').setActive(!!c.locked);
+    it.ref('labStage').setString(c.headline || ''); it.ref('labTitle').setString(c.title || '');
+    var d = it.ref('desc'); d.setString(c.describe || ''); d.el.style.whiteSpace = 'normal';
+    var progTxt = '推荐等级：' + (c.lvl || '') + '   进度 ' + c.done + '/' + c.total;
+    if (c.claimable) progTxt += '  可领 ' + c.claimable;
+    it.ref('labrecommond').setString(progTxt);
+    // 章节背景
+    var bgPath = L.stageBg && L.stageBg(c);
+    var statebg = it.ref('statebg') || it.findDeep('statebg');
+    if (statebg && bgPath) try { statebg.setImage(IMG + bgPath.replace(/^images\//, '')); } catch (e) {}
+    var go = it.findDeep('img_go'); if (go) go.setImage(IMG + 'basics/img_btn_0.png');
+    var tl = it.ref('previewNode'); tl.setActive(!!open);
+    if (open) {
+      var tc = tl.find('view/content'); tc.d.ly = {t: 2, rs: 1, sy: 8, pt: 8, pb: 8, pl: 0, pr: 0, sx: 0};
+      // 章顶：一键领取（挂在 preview 顶部 DOM，不依赖额外 prefab）
+      if (c.claimable > 0) {
+        var bar = document.createElement('div');
+        bar.className = 'cc';
+        bar.style.cssText = 'position:relative;width:92%;margin:6px auto;padding:8px 12px;box-sizing:border-box;background:linear-gradient(#5a4a30,#3a3020);border:1px solid #a08040;border-radius:4px;color:#ffd76a;font-size:18px;text-align:center;cursor:pointer;z-index:2';
+        bar.textContent = '一键领取本章 (' + c.claimable + ')';
+        bar.onclick = function(ev){ ev.stopPropagation(); msg(L.claimAll(c.id)); };
+        tl.el.insertBefore(bar, tl.el.firstChild);
+      }
+      c.tasks.forEach(function(t){
+        var ti = inst('itemTask');
+        ti.ref('lab_taskdesc').setString(t.describe || t.name);
+        ti.ref('lab_schedule').setString('进度： ');
+        var pr = t.progress;
+        var curN = pr ? Math.min(pr[0], pr[1]) : 0, needN = pr ? pr[1] : 0;
+        var cnt = ti.ref('lab_scheduleCnt');
+        cnt.setString(pr ? (curN + '/' + needN) : '');
+        cnt.setColor(pr && pr[0] >= pr[1] ? '#32C63D' : '#d62f2f');
+        if (t.reward) { var st = stuffIcon(t.reward[0], t.reward[1]); if (st) { st.tf = 'scale(.8)'; ti.ref('item').addChild(st); } }
+        ti.ref('tipReceived').setActive(!!t.done);
+        var btn = ti.ref('btnOption');
+        // 原版：未完成也显示按钮「未完成」；可领显示「领取」
+        if (t.done) { btn.setActive(false); }
+        else {
+          btn.setActive(true);
+          var lab = btn.find('label') || btn.findDeep('label') || btn.findDeep('labelBtn');
+          // itemTask 用 labelBtn ref?
+          var lb = ti.ref('labelBtn') || lab;
+          if (lb && lb.setString) {
+            lb.setString(t.canClaim ? '领取' : '未完成');
+            lb.setColor(t.canClaim ? '#c86523' : '#40382a');
+          } else if (lab && lab.setString) {
+            lab.setString(t.canClaim ? '领取' : '未完成');
+          }
+          if (t.canClaim) {
+            try { btn.setImage(IMG + 'story/btn_normal.png'); } catch (e) {}
+            btn.on(function(){ msg(L.claim(t.id)); });
+          } else {
+            try { btn.setImage(IMG + 'story/btn_enable.png'); } catch (e) {}
+            btn.on(function(){ toast('尚未完成'); });
+          }
+        }
+        tc.addChild(ti, true);
+      });
+      tc.layout(); tl.h = Math.min(640, tc.h + 8); tl.find('view').h = tl.h; tl.refresh();
+      it.h = 230 + tl.h; it.place(); it.children.forEach(function(ch){ ch.y += tl.h / 2; ch.place(); });
+    }
+    if (go) go.on(function(){
+      if (c.locked) return toast('章节未解锁');
+      UI.storyOpenId = (UI.storyOpenId === c.id) ? 0 : c.id;
+      refreshAll();
+    });
+    content.addChild(it, true);
+  });
+  content.layout(); p.ref('storylist').find('view').el.style.overflowY = 'auto';
+  return true;
+}
+
 function storyPage(p){
   var L = S_().lilian; if (!L) return false;
   var content = p.ref('storylist').find('view/content'); content.removeAllChildren();
