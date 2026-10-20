@@ -31,9 +31,9 @@ R('loadConfigs()').then(()=>{
   const white=r.bag.filter(s=>s.q===1 && S.findStuff(s.uid))[0] || r.bag.find(s=>stuffCfg(s).type==2 && s.q===1);
   // create a white equip explicitly
   const w=R('(function(){var c=CFG.item.list.find(function(x){return x.type==2&&x.stdmode==5&&x.needlevel<=10;});var s=createStuff(c.id,1,1);s.lock=false;addItem(s);return s;})()');
-  ok(S.loot.shouldAuto(w)===true, '白装自动分解开启后 shouldAuto');
+  ok(S.loot.shouldAuto(w)===true, '白装自动回收开启后 shouldAuto');
   ST.set('recycle.white', false);
-  ok(S.loot.shouldAuto(w)===false, '关闭白装后不分解');
+  ok(S.loot.shouldAuto(w)===false, '关闭白装后不回收');
 
   // 药品阈值与指定 id
   r.level=60; r.bag.length=0;

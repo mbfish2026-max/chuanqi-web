@@ -11,7 +11,7 @@
       // —— 原版 setupValue ——
       recycle: {
         noProfession: false,
-        nonsuch: false,       // true = 极品也自动分解/回收
+        nonsuch: false,       // true = 极品也自动回收
         white: false, green: false, blue: false, purple: false,
         keepSet: true, keepUnique: true  // 网页扩展（原版无暗金/套装概念）
       },
@@ -26,7 +26,7 @@
         autoCombat: true,
         autoSkill: true,
         autoMove: true,
-        autoPick: true,       // false 时跳过自动分解（仍入包）
+        autoPick: true,       // false 时跳过自动回收（仍入包）
         stopBagFull: false
       },
       game: {
@@ -208,7 +208,7 @@
     }
   }
 
-  // 自动分解：受 afk.autoPick 约束（关拾取分解 = 只入包不分解）
+  // 自动回收：受 afk.autoPick 约束（关 = 只入包不回收）
   function installSalvageGate(){
     if(!S.loot || !S.loot.shouldAuto) return;
     var _sa = S.loot.shouldAuto;

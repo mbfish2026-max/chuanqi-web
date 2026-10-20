@@ -22,7 +22,18 @@ function fuliSign(node){
       m.find('lab_day').setString('第' + c.id + '日');
       var st = stuffIcon(c.item, c.count); if (st) m.find('items').addChild(st);
       m.find('received').setActive(!!c.signed);
-      if (c.id === today && !c.signed) m.find('img_bg').el.style.filter = 'drop-shadow(0 0 6px #ffd76a)';
+      if (c.id === today && !c.signed) {
+        m.find('img_bg').el.style.filter = 'drop-shadow(0 0 6px #ffd76a)';
+        try {
+          var bo = m.find('btnOption');
+          if (bo && !bo.el.querySelector('.cq-reddot')) {
+            var rd = document.createElement('div'); rd.className = 'cq-reddot';
+            rd.style.cssText = 'position:absolute;right:2px;top:2px;width:16px;height:16px;background:url('+IMG+'basics/img_red.png) center/contain no-repeat;pointer-events:none;z-index:2';
+            if (getComputedStyle(bo.el).position==='static') bo.el.style.position='relative';
+            bo.el.appendChild(rd);
+          }
+        } catch (e) {}
+      }
       m.find('btnOption').on(function(){ if (c.id !== today) return toast('只能在第' + c.id + '日签到'); msg(F.sign()); redraw(); });
       content.addChild(it, true);
     });
@@ -36,6 +47,16 @@ function fuliSign(node){
       sv.findDeep('received').setActive(!!c.signed);
       var btn = sv.findDeep('btn_option'); btn.setActive(!c.signed); sv.findDeep('label').setActive(!c.signed); sv.findDeep('label').setString(c.canSign ? '签到' : '未到');
       if (!c.canSign) btn.el.style.filter = 'grayscale(1)';
+      else {
+        try {
+          if (!btn.el.querySelector('.cq-reddot')) {
+            var rd2 = document.createElement('div'); rd2.className = 'cq-reddot';
+            rd2.style.cssText = 'position:absolute;right:2px;top:2px;width:16px;height:16px;background:url('+IMG+'basics/img_red.png) center/contain no-repeat;pointer-events:none;z-index:2';
+            if (getComputedStyle(btn.el).position==='static') btn.el.style.position='relative';
+            btn.el.appendChild(rd2);
+          }
+        } catch (e) {}
+      }
       btn.on(function(){ if (!c.canSign) return toast('还未到签到日'); msg(F.signWeek()); redraw(); });
       c2.addChild(it, true);
     });
@@ -196,6 +217,14 @@ function storyPage(p){
           }
           if (t.canClaim) {
             try { btn.setImage(IMG + 'story/btn_normal.png'); } catch (e) {}
+            try {
+              if (!btn.el.querySelector('.cq-reddot')) {
+                var rd = document.createElement('div'); rd.className = 'cq-reddot';
+                rd.style.cssText = 'position:absolute;right:2px;top:2px;width:16px;height:16px;background:url('+IMG+'basics/img_red.png) center/contain no-repeat;pointer-events:none;z-index:2';
+                if (getComputedStyle(btn.el).position==='static') btn.el.style.position='relative';
+                btn.el.appendChild(rd);
+              }
+            } catch (e) {}
             btn.on(function(){ msg(L.claim(t.id)); });
           } else {
             try { btn.setImage(IMG + 'story/btn_enable.png'); } catch (e) {}

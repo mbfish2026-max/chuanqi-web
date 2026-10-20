@@ -148,11 +148,15 @@
     }
   }
 
-  // 击杀经验 +10%（对齐 BattleTool._killexpup）
+  // 击杀经验 +10%（对齐 BattleTool._killexpup）；有 SystemMsg batch 时并入汇总行
   S.on('kill', function(m){
     var pct = killExpPct(); if(!pct || !m) return;
     var bonus = Math.ceil(m.exp * pct / 100);
-    if(bonus > 0){ addExp(bonus); log('特权经验 +' + bonus); }
+    if(bonus > 0){
+      addExp(bonus);
+      if(S.loot && S.loot._batch) S.loot._batch.addExpBonus = (S.loot._batch.addExpBonus||0) + bonus;
+      else log('特权经验 +' + bonus);
+    }
   });
 
   // BOSS 刷新时间减半

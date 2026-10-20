@@ -49,13 +49,15 @@ R('loadConfigs()').then(()=>{
   // 对比
   const nw=R('createStuff(105022,1,5)'); L.finalize(nw); R('addItem')(nw); const cp=L.compare(nw.uid);
   ok(cp && cp.slot===5 && cp.power.delta>0 && cp.rows.find(x=>x.key==='atkmax').delta>0, '对比: 裁决 战力 +'+cp.power.delta);
-  // 锁定 / 分解 / 自动分解
+  // 锁定 / 手动分解→精华 / 自动回收→金币
   S.bag.toggleLock(nw.uid); ok(S.loot.salvage(nw.uid)==='装备已锁定' && R('sellItem')(nw.uid)==='物品已锁定', '锁定阻止分解与出售');
-  S.bag.toggleLock(nw.uid); console.log('  ', L.salvage(nw.uid)); ok(r.essence===15, '暗金分解 15 精华');
-  L.setAuto(1,true); const w=R('createStuff(105005,1,1)'); w.nonsuch=0; L._killing={q:1,cfg:{lvl:10}}; const before=r.bag.length; R('addItem')(w); L._killing=null;
-  ok(r.bag.length===before && r.essence===16, '自动分解白装 → 精华');
+  S.bag.toggleLock(nw.uid); console.log('  ', L.salvage(nw.uid)); ok(r.essence===15, '暗金手动分解 15 精华');
+  L.setAuto(1,true); const w=R('createStuff(105005,1,1)'); w.nonsuch=0;
+  const g0=r.gold, sell=(R('stuffCfg')(w).sellprice||0)*w.q, expectG=Math.ceil(sell*0.5);
+  L._killing={q:1,cfg:{lvl:10}}; const before=r.bag.length; R('addItem')(w); L._killing=null;
+  ok(r.bag.length===before && r.essence===15 && r.gold===g0+expectG, '自动回收白装 → 金币50% (+'+expectG+')');
   const st=R('createStuff(110014,1,4)'); L.finalize(st); L._killing={q:1,cfg:{lvl:55}}; L.setAuto(4,true); R('addItem')(st); L._killing=null;
-  ok(r.bag.some(x=>x.uid===st.uid), '自动分解保留套装件');
+  ok(r.bag.some(x=>x.uid===st.uid), '自动回收保留套装件');
   r.essence=20; console.log('  ', L.exchangeStone(2)); ok(r.essence===10, '精华兑换洗练石');
   // 整理
   ['105005','110013','105034'].forEach(id=>R('addItem')(R('createStuff('+id+',1,'+(id==='105005'?1:id==='110013'?3:5)+')')));

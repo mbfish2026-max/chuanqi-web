@@ -50,13 +50,17 @@
     bindToggle('eGreen', function(){ return st.recycle.green; }, function(v){ st.recycle.green=v; });
     bindToggle('eBule', function(){ return st.recycle.blue; }, function(v){ st.recycle.blue=v; });
     bindToggle('ePurple', function(){ return st.recycle.purple; }, function(v){ st.recycle.purple=v; });
-    // 把「自动回收」文案改成「自动分解」以匹配网页精华体系
+    // 原版文案「自动回收」= 击杀掉落换金币；保留勾选标签，脚注说明与手动分解区别
     ['noProfession','eNonsuch','eWhite','eGreen','eBule','ePurple'].forEach(function(ref){
       var t=p.ref(ref); if(!t) return;
-      t.children.forEach(function(ch){ if(ch.lb && /自动回收/.test(ch.el.textContent)) ch.setString('自动分解'); });
+      t.children.forEach(function(ch){
+        if(ch.lb && /自动分解/.test(ch.el.textContent)) ch.setString(ch.el.textContent.replace(/自动分解/g,'自动回收'));
+      });
     });
     var note = p.findDeep('img_bg1') && p.findDeep('img_bg1').find('label');
-    if(note) note.setString('※分解得精华(5精华=1洗练石)，锁定/套装/暗金默认保留  精华 '+(G.role.essence||0));
+    var rate = (Systems.prerogative && Systems.prerogative.recycleRate) ? Systems.prerogative.recycleRate() : 0.5;
+    var rateTxt = Math.round(rate*100)+'%'+(rate>=1?'(特权满额)':'（默认；回收特权可满额）');
+    if(note) note.setString('※自动回收→金币 '+rateTxt+'；手动「分解」→精华(5=1洗练石)；锁/套装/暗金默认保留  精华 '+(G.role.essence||0));
 
     function refreshDrugRow(kind, revertRef, nameRef, pctRef){
       var d = st.drug[kind];

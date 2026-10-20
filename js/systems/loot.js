@@ -1,5 +1,5 @@
 // [loot] 装备系统改造 (EQUIP_SYSTEM_from_idle_arpg.md): 品质判定公式 / 每怪掉落 TC / 暗金(橙)唯一 / 套装 2-3-5 件 /
-// 分解成精华 + 自动分解规则 / 锁定 / 自动整理 / 对比 / 掉落光柱 / 存档迁移 role.ver (存档 key 仍为 cq_web_save_v1)
+// 手动分解→精华；自动回收→金币(50%/特权满额) / 锁定 / 自动整理 / 对比 / 掉落光柱 / 存档迁移 role.ver
 //
 // 部位校验 (stdmode -> 部位), 已对照原版 GameKeys.eWeaponPart 与 item.txt 全表确认:
 //   5 武器 | 10 衣服 | 15 头盔 | 20 项链 | 22/23 戒指(左/右) | 24/25 手镯(左/右) | 62 鞋子 | 64 腰带
@@ -56,13 +56,65 @@
       var q=rollQuality(L, ic.needlevel, curMF(), m.q||1, rnd), s=createStuff(ic.id,1,q); S.loot._ilvl=0; if(s) out.push(finalize(s)); }
     return out; }
   S.on('kill', function(m){ if(!G.role || S.loot.tcOff) return; tcPick(m).forEach(function(s){ var c=stuffCfg(s);
-    if(addItem(s)!==false) log('获得 <span class="q'+s.q+'">['+label(s)+']'+c.name+'</span>'); }); });
+    if(addItem(s)!==false){
+      if(S.loot._batch) S.loot._batch.kept.push({name:c.name, q:s.q, count:s.count||1, label:label(s)});
+      else log('获得 <span class="q'+s.q+'">['+label(s)+']'+c.name+'</span>');
+    } }); });
 
-  // ---------- 掉落光柱 + 自动分解 (先于 core 的背包上限钩子) ----------
-  var _kill = killMonster; killMonster = function(b, m){ S.loot._killing = m; try { return _kill.apply(this, arguments); } finally { S.loot._killing = null; } };
+  // ---------- 掉落光柱 + 自动回收→金币 (原版 calculateAutoPickup；手动分解仍→精华) ----------
+  function escLite(s){ return String(s==null?'':s).replace(/[&<>]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c]; }); }
+  function equipGold(s, c){ return (c.sellprice||0) * (s.q||1); }
+  function recycleRate(){ return (S.prerogative && S.prerogative.recycleRate) ? S.prerogative.recycleRate() : 0.5; }
+  function beginKill(m){
+    S.loot._killing = m;
+    S.loot._batch = {reclaim:[], fullGold:0, kept:[], dropGold:0, addExpBonus:0};
+    return S.loot._batch;
+  }
+  function endKill(m, batch){
+    batch = batch || S.loot._batch;
+    try {
+      if(!batch || !m || !G.role) return;
+      var rate = recycleRate();
+      var rg = Math.ceil(batch.fullGold * rate);
+      if(rg > 0) G.role.gold += rg;
+      var parts = [];
+      parts.push('<span style="color:#00fff0">'+escLite(G.role.name)+'</span> 击杀了 <span class="q'+m.q+'">【'+escLite(m.cfg.name)+'】</span>');
+      var totExp = (m.exp||0) + (batch.addExpBonus||0);
+      parts.push('经验 +'+totExp+(batch.addExpBonus ? '(+'+batch.addExpBonus+')' : ''));
+      if(batch.dropGold) parts.push('金币 +'+batch.dropGold);
+      if(batch.kept.length){
+        parts.push('掉落了'+batch.kept.map(function(it){
+          return '<span class="q'+it.q+'">【'+escLite(it.label||it.name)+'】</span>x'+(it.count||1);
+        }).join('<span style="color:#fff">,</span>'));
+      }
+      if(batch.reclaim.length){
+        parts.push('自动回收了：'+batch.reclaim.map(function(it){
+          return '<span class="q'+it.q+'">【'+escLite(it.name)+'】</span>x'+(it.count||1);
+        }).join('<span style="color:#fff">,</span>')+' 获得了金币：'+rg);
+      }
+      log(parts[0]+' ,  '+parts.slice(1).join(' ,  '));
+    } finally {
+      S.loot._batch = null; S.loot._killing = null;
+    }
+  }
+  var _kill = killMonster; killMonster = function(b, m){
+    var batch = beginKill(m);
+    try { return _kill.apply(this, arguments); }
+    finally { if(S.loot._batch) endKill(m, batch); }
+  };
   (S.hooks.addItem = S.hooks.addItem || []).unshift(function(v, s, c){ if(v || !c || c.type!=2 || !G.role) return;
     var m = S.loot._killing; if(m && (s.q>=3 || s.uq || s.set)) FXE('drop', {m:m, q:s.q, name:c.name, uq:!!s.uq, set:!!s.set});
-    if(m && shouldAuto(s)){ var e=essOf(s); G.role.essence=(G.role.essence||0)+e; log('自动分解 '+c.name+' → 精华 '+e); return true; } });
+    if(m && shouldAuto(s)){
+      var full = equipGold(s, c);
+      var batch = S.loot._batch;
+      if(batch){ batch.reclaim.push({name:c.name, q:s.q, count:s.count||1}); batch.fullGold += full; }
+      else {
+        var g = Math.ceil(full * recycleRate());
+        G.role.gold += g;
+        log('自动回收了：<span class="q'+s.q+'">【'+escLite(c.name)+'】</span>x'+(s.count||1)+' 获得了金币：'+g);
+      }
+      return true;
+    } });
   function cfgL(){ var r=G.role; r.lootCfg = r.lootCfg || {auto:{1:false,2:false,3:false,4:false,5:false}, keepNonsuch:true, keepSet:true, keepUnique:true, autoSort:false}; return r.lootCfg; }
   function shouldAuto(s){ var L=cfgL(); if(s.lock || (L.keepSet && s.set) || (L.keepUnique && s.uq)) return false; if(L.offProf){ var oc=stuffCfg(s); if(oc.profession && oc.profession!=G.role.prof && !(L.keepNonsuch && s.nonsuch)) return true; } if(!L.auto[s.q]) return false;
     if(L.keepNonsuch && s.nonsuch) return false; if(L.keepSet && s.set) return false; if(L.keepUnique && s.uq) return false; return true; }
@@ -121,6 +173,7 @@
     VER:VER, DATA_FILE:'js/systems/lootdata/{tc,uniques,sets}.js', UNIQUES:UNIQUES, SETS:SETS, SET_OF:SET_OF, TC:TC, RATIO:RATIO, ANAME:ANAME, _ilvl:0, _killing:null, tcOff:false,
     chance:chance, rollQuality:rollQuality, bases:bases, mfEff:mfEff, tcPick:tcPick, finalize:finalize, makeUnique:makeUnique, label:label,
     setCounts:setCounts, setBonus:setBonus, compare:compare, salvage:salvage, salvageAll:salvageAll, essOf:essOf, exchangeStone:exchangeStone,
+    beginKill:beginKill, endKill:endKill, equipGold:equipGold,
     cfg:cfgL, shouldAuto:shouldAuto, migrate:migrate,
     setAuto:function(q, on){ cfgL().auto[q]=!!on; save(); return S.ok(); },
     setFlag:function(k, on){ cfgL()[k]=!!on; save(); return S.ok(); }

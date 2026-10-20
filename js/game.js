@@ -151,12 +151,18 @@ function roleAttack(b, a){
 function killMonster(b, m){
   FXE('kill',{m:m}); var r=G.role; m.dead=true; m.hp=0; m.respawn = (m.boss? 0 : (m.cfg.rebirth||3));
   r.kills[m.cfg.id]=(r.kills[m.cfg.id]||0)+1;
-  log('击败 <span class="q'+m.q+'">'+QNAME[m.q]+' '+m.cfg.name+'</span>, 获得经验 '+m.exp);
+  // Systems.loot.beginKill 包装后写入 _batch；有 batch 时由 endKill 发原版 SystemMsg 汇总行
+  var batch = (typeof Systems!=='undefined' && Systems.loot && Systems.loot._batch) || null;
+  if(!batch) log('击败 <span class="q'+m.q+'">'+QNAME[m.q]+' '+m.cfg.name+'</span>, 获得经验 '+m.exp);
   addExp(m.exp);
-  var drop = rollDrop(m); if(drop.gold){ r.gold+=drop.gold; log('获得金币 '+drop.gold); }
+  var drop = rollDrop(m); if(drop.gold){ r.gold+=drop.gold; if(batch) batch.dropGold += drop.gold; else log('获得金币 '+drop.gold); }
   drop.item.forEach(function(s){ var c=stuffCfg(s);
-    if(c.type==2 && G.settings.autoSell && s.q<=G.settings.autoSell && !s.nonsuch){ r.gold+=c.sellprice||0; log('自动出售 '+c.name); return; }
-    addItem(s); log('获得 <span class="q'+s.q+'">'+(c.type==2?'['+QNAME[s.q]+']':'')+c.name+(s.count>1?' x'+s.count:'')+(s.nonsuch?' (极品+'+s.nonsuch+')':'')+'</span>'); });
+    if(c.type==2 && G.settings.autoSell && s.q<=G.settings.autoSell && !s.nonsuch){ r.gold+=c.sellprice||0; if(batch){ batch.reclaim.push({name:c.name,q:s.q,count:s.count||1}); batch.fullGold+=(c.sellprice||0)*s.q; } else log('自动出售 '+c.name); return; }
+    if(addItem(s)!==false){
+      if(batch) batch.kept.push({name:c.name,q:s.q,count:s.count||1,label:(c.type==2?QNAME[s.q]+' ':'')+c.name});
+      else log('获得 <span class="q'+s.q+'">'+(c.type==2?'['+QNAME[s.q]+']':'')+c.name+(s.count>1?' x'+s.count:'')+(s.nonsuch?' (极品+'+s.nonsuch+')':'')+'</span>');
+    }
+  });
   H('kill', m, b);
   if(m.boss){ r.stat['boss_'+m.cfg.id]=Date.now()+60000*(m.cfg.rebirth||3); b.mons.splice(b.mons.indexOf(m),1); }
 }
