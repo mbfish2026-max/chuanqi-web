@@ -23,7 +23,7 @@ var FX = (function(){
   }
   // 预载全部技能 + 合击 sheet, 首次合击不再走程序化兜底
   var HEJI_DIRS = ['heji_pohunzhan', 'heji_pixingzhan', 'heji_leitingyiji', 'heji_huolongqiyan', 'heji_shihunzhaoze', 'heji_morishenpan'];
-  function preload(){ Object.keys(SKILL_DIR).forEach(function(k){ loadSheet(SKILL_DIR[k]); }); HEJI_DIRS.forEach(loadSheet); }
+  function preload(){ Object.keys(SKILL_DIR).forEach(function(k){ loadSheet(SKILL_DIR[k]); }); HEJI_DIRS.forEach(function(d){ loadSheet(d); loadSheet(d + '_charge'); }); }
 
   // ---------- canvas / geometry ----------
   function attach(holderNode){
@@ -66,7 +66,7 @@ var FX = (function(){
     // branch
     var k = 3 + Math.floor(Math.random() * 4), b = pts[k]; bolts.push({pts: [b, [b[0] + (Math.random() - .5) * 90, b[1] + 40 + Math.random() * 50]], c: col, life: life * .7, max: life * .7, thin: true});
   }
-  function text(x, y, str, o){ texts.push({x: x + (Math.random() - .5) * 30, y: y, str: str, c: o.c || '#fff', size: o.size || 30, life: o.life || 1.0, max: o.life || 1.0, vy: o.vy || -70, pop: 0}); }
+  function text(x, y, str, o){ texts.push({x: x + (o.dx != null ? o.dx : (Math.random() - .5) * 30), y: y, str: str, c: o.c || '#fff', size: o.size || 30, life: o.life || 1.0, max: o.life || 1.0, vy: o.vy || -70, pop: 0}); }
   function sprite(dir, x, y, o){
     var s = loadSheet(dir); if (!s.ok) return false;
     o = o || {}; anims.push({s: s, x: x, y: y, t: 0, scale: o.scale || 1.4, rot: o.rot || 0, tx: o.tx, ty: o.ty, dur: o.dur, done: o.done});
@@ -231,24 +231,37 @@ var FX = (function(){
   var HEJI_WIND = 280;                                                 // ms 蓄力
   function hold(m, ms){ if (!m) return; var u = performance.now() + ms; if (!(m._fxHold > u)) m._fxHold = u;
     setTimeout(function(){ if (m.dead && UI.pageKey === 'fight' && typeof refreshScene === 'function') try { refreshScene(); } catch (e) {} }, ms + 20); }
+  // 合击冲击帧(ms): fx.json "impact" (0-based 帧号) / fps; 没有 impact 时回退 sheet 时长 35%; 无 sheet 时 60ms
+  function hejiImpact(sh){ if (!(sh && sh.ok)) return 60; var me = sh.meta;
+    return me.impact != null && isFinite(+me.impact) ? Math.round(Math.max(0, Math.min(me.frames - 1, +me.impact)) / me.fps * 1000) : Math.round(me.frames / me.fps * 350); }
+  // 群体合击伤害数字横向错开: 同一行(|dy|<46)相邻数字估算宽度重叠时左右推开
+  function spreadX(ts, strs, size){ var xs = ts.map(function(t){ return t.x; }), wd = strs.map(function(str){ return str.length * size * .56 + 14; });
+    for (var it = 0; it < 6; it++) for (var i = 0; i < xs.length; i++) for (var j = i + 1; j < xs.length; j++) {
+      if (Math.abs(ts[i].y - ts[j].y) >= 46) continue; var a = xs[i] <= xs[j] ? i : j, c = a === i ? j : i, need = (wd[a] + wd[c]) / 2 - (xs[c] - xs[a]);
+      if (need > 0) { xs[a] -= need / 2; xs[c] += need / 2; } }
+    return xs.map(function(x, i){ return Math.max(wd[i] / 2, Math.min(W - wd[i] / 2, x)) - ts[i].x; }); }
   function heji(o){
     var hits = o.hits || [], b = G.battle; if (!hits.length) return;
     var unit = b && b._heroUnit, re = roleEl(), he = petEl(unit), m0 = hits[0].m, t0 = centerOf(monEl(m0)), s = centerOf(re), h = he ? centerOf(he) : null;
     var col = HEJI_COL[o.fx] || HEJI_COL.heji_pohunzhan, sh = sheets[o.fx]; if (!sh) { loadSheet(o.fx); sh = sheets[o.fx]; }
-    var useSheet = !!(sh && sh.ok), imp = useSheet ? Math.round(sh.meta.frames / sh.meta.fps * 350) : 60;   // 冲击帧 ≈ sheet 35%
+    var useSheet = !!(sh && sh.ok), imp = hejiImpact(sh), cdir = o.fx + '_charge', csh = loadSheet(cdir), useCharge = !!csh.ok;
     hits.forEach(function(x, k){ hold(x.m, HEJI_WIND + imp + k * 60 + 160); });
-    // 蓄力
+    // 蓄力: 玩家和英雄身上播放 heji_*_charge (能量向内汇聚), 程序能量流作补充; 没有 charge sheet 时用程序光环
     screenFlash('#ffcc66', .2);
-    text(375, 140, o.name, {c: '#ffd23f', size: 64, life: 1.8, vy: -20});
-    atkBetween(re, monEl(m0), b && b.roleIdx, m0.idx); ring(s.x, s.y, 90, 12, col[1], HEJI_WIND / 1000, 6); trailFollow(s, t0, HEJI_WIND / 1000, col);
-    if (he) { atkBetween(he, monEl(m0), unit && unit.idx, m0.idx); ring(h.x, h.y, 90, 12, col[1], HEJI_WIND / 1000, 6); trailFollow(h, t0, HEJI_WIND / 1000, col); }
+    text(375, 140, o.name, {c: '#ffd23f', size: 64, life: 1.8, vy: -20, dx: 0});
+    var charge = function(p){ if (useCharge) { var cm = csh.meta; sprite(cdir, p.x, p.y, {scale: 1.25}); if (cm.frames / cm.fps * 1000 < HEJI_WIND - 40) setTimeout(function(){ if (visible()) sprite(cdir, p.x, p.y, {scale: 1.25}); }, cm.frames / cm.fps * 1000); }
+      else ring(p.x, p.y, 90, 12, col[1], HEJI_WIND / 1000, 6); };
+    var stream = function(p){ if (useCharge) setTimeout(function(){ if (visible()) trailFollow(p, t0, (HEJI_WIND - 120) / 1000, col); }, 120); else trailFollow(p, t0, HEJI_WIND / 1000, col); };
+    atkBetween(re, monEl(m0), b && b.roleIdx, m0.idx); charge(s); stream(s);
+    if (he) { atkBetween(he, monEl(m0), unit && unit.idx, m0.idx); charge(h); stream(h); }
     setTimeout(function(){
       if (!visible()) return;
       var ts = hits.map(function(x){ return centerOf(monEl(x.m)); }), s2 = centerOf(roleEl()), h2 = he ? centerOf(he) : s2;
       screenFlash('#ffcc66', .35); screenShake(10);
       if (useSheet) ts.forEach(function(t){ sprite(o.fx, t.x, t.y, {scale: 1.4}); }); else (HEJI[o.fx] || HEJI.heji_pohunzhan)(s2, h2, ts);
+      var strs = hits.map(function(x){ return '-' + x.d; }), dxs = hits.length > 1 ? spreadX(ts, strs, 46) : [0];
       hits.forEach(function(x, k){ setTimeout(function(){ var el = monEl(x.m), t = centerOf(el); flashCard(el, 'crit'); burst(t.x, t.y, 14, [col[0], col[1], '#ffffff'], 300, 5, .45);
-        text(t.x, t.y - 20, '-' + x.d, {c: '#ffb000', size: 46, life: 1.3}); if (!k) screenShake(16); }, imp + k * 60); });
+        text(t.x, t.y - 20, strs[k], {c: '#ffb000', size: 46, life: 1.3, dx: dxs[k]}); if (!k) { screenShake(16); screenFlash("#ffffff", .16); } }, imp + k * 60); });
     }, HEJI_WIND);
   }
   // bridge for skills cast inside js/systems (buff.js logs "[技能名] ..."): play their FX without touching that code
@@ -361,6 +374,6 @@ var FX = (function(){
 
   // demo/test helper: FX.demo('leidianshu')
   function demo(dir){ var s = centerOf(roleEl()), m = G.battle && G.battle.mons.filter(function(x){ return !x.dead; })[0], t = centerOf(monEl(m)); playSkill(dir, s, t, function(){ flashCard(monEl(m), 'crit'); text(t.x, t.y - 20, '暴击 -' + (500 + Math.floor(Math.random() * 500)), {c: '#ffd23f', size: 48, life: 1.4}); }); }
-  return {registerHeji: registerHeji, heji: HEJI, playAtk: playAtk, attach: attach, emit: emit, preload: preload, hookLog: hookLog, demo: demo, procedural: PROC, SKILL_DIR: SKILL_DIR, _sheets: sheets,
+  return {registerHeji: registerHeji, heji: HEJI, hejiImpact: function(d){ return hejiImpact(sheets[d]); }, playAtk: playAtk, attach: attach, emit: emit, preload: preload, hookLog: hookLog, demo: demo, procedural: PROC, SKILL_DIR: SKILL_DIR, _sheets: sheets,
     stats: function(){ return {parts: parts.length, anims: anims.length, texts: texts.length}; }};
 })();
