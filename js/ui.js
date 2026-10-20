@@ -297,7 +297,7 @@ function refreshScene(){
       it.ref('monsterLevel').setString('Lv.' + x.cfg.lvl);
       UI.cells[x.idx != null ? x.idx : MON_CELLS[i % MON_CELLS.length]].addChild(it); it._cell = x.idx;
     }
-    if (x.dead && it.active && typeof POP !== 'undefined' && it._pop) { if (!it._dying) { it._dying = true; POP.die(it, function(){ it._dying = false; if (x.dead) it.setActive(false); }); } }
+    if (x.dead && it.active && typeof POP !== 'undefined' && it._pop) { if (!it._dying && !(x._fxHold > performance.now())) { it._dying = true; POP.die(it, function(){ it._dying = false; if (x.dead) it.setActive(false); }); } }
     else if (!x.dead && !it.active) { it.setActive(true); if (typeof POP !== 'undefined') POP.attach(it, it.ref('monsterIcon'), x.cfg.model, IMG + 'monster/' + x.cfg.model + '.png', {rise: x.boss ? 1.6 : 1.45}); }
     else if (!it._dying) it.setActive(!x.dead);
     it.ref('monsterHpBar').setProgress(x.hp / x.maxhp); it.ref('monsterTipHp').setString(Math.max(0, Math.ceil(x.hp)) + '/' + x.maxhp);

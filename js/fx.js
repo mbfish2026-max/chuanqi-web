@@ -190,14 +190,16 @@ var FX = (function(){
       var hit = function(){ var el = monEl(o.target); flashCard(el, o.crit ? 'crit' : 'hit');
         text(t.x, t.y - 20, (o.crit ? '暴击 ' : '') + '-' + o.dmg, {c: o.crit ? '#ffd23f' : '#ffffff', size: o.crit ? 48 : 32, life: o.crit ? 1.2 : .9});
         if (o.crit || o.dmg > (o.target.maxhp || 1) * 0.35) screenShake(o.crit ? 12 : 7); };
-      if (sk.length) { var d = dirFor(sk[0]); playSkill(d, s, t, hit); for (var i = 1; i < sk.length; i++) playSkill(dirFor(sk[i]), s, t); }
+      if (sk.length) { var d = dirFor(sk[0]);
+        if (d === 'huoqiu' || d === 'linghunhuofu') { var pdx = t.x - s.x, pdy = t.y - s.y; hold(o.target, Math.sqrt(pdx * pdx + pdy * pdy) / (sheets[d] && sheets[d].ok ? .82 : d === 'huoqiu' ? .9 : .76) + 140); }
+        playSkill(d, s, t, hit); for (var i = 1; i < sk.length; i++) playSkill(dirFor(sk[i]), s, t); }
       else { PROC.slash(s, t, false); setTimeout(hit, 60); }
     } else if (type === 'miss') { var tm = centerOf(monEl(o.target)); text(tm.x, tm.y - 20, '闪避', {c: '#b8c7d9', size: 26}); }
     else if (type === 'hurt') { var r = roleEl(); flashCard(r, 'hit'); text(s.x, s.y - 20, '-' + o.d, {c: '#ff5a4f', size: 30}); var ms = centerOf(monEl(o.m)); burst(s.x, s.y, 8, ['#ff9a8a', '#ffffff'], 160, 3, .35); if (o.d > 0 && o.m && o.m.boss) screenShake(9); }
     else if (type === 'matk') { atkBetween(monEl(o.m), roleEl(), o.m && o.m.idx, G.battle && G.battle.roleIdx); }
     else if (type === 'dodge') text(s.x, s.y - 20, '闪避', {c: '#b8c7d9', size: 26});
     else if (type === 'heal') { PROC.heal(s); if (sheets.zhiliaoshu && sheets.zhiliaoshu.ok) sprite('zhiliaoshu', s.x, s.y, {scale: 1.3}); text(s.x, s.y - 30, '+' + o.amount, {c: '#5dff7a', size: 34, life: 1.2}); }
-    else if (type === 'kill') { var tk = centerOf(monEl(o.m)); burst(tk.x, tk.y, o.m.boss ? 70 : 26, o.m.q >= 4 ? ['#ffd24d', '#ff8a00', '#fff'] : ['#ffffff', '#d9c7a3', '#8f7c5a'], o.m.boss ? 420 : 240, 5, .7); ring(tk.x, tk.y, 10, o.m.boss ? 180 : 90, 'rgba(255,240,200,.9)', .4, 6); if (o.m.boss) { screenShake(22); screenFlash('#ffd24d', .35); } }
+    else if (type === 'kill') { var hw = (o.m._fxHold || 0) - performance.now(); if (hw > 0) { var om = o.m; setTimeout(function(){ if (visible()) killFx(om); }, hw); } else killFx(o.m); }
     else if (type === 'cast') { var dir = SKILL_DIR[o.base], tt = o.target ? centerOf(monEl(o.target)) : s; if (dir) playSkill(dir, s, tt); }
     else if (type === 'heji') heji(o);                                  // [hero] 合击
     else if (type === 'heroatk') { var he = petEl(o.unit), tg = monEl(o.target), th = centerOf(tg); atkBetween(he, tg, o.unit && o.unit.idx, o.target && o.target.idx);
@@ -205,6 +207,7 @@ var FX = (function(){
     else if (type === 'drop') dropBeam(o);                              // [loot] 掉落光柱 (按品质)
     else if (type === 'dot') { var td = centerOf(monEl(o.m)); text(td.x, td.y - 10, '-' + o.d, {c: '#7dff6a', size: 24, life: .8}); flashCard(monEl(o.m), 'hit'); }
   }
+  function killFx(m){ var tk = centerOf(monEl(m)); burst(tk.x, tk.y, m.boss ? 70 : 26, m.q >= 4 ? ['#ffd24d', '#ff8a00', '#fff'] : ['#ffffff', '#d9c7a3', '#8f7c5a'], m.boss ? 420 : 240, 5, .7); ring(tk.x, tk.y, 10, m.boss ? 180 : 90, 'rgba(255,240,200,.9)', .4, 6); if (m.boss) { screenShake(22); screenFlash('#ffd24d', .35); } }
   // [loot] 掉落光柱: 蓝/紫/橙 不同颜色与高度, 暗金额外金环
   var BEAM = {3: ['#2E8DD6', '#9fd0ff'], 4: ['#D425D2', '#f2a8ff'], 5: ['#D96324', '#ffd27a']};
   function dropBeam(o){ var t = centerOf(monEl(o.m)), col = o.set ? ['#32C63D', '#b6ffbf'] : (BEAM[o.q] || BEAM[3]), hgt = o.q >= 5 ? 1 : o.q >= 4 ? .75 : .5;
@@ -222,13 +225,31 @@ var FX = (function(){
     heji_morishenpan: function(s, h, ts){ ts.forEach(function(t){ ring(t.x, t.y, 10, 120, 'rgba(255,215,90,.95)', .6, 9); burst(t.x, t.y, 30, ['#fff6c0', '#ffd34d', '#ffffff'], 300, 5, .8, {up: 80}); }); PROC.heal(s); PROC.heal(h); }
   };
   function registerHeji(dir, fn){ HEJI[dir] = fn; }
+  // 合击: 蓄力(玩家+英雄同时向目标突进, 两道能量流汇聚) -> 命中(sheet/程序特效) -> 伤害数字对齐 sheet 冲击帧; 被击杀的怪等数字出来后再倒下
+  var HEJI_COL = {heji_pohunzhan: ['#fff3b0', '#ff8a00'], heji_pixingzhan: ['#fffbe0', '#ffd34d'], heji_leitingyiji: ['#e6f2ff', '#6fb8ff'],
+    heji_huolongqiyan: ['#fff2a8', '#ff4d00'], heji_shihunzhaoze: ['#e2c4ff', '#5fd36b'], heji_morishenpan: ['#fff6c0', '#ffd34d']};
+  var HEJI_WIND = 280;                                                 // ms 蓄力
+  function hold(m, ms){ if (!m) return; var u = performance.now() + ms; if (!(m._fxHold > u)) m._fxHold = u;
+    setTimeout(function(){ if (m.dead && UI.pageKey === 'fight' && typeof refreshScene === 'function') try { refreshScene(); } catch (e) {} }, ms + 20); }
   function heji(o){
-    var s = centerOf(roleEl()), h = centerOf(petEl(G.battle && G.battle._heroUnit)) , ts = (o.hits || []).map(function(x){ return centerOf(monEl(x.m)); });
-    if (!ts.length) return; screenFlash('#ffcc66', .35);
-    text(375, 140, o.name, {c: '#ffd23f', size: 64, life: 1.6, vy: -20});
-    var sh = sheets[o.fx]; if (!sh) { loadSheet(o.fx); sh = sheets[o.fx]; }
-    if (sh && sh.ok) ts.forEach(function(t){ sprite(o.fx, t.x, t.y, {scale: 1.4}); }); else (HEJI[o.fx] || HEJI.heji_pohunzhan)(s, h, ts);
-    (o.hits || []).forEach(function(x, k){ setTimeout(function(){ var t = centerOf(monEl(x.m)); flashCard(monEl(x.m), 'crit'); text(t.x, t.y - 20, '-' + x.d, {c: '#ffb000', size: 46, life: 1.3}); }, 150 + k * 60); });
+    var hits = o.hits || [], b = G.battle; if (!hits.length) return;
+    var unit = b && b._heroUnit, re = roleEl(), he = petEl(unit), m0 = hits[0].m, t0 = centerOf(monEl(m0)), s = centerOf(re), h = he ? centerOf(he) : null;
+    var col = HEJI_COL[o.fx] || HEJI_COL.heji_pohunzhan, sh = sheets[o.fx]; if (!sh) { loadSheet(o.fx); sh = sheets[o.fx]; }
+    var useSheet = !!(sh && sh.ok), imp = useSheet ? Math.round(sh.meta.frames / sh.meta.fps * 350) : 60;   // 冲击帧 ≈ sheet 35%
+    hits.forEach(function(x, k){ hold(x.m, HEJI_WIND + imp + k * 60 + 160); });
+    // 蓄力
+    screenFlash('#ffcc66', .2);
+    text(375, 140, o.name, {c: '#ffd23f', size: 64, life: 1.8, vy: -20});
+    atkBetween(re, monEl(m0), b && b.roleIdx, m0.idx); ring(s.x, s.y, 90, 12, col[1], HEJI_WIND / 1000, 6); trailFollow(s, t0, HEJI_WIND / 1000, col);
+    if (he) { atkBetween(he, monEl(m0), unit && unit.idx, m0.idx); ring(h.x, h.y, 90, 12, col[1], HEJI_WIND / 1000, 6); trailFollow(h, t0, HEJI_WIND / 1000, col); }
+    setTimeout(function(){
+      if (!visible()) return;
+      var ts = hits.map(function(x){ return centerOf(monEl(x.m)); }), s2 = centerOf(roleEl()), h2 = he ? centerOf(he) : s2;
+      screenFlash('#ffcc66', .35); screenShake(10);
+      if (useSheet) ts.forEach(function(t){ sprite(o.fx, t.x, t.y, {scale: 1.4}); }); else (HEJI[o.fx] || HEJI.heji_pohunzhan)(s2, h2, ts);
+      hits.forEach(function(x, k){ setTimeout(function(){ var el = monEl(x.m), t = centerOf(el); flashCard(el, 'crit'); burst(t.x, t.y, 14, [col[0], col[1], '#ffffff'], 300, 5, .45);
+        text(t.x, t.y - 20, '-' + x.d, {c: '#ffb000', size: 46, life: 1.3}); if (!k) screenShake(16); }, imp + k * 60); });
+    }, HEJI_WIND);
   }
   // bridge for skills cast inside js/systems (buff.js logs "[技能名] ..."): play their FX without touching that code
   function hookLog(){
