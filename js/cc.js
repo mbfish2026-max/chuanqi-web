@@ -75,6 +75,7 @@ var CC = (function(){
 
   // ---- Sprite ----
   // t: 0 SIMPLE, 1 SLICED, 2 TILED, 3 FILLED
+  var TEX_SCALE = {}; // src -> naturalWidth / declared width (0 = loading)
   Node.prototype.setFrame = function(f, type, sp){
     if (!this.spEl) { this.spEl = document.createElement('div'); this.spEl.className = 'cc-sp'; this.el.insertBefore(this.spEl, this.el.firstChild); }
     var s = this.spEl.style; this.frame = f;
@@ -83,7 +84,11 @@ var CC = (function(){
     if (type === 1 && f.b) {
       var b = f.b; s.backgroundImage = '';
       s.borderStyle = 'solid'; s.borderWidth = b.join('px ') + 'px';
-      s.borderImage = 'url("' + f.src + '") ' + b.join(' ') + ' fill stretch';
+      // 2x textures: slice insets are in image pixels -> scale by naturalWidth / declared frame width; border widths stay in design px
+      var setBI = function(k){ s.borderImage = 'url("' + f.src + '") ' + b.map(function(v){ return Math.round(v * k * 100) / 100; }).join(' ') + ' fill stretch'; };
+      var k0 = TEX_SCALE[f.src]; setBI(k0 || 1);
+      if (k0 == null && f.w) { TEX_SCALE[f.src] = 0; var im = new Image(), self = this; im.onload = function(){ var k = im.naturalWidth / f.w; TEX_SCALE[f.src] = k; if (self.frame === f && k !== 1) setBI(k); }; im.src = f.src; }
+      else if (k0 === 0 && f.w) { var self2 = this, iv = setInterval(function(){ var k = TEX_SCALE[f.src]; if (k) { clearInterval(iv); if (self2.frame === f && k !== 1) setBI(k); } }, 100); setTimeout(function(){ clearInterval(iv); }, 10000); }
       s.boxSizing = 'border-box';
     } else {
       s.backgroundImage = 'url("' + f.src + '")'; s.borderImage = ''; s.borderWidth = '0';
