@@ -53,18 +53,21 @@ var FX = (function(){
   function visible(){ return canvas && UI.battle && UI.pageKey === 'fight' && canvas.isConnected; }
 
   // ---------- primitives ----------
-  function P(o){ if (parts.length >= MAX_P) parts.shift(); o.life = o.max = o.life || 0.6; o.vx = o.vx || 0; o.vy = o.vy || 0; o.g = o.g || 0; o.s = o.s || 4; o.drag = o.drag == null ? 0.98 : o.drag; parts.push(o); return o; }
+  // CQ_FX_FLAGS.low：手机/低特效质量 — 少粒子、弱 glow、跳过次要 trail；sheet/伤害数字/合击蓄力保留
+  function isLow(){ return !!(window.CQ_FX_FLAGS && CQ_FX_FLAGS.low && CQ_FX_FLAGS.low()); }
+  function P(o){ var cap = isLow() ? Math.min(MAX_P, 180) : MAX_P; if (parts.length >= cap) parts.shift(); o.life = o.max = o.life || 0.6; o.vx = o.vx || 0; o.vy = o.vy || 0; o.g = o.g || 0; o.s = o.s || 4; o.drag = o.drag == null ? 0.98 : o.drag; parts.push(o); return o; }
   function burst(x, y, n, col, spd, size, life, opts){
     opts = opts || {};
+    if (isLow()) n = Math.max(2, Math.ceil(n * 0.35));
     for (var i = 0; i < n; i++) { var a = Math.random() * Math.PI * 2, v = spd * (0.3 + Math.random()); P({x: x, y: y, vx: Math.cos(a) * v, vy: Math.sin(a) * v - (opts.up || 0), s: size * (0.5 + Math.random()), c: col[i % col.length], life: life * (0.6 + Math.random() * 0.6), g: opts.g || 0, shape: opts.shape}); }
   }
   function ring(x, y, r0, r1, col, life, w){ rings.push({x: x, y: y, r0: r0, r1: r1, c: col, life: life, max: life, w: w || 6}); }
   function bolt(x0, y0, x1, y1, col, life){
-    var pts = [[x0, y0]], n = 9;
+    var pts = [[x0, y0]], n = isLow() ? 5 : 9;
     for (var i = 1; i < n; i++) { var t = i / n; pts.push([x0 + (x1 - x0) * t + (Math.random() - .5) * 46, y0 + (y1 - y0) * t + (Math.random() - .5) * 12]); }
     pts.push([x1, y1]); bolts.push({pts: pts, c: col, life: life, max: life});
-    // branch
-    var k = 3 + Math.floor(Math.random() * 4), b = pts[k]; bolts.push({pts: [b, [b[0] + (Math.random() - .5) * 90, b[1] + 40 + Math.random() * 50]], c: col, life: life * .7, max: life * .7, thin: true});
+    // branch（低特效跳过次要分叉）
+    if (!isLow()) { var k = 3 + Math.floor(Math.random() * 4), b = pts[k]; bolts.push({pts: [b, [b[0] + (Math.random() - .5) * 90, b[1] + 40 + Math.random() * 50]], c: col, life: life * .7, max: life * .7, thin: true}); }
   }
   function text(x, y, str, o){ if(window.CQ_FX_FLAGS && CQ_FX_FLAGS.dmg && !CQ_FX_FLAGS.dmg()) return; texts.push({x: x + (o.dx != null ? o.dx : (Math.random() - .5) * 30), y: y, str: str, c: o.c || '#fff', size: o.size || 30, life: o.life || 1.0, max: o.life || 1.0, vy: o.vy || -70, pop: 0}); }
   function sprite(dir, x, y, o){
@@ -157,6 +160,7 @@ var FX = (function(){
     if (proc !== 'huoqiu' && proc !== 'linghun' && done) setTimeout(done, 120);
   }
   function trailFollow(s, t, dur, cols){
+    if (isLow()) return; // 低特效跳过次要拖尾粒子
     var t0 = performance.now(), iv = setInterval(function(){ var k = (performance.now() - t0) / 1000 / dur; if (k >= 1) return clearInterval(iv);
       var x = s.x + (t.x - s.x) * k, y = s.y + (t.y - s.y) * k; for (var i = 0; i < 3; i++) P({x: x + (Math.random() - .5) * 10, y: y + (Math.random() - .5) * 10, s: 5 + Math.random() * 5, c: cols[i % cols.length], life: .35}); }, 16);
   }
@@ -248,7 +252,8 @@ var FX = (function(){
     hits.forEach(function(x, k){ hold(x.m, HEJI_WIND + imp + k * 60 + 160); });
     // 蓄力: 玩家和英雄身上播放 heji_*_charge (能量向内汇聚), 程序能量流作补充; 没有 charge sheet 时用程序光环
     screenFlash('#ffcc66', .2);
-    text(375, 140, o.name, {c: '#ffd23f', size: 64, life: 1.8, vy: -20, dx: 0});
+    // 合击大字靠上，避开顶排怪伤害数字（y≈怪物中心-20）；原 y=140 会叠字
+    text(375, 78, o.name, {c: '#ffd23f', size: 56, life: 1.8, vy: -18, dx: 0});
     var charge = function(p){ if (useCharge) { var cm = csh.meta; sprite(cdir, p.x, p.y, {scale: 1.25}); if (cm.frames / cm.fps * 1000 < HEJI_WIND - 40) setTimeout(function(){ if (visible()) sprite(cdir, p.x, p.y, {scale: 1.25}); }, cm.frames / cm.fps * 1000); }
       else ring(p.x, p.y, 90, 12, col[1], HEJI_WIND / 1000, 6); };
     var stream = function(p){ if (useCharge) setTimeout(function(){ if (visible()) trailFollow(p, t0, (HEJI_WIND - 120) / 1000, col); }, 120); else trailFollow(p, t0, HEJI_WIND / 1000, col); };
@@ -300,7 +305,7 @@ var FX = (function(){
       var names = (m._buffs || []).map(function(y){ return y.cfg && y.cfg.name || ''; }).join(',');
       var cls = /毒/.test(names) ? 'fx-poison' : /冰|冻/.test(names) ? 'fx-frozen' : /火|烈/.test(names) ? 'fx-burn' : '';
       if (el._fxTint !== cls) { if (el._fxTint) el.classList.remove(el._fxTint); if (cls) el.classList.add(cls); el._fxTint = cls; }
-      if (cls && Math.random() < .25) { var c = centerOf(el); P({x: c.x + (Math.random() - .5) * 60, y: c.y + 20, vy: -40, s: 4, c: cls === 'fx-poison' ? 'rgba(120,255,100,.8)' : cls === 'fx-frozen' ? 'rgba(200,240,255,.9)' : 'rgba(255,150,40,.9)', life: .6}); }
+      if (cls && Math.random() < (isLow() ? .08 : .25)) { var c = centerOf(el); P({x: c.x + (Math.random() - .5) * 60, y: c.y + 20, vy: -40, s: 4, c: cls === 'fx-poison' ? 'rgba(120,255,100,.8)' : cls === 'fx-frozen' ? 'rgba(200,240,255,.9)' : 'rgba(255,150,40,.9)', life: .6}); }
     });
   }
 
@@ -326,8 +331,9 @@ var FX = (function(){
       var q = parts[i]; q.life -= dt; if (q.life <= 0) { if (q.onHit) q.onHit(); parts.splice(i, 1); continue; }
       var a = q.life / q.max;
       if (q.proj) { q.t += dt; var f = Math.min(1, q.t / q.dur), px = q.sx + (q.tx - q.sx) * f, py = q.sy + (q.ty - q.sy) * f - Math.sin(f * Math.PI) * 30 + (q.wob ? Math.sin(q.t * 30) * 6 : 0);
-        glow(px, py, q.s * 2.6, q.cols[2] || q.cols[1], .55); glow(px, py, q.s * 1.4, q.cols[1], .9); glow(px, py, q.s * .6, q.cols[0], 1);
-        for (var j = 0; j < 2; j++) P({x: px, y: py, vx: (Math.random() - .5) * 60, vy: (Math.random() - .5) * 60, s: q.s * .45, c: q.cols[j + 1] || q.cols[0], life: .3});
+        if (isLow()) { glow(px, py, q.s * 1.2, q.cols[0], .95); }
+        else { glow(px, py, q.s * 2.6, q.cols[2] || q.cols[1], .55); glow(px, py, q.s * 1.4, q.cols[1], .9); glow(px, py, q.s * .6, q.cols[0], 1);
+          for (var j = 0; j < 2; j++) P({x: px, y: py, vx: (Math.random() - .5) * 60, vy: (Math.random() - .5) * 60, s: q.s * .45, c: q.cols[j + 1] || q.cols[0], life: .3}); }
         continue; }
       if (q.arc) { var pr = 1 - a, a1 = q.sweep ? q.a0 + (q.a1 - q.a0) * Math.min(1, pr * 2.2) : q.a1;
         ctx.globalAlpha = a; ctx.lineCap = 'round';

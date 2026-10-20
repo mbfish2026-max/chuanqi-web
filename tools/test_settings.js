@@ -75,6 +75,10 @@ R('loadConfigs()').then(()=>{
   ok(ST.fxAllows('shake')===false, '关闭震屏');
   ST.rebindFx && ST.rebindFx();
   ok(ctx.CQ_FX_FLAGS && ctx.CQ_FX_FLAGS.dmg()===false, 'CQ_FX_FLAGS 生效');
+  ST.set('game.fxQuality', 0); ST.rebindFx && ST.rebindFx();
+  ok(ctx.CQ_FX_FLAGS.low()===true, '低特效质量 CQ_FX_FLAGS.low');
+  ST.set('game.fxQuality', 1); ST.rebindFx && ST.rebindFx();
+  ok(ctx.CQ_FX_FLAGS.low()===false, '高特效质量 low=false');
 
   // 存档迁移：旧档无 settings
   const old={name:'旧',prof:1,level:10,exp:0,gold:0,yuanbao:0,hp:100,mp:50,mapId:1003,bag:[],equip:{},skills:{},kills:{},stat:{},tasksDone:{},
