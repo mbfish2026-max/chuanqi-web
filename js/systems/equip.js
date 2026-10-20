@@ -26,9 +26,9 @@
   S.on('createStuff', function(s, c){ if(c.type==2 && !s.affix) s.affix = genAffix(s, c); });
 
   // 把穿戴装备的词缀加到属性 (Role.equipAddition / additionBaseAttr)
-  S.on('attr', function(a, r){
+  function applyAffixes(a, equip){
     var sum = {};
-    for(var sl in r.equip){ var s=r.equip[sl]; if(!s || !s.affix) continue;
+    for(var sl in equip){ var s=equip[sl]; if(!s || !s.affix) continue;
       s.affix.forEach(function(x){
         if(x.code==1) a.maxhp += x.minValue; else if(x.code==2) a.maxmp += x.minValue;
         else if(ATKCODE[x.code]){ a['min'+ATKCODE[x.code]] += x.minValue; a['max'+ATKCODE[x.code]] += x.maxValue; }
@@ -37,7 +37,8 @@
     for(var k in sum) a[k] = (a[k]||0) + sum[k];
     if(a.maxhprate) a.maxhp = Math.ceil(a.maxhp*(1+a.maxhprate/100));
     if(a.maxmprate) a.maxmp = Math.ceil(a.maxmp*(1+a.maxmprate/100));
-  });
+  }
+  S.on('attr', function(a, r){ applyAffixes(a, r.equip); });
   // 伤害增幅 / 暴击伤害 / 吸血
   S.on('roleDamage', function(d, t, a, used, crit){
     if(a.adddamage) d *= 1 + a.adddamage/100;
@@ -64,6 +65,7 @@
 
   var pending = {};   // uid -> {affix, locks}
   S.equip = {
+    applyAffixes: applyAffixes,   // 英雄装备复用
     affixes: function(uid){ var f=S.findStuff(uid); if(!f||!f.s.affix) return []; return f.s.affix.map(function(x){ return {text:affixText(x), quality:affixQuality(x), raw:x}; }); },
     affixText: affixText,
     remakeCost: function(uid, locks){ var f=S.findStuff(uid); if(!f) return null; var s=f.s, c=stuffCfg(s); if(c.type!=2 || s.q<2) return null;

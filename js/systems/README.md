@@ -21,3 +21,25 @@
 | Systems.pets.list() | 当前召唤兽 [{name,hp,maxhp,atk,ac}] |
 
 测试: `node tools/test_systems.js`
+
+## 英雄 + 合击 (js/systems/hero.js, UI: js/ui_hero.js)
+原版传奇之旅的源码和配置里都没有英雄或合击 (grep hero/heji/合击/英雄 只找到地图介绍文字), 所以按热血传奇 1.80 英雄版的经典规则设计。
+- 解锁: 主角 Lv22 起, `Systems.hero.unlock(prof 1战/2法/3道, name?)`; 每个角色只能有一个英雄; 英雄起始等级 = 主角等级-10; 之后共享击杀经验, 等级不超过主角
+- 属性: profession 表成长 (生命 ×0.8) + 10 个装备位 (主角背包装备 → 英雄, 复用强化外的装备/词缀数据); 技能: 本职业 1 级主动技能 (slevel ≤ 英雄等级)
+- 战场: 英雄单位 `{isHero:true}` 放进 `G.battle._pets`, move.js 负责走位, ui.js 的宝宝卡片负责绘制 (ui_hero.js 换成英雄头像); 战士英雄近战 (距离 1), 法/道英雄距离 4; 阵亡后 30 秒复活
+- 模式: attack 攻击 / follow 跟随 (在场但不出手) / rest 休息 (离开战场, 不得经验也不涨怒气)
+- 怒气 0~100: 主角每次攻击 +2, 英雄每次攻击 +3, 主角受击 +1, 英雄受击 +2。满怒气时施放合击, 冷却 30 秒, 怒气清零; `setAuto(true)` 开启自动合击
+- 合击伤害 = (主角攻击上限 + 英雄攻击上限) × 倍率 × (1 + 主角等级/50) × 随机 0.9~1.1, 再减去目标防御
+
+| 主角+英雄 | 合击 | FX 目录 | 倍率 | 效果 |
+|---|---|---|---|---|
+| 战+战 | 破魂斩 | heji_pohunzhan | 3.0 | 群体 |
+| 战+法 | 劈星斩 | heji_pixingzhan | 4.5 | 单体, 无视 50% 防御 |
+| 战+道 | 雷霆一击 | heji_leitingyiji | 3.2 | 群体 + 眩晕 2 秒 |
+| 法+法 | 火龙气焰 | heji_huolongqiyan | 3.6 | 群体 |
+| 法+道 | 噬魂沼泽 | heji_shihunzhaoze | 2.6 | 群体 + 5 秒每秒追加 20% 伤害 |
+| 道+道 | 末日审判 | heji_morishenpan | 2.8 | 群体 + 主角/英雄回复 20% 生命 |
+
+API: `Systems.hero.has() / canUnlock() / unlock(prof,name) / info() / attr() / equip(uid) / unequip(slot) / setMode('attack'|'follow'|'rest') / setAuto(bool) / heji() / rage() → {rage,max,ready,cd} / unit() / comboFor(p1,p2) / COMBO`
+事件: `FXE('heji', {name, fx, key, hits:[{m,d}], total, manual})`, `FXE('heroatk', {unit, target, dmg, crit, skill})`, `FXE('herodie')`。fx.js 会先找 `assets/fx/<fx>/sheet.png`, 找不到就用程序生成的特效; `FX.registerHeji(dir, fn(s, h, targets))` 可以替换某个合击的程序特效。
+截图参数: `?seed=1&map=1003&hero=<prof|0>[&panel=1][&heji=1][&rage=1]`

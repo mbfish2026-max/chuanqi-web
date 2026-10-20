@@ -197,7 +197,29 @@ var FX = (function(){
     else if (type === 'heal') { PROC.heal(s); if (sheets.zhiliaoshu && sheets.zhiliaoshu.ok) sprite('zhiliaoshu', s.x, s.y, {scale: 1.3}); text(s.x, s.y - 30, '+' + o.amount, {c: '#5dff7a', size: 34, life: 1.2}); }
     else if (type === 'kill') { var tk = centerOf(monEl(o.m)); burst(tk.x, tk.y, o.m.boss ? 70 : 26, o.m.q >= 4 ? ['#ffd24d', '#ff8a00', '#fff'] : ['#ffffff', '#d9c7a3', '#8f7c5a'], o.m.boss ? 420 : 240, 5, .7); ring(tk.x, tk.y, 10, o.m.boss ? 180 : 90, 'rgba(255,240,200,.9)', .4, 6); if (o.m.boss) { screenShake(22); screenFlash('#ffd24d', .35); } }
     else if (type === 'cast') { var dir = SKILL_DIR[o.base], tt = o.target ? centerOf(monEl(o.target)) : s; if (dir) playSkill(dir, s, tt); }
+    else if (type === 'heji') heji(o);                                  // [hero] 合击
+    else if (type === 'heroatk') { var he = petEl(o.unit), tg = monEl(o.target), th = centerOf(tg); atkBetween(he, tg, o.unit && o.unit.idx, o.target && o.target.idx);
+      PROC.slash(centerOf(he), th, false); flashCard(tg, o.crit ? 'crit' : 'hit'); text(th.x, th.y - 20, (o.crit ? '暴击 ' : '') + '-' + o.dmg, {c: '#7fd7ff', size: o.crit ? 44 : 30}); }
     else if (type === 'dot') { var td = centerOf(monEl(o.m)); text(td.x, td.y - 10, '-' + o.d, {c: '#7dff6a', size: 24, life: .8}); flashCard(monEl(o.m), 'hit'); }
+  }
+  // ---------- [hero] 合击 FX: sheet assets/fx/heji_<pinyin>/ if present, else procedural (registerable) ----------
+  function petEl(u){ var it = (UI.petItems || []).filter(function(x){ return x._pet === u; })[0]; return it ? it.el : null; }
+  var HEJI = {
+    heji_pohunzhan: function(s, h, ts){ ts.forEach(function(t, k){ setTimeout(function(){ PROC.slash(s, t, true); PROC.slash(h, t, true); burst(t.x, t.y, 30, ['#ffffff', '#ffd27a', '#ff6a00'], 360, 6, .6); }, k * 70); }); screenShake(16); },
+    heji_pixingzhan: function(s, h, ts){ var t = ts[0]; for (var i = 0; i < 5; i++) bolt(t.x + (Math.random() - .5) * 40, t.y - 360, t.x, t.y, '#fff6c8', .5); ring(t.x, t.y, 10, 150, 'rgba(255,230,120,.95)', .5, 10); burst(t.x, t.y, 60, ['#fffbe0', '#ffd34d', '#ff8a00'], 460, 7, .8); screenShake(20); },
+    heji_leitingyiji: function(s, h, ts){ ts.forEach(function(t){ bolt(t.x, t.y - 380, t.x, t.y, '#e6f2ff', .55); bolt(t.x + 20, t.y - 360, t.x, t.y, '#9fc8ff', .45); ring(t.x, t.y, 6, 90, 'rgba(140,190,255,.9)', .4, 6); }); screenShake(14); },
+    heji_huolongqiyan: function(s, h, ts){ ts.forEach(function(t, k){ setTimeout(function(){ burst(t.x, t.y, 40, ['#fff2a8', '#ff9a1f', '#ff3d00'], 380, 7, .8, {g: -80}); ring(t.x, t.y, 8, 110, 'rgba(255,120,0,.9)', .45, 8); }, k * 90); }); screenShake(12); },
+    heji_shihunzhaoze: function(s, h, ts){ ts.forEach(function(t){ for (var i = 0; i < 18; i++) P({x: t.x + (Math.random() - .5) * 110, y: t.y + 30 + (Math.random() - .5) * 30, vy: -10 - Math.random() * 30, s: 14 + Math.random() * 16, c: ['rgba(120,60,160,.6)', 'rgba(60,140,70,.55)'][i % 2], life: 1.6, cloud: 1, drag: .97}); }); },
+    heji_morishenpan: function(s, h, ts){ ts.forEach(function(t){ ring(t.x, t.y, 10, 120, 'rgba(255,215,90,.95)', .6, 9); burst(t.x, t.y, 30, ['#fff6c0', '#ffd34d', '#ffffff'], 300, 5, .8, {up: 80}); }); PROC.heal(s); PROC.heal(h); }
+  };
+  function registerHeji(dir, fn){ HEJI[dir] = fn; }
+  function heji(o){
+    var s = centerOf(roleEl()), h = centerOf(petEl(G.battle && G.battle._heroUnit)) , ts = (o.hits || []).map(function(x){ return centerOf(monEl(x.m)); });
+    if (!ts.length) return; screenFlash('#ffcc66', .35);
+    text(375, 140, o.name, {c: '#ffd23f', size: 64, life: 1.6, vy: -20});
+    var sh = sheets[o.fx]; if (!sh) { loadSheet(o.fx); sh = sheets[o.fx]; }
+    if (sh && sh.ok) ts.forEach(function(t){ sprite(o.fx, t.x, t.y, {scale: 1.4}); }); else (HEJI[o.fx] || HEJI.heji_pohunzhan)(s, h, ts);
+    (o.hits || []).forEach(function(x, k){ setTimeout(function(){ var t = centerOf(monEl(x.m)); flashCard(monEl(x.m), 'crit'); text(t.x, t.y - 20, '-' + x.d, {c: '#ffb000', size: 46, life: 1.3}); }, 150 + k * 60); });
   }
   // bridge for skills cast inside js/systems (buff.js logs "[技能名] ..."): play their FX without touching that code
   function hookLog(){
@@ -309,6 +331,6 @@ var FX = (function(){
 
   // demo/test helper: FX.demo('leidianshu')
   function demo(dir){ var s = centerOf(roleEl()), m = G.battle && G.battle.mons.filter(function(x){ return !x.dead; })[0], t = centerOf(monEl(m)); playSkill(dir, s, t, function(){ flashCard(monEl(m), 'crit'); text(t.x, t.y - 20, '暴击 -' + (500 + Math.floor(Math.random() * 500)), {c: '#ffd23f', size: 48, life: 1.4}); }); }
-  return {playAtk: playAtk, attach: attach, emit: emit, preload: preload, hookLog: hookLog, demo: demo, procedural: PROC, SKILL_DIR: SKILL_DIR, _sheets: sheets,
+  return {registerHeji: registerHeji, heji: HEJI, playAtk: playAtk, attach: attach, emit: emit, preload: preload, hookLog: hookLog, demo: demo, procedural: PROC, SKILL_DIR: SKILL_DIR, _sheets: sheets,
     stats: function(){ return {parts: parts.length, anims: anims.length, texts: texts.length}; }};
 })();

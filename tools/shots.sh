@@ -23,3 +23,7 @@ shot 18_blacksmith "?seed=1&map=1004&tip=smith"
 shot 19_fuse "?seed=1&tip=fuse"
 shot 20_fuli_week "?seed=1&tip=week"
 shot 21_fuli_exchange "?seed=1&tip=exchange"
+shot hero_field "?seed=1&map=1003&hero=2" 5000
+shot hero_panel "?seed=1&map=1003&hero=2&panel=1" 4500
+shot hero_heji "?seed=1&map=1003&hero=2&heji=1&hejiwait=1800" 4650
+shot hero_unlock "?seed=3&map=1003&hero=0&panel=1&herowait=1500" 3800

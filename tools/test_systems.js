@@ -5,7 +5,7 @@ const store={};
 const ctx={console, Math, Date, JSON, Promise, setTimeout, localStorage:{getItem:k=>store[k]||null,setItem:(k,v)=>store[k]=v,removeItem:k=>delete store[k]},
   fetch:u=>Promise.resolve({text:()=>Promise.resolve(fs.readFileSync(path.join(root,u),'utf8'))}), toast:()=>{}, location:{reload(){}}};
 ctx.globalThis=ctx; ctx.window=ctx; vm.createContext(ctx);
-['js/data.js','js/game.js','js/move.js','js/systems/core.js','js/systems/fuli.js','js/systems/equip.js','js/systems/smith.js','js/systems/lilian.js','js/systems/buff.js']
+['js/data.js','js/game.js','js/move.js','js/systems/core.js','js/systems/fuli.js','js/systems/equip.js','js/systems/smith.js','js/systems/lilian.js','js/systems/buff.js','js/systems/hero.js']
   .forEach(f=>vm.runInContext(fs.readFileSync(path.join(root,f),'utf8'),ctx,{filename:f}));
 let fails=0; const ok=(c,m)=>{ console.log((c?'PASS ':'FAIL ')+m); if(!c) fails++; };
 const R=s=>vm.runInContext(s,ctx);
@@ -76,6 +76,31 @@ R('loadConfigs()').then(()=>{
   R('enterMap(CFG.map.list.find(function(m){return m.type==2;}).id)'); G.logs=[]; G._all=[];
   for(let i=0;i<300;i++) R('tick(0.1)');
   ok(G._all.some(l=>/魔法盾/.test(l)),'法师魔法盾施放'); console.log('  mage:', G._all.filter(l=>/魔法盾|火球/.test(l)).slice(0,3).join(' || '));
+
+  // ---------- 英雄 + 合击 ----------
+  R("newRole('英雄测试',1)"); G.role.level=21; G.role.skills={};
+  ok(S.hero.unlock(2).indexOf('需要等级')===0,'Lv21 不能召唤英雄');
+  G.role.level=30; const u1=S.hero.unlock(2,'小法'); console.log('  unlock:',u1); ok(u1.indexOf('OK')===0 && /劈星斩/.test(u1),'战+法 = 劈星斩');
+  ok(S.hero.unlock(3).indexOf('已经')===0,'只能有一个英雄');
+  const hi=S.hero.info(); ok(hi.level===20 && hi.attr.maxhp>0,'英雄等级 '+hi.level+' 生命 '+hi.attr.maxhp+' 技能 '+hi.skills.join(','));
+  const heq=R('(function(){var c=CFG.item.list.find(function(x){return x.type==2&&x.stdmode==5&&(!x.profession||x.profession==2)&&x.needlevel<=20&&x.needlevel>0;});var s=createStuff(c.id,1,3);addItem(s);return s;})()');
+  const pw0=S.hero.info().power; console.log('  hero equip:', S.hero.equip(heq.uid)); ok(S.hero.info().power>=pw0 && S.hero.info().equip[5],'英雄武器栏');
+  R('enterMap(CFG.map.list.filter(function(m){return m.type==2;})[3].id)'); G._all=[];
+  let sawUnit=false, hejiDone=false, maxRage=0;
+  for(let i=0;i<2000 && !hejiDone;i++){ R('tick(0.1)'); if(S.hero.unit() && (G.battle._pets||[]).indexOf(S.hero.unit())>=0) sawUnit=true; maxRage=Math.max(maxRage,S.hero.rage().rage);
+    if(S.hero.rage().ready){ const res=S.hero.heji(); console.log('  heji:',res); hejiDone=res.indexOf('OK')===0; } }
+  ok(sawUnit,'英雄作为战场单位出现在 _pets'); ok(G._all.some(l=>/^英雄/.test(l)),'英雄出手');
+  ok(hejiDone,'怒气满后合击成功 (max rage '+maxRage+')'); ok(S.hero.rage().rage===0 && S.hero.rage().cd>0,'合击消耗怒气并进入冷却');
+  ok(S.hero.heji().indexOf('怒气不足')===0,'怒气不足不能合击');
+  ok(S.hero.setMode('rest').indexOf('OK')===0,'休息模式'); R('tick(0.1)'); ok(!(G.battle._pets||[]).some(p=>p.isHero),'休息时离开战场');
+  S.hero.setMode('attack'); S.hero.setAuto(true); G.role.hero.rage=100; G.role.hero.hejiCd=0; for(let i=0;i<5;i++) R('tick(0.1)'); ok(G.role.hero.hejiCount>=2,'自动合击');
+  // 召唤术与英雄共存 (道士+英雄)
+  R("newRole('道',3)"); G.role.level=30; G.role.skills={3005:{lv:1,exp:0,cd:0}}; S.hero.unlock(3);
+  R('enterMap(CFG.map.list.filter(function(m){return m.type==2;})[3].id)'); for(let i=0;i<100;i++) R('tick(0.1)');
+  ok((G.battle._pets||[]).some(p=>p.isHero) && (G.battle._pets||[]).some(p=>!p.isHero),'召唤兽与英雄同时在场');
+  ok(S.hero.info().combo.name==='末日审判','道+道 = 末日审判');
+  R('save()'); const sv=JSON.parse(store['cq_web_save_v1']); ok(sv.role.hero && sv.role.hero.prof===3,'英雄写入存档');
+  const combos=[[1,1],[1,2],[1,3],[2,2],[2,3],[3,3]].map(([a,b])=>a+'+'+b+'='+S.hero.comboFor(a,b).name).join(' '); console.log('  combos:',combos);
   R('save()'); ok(!!store['cq_web_save_v1'],'存档成功');
   console.log(fails? fails+' FAILED':'ALL PASSED'); process.exit(fails?1:0);
 }).catch(e=>{ console.error(e); process.exit(2); });
