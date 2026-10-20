@@ -10,10 +10,7 @@
    "helmet",
    "weapon"
   ],
-  "base": {
-   "body": "body.png"
-  },
-  "note": "战士(prof=1)，原版仅男性形象；无披风/盾牌部位。所有图层同画布、同姿势、脚底贴底边、水平居中。",
+  "note": "战士(prof=1)，仅男性。所有图层同画布、同姿势、脚底贴底边、水平居中。tiers.body 在戴头盔时切换无发髻 body。",
   "tiers": {
    "armor": [
     {
@@ -57,26 +54,46 @@
      "minLevel": 25,
      "itemIds": [
       110004,
-      110007,
       110010
      ],
      "names": [
       "重盔甲",
-      "战神盔甲",
       "天魔神甲"
      ]
     },
     {
-     "tier": "supreme",
-     "file": "armor_supreme.png",
+     "tier": "zhanshen",
+     "file": "armor_zhanshen.png",
+     "minLevel": 35,
+     "itemIds": [
+      110007
+     ],
+     "names": [
+      "战神盔甲"
+     ],
+     "note": "套装·战神"
+    },
+    {
+     "tier": "shengzhan",
+     "file": "armor_shengzhan.png",
      "minLevel": 55,
      "itemIds": [
-      110013,
+      110013
+     ],
+     "names": [
+      "圣战宝甲"
+     ],
+     "note": "套装·圣战"
+    },
+    {
+     "tier": "supreme",
+     "file": "armor_supreme.png",
+     "minLevel": 65,
+     "itemIds": [
       110016,
       110019
      ],
      "names": [
-      "圣战宝甲",
       "雷霆战甲",
       "至尊战袍"
      ]
@@ -105,7 +122,7 @@
     {
      "tier": "iron",
      "file": "weapon_iron.png",
-     "minLevel": 9,
+     "minLevel": 1,
      "itemIds": [
       105005,
       105006,
@@ -120,7 +137,8 @@
       105017,
       105014,
       105042,
-      105044
+      105044,
+      105036
      ],
      "names": [
       "青铜剑",
@@ -136,27 +154,42 @@
       "祈祷之刃",
       "炼狱",
       "凌风",
-      "斩马刀"
+      "斩马刀",
+      "倚天剑"
+     ]
+    },
+    {
+     "tier": "zuma",
+     "file": "weapon_zuma.png",
+     "minLevel": 31,
+     "itemIds": [
+      105018,
+      105021,
+      105025,
+      105026,
+      105029
+     ],
+     "names": [
+      "井中月",
+      "赤血魔剑",
+      "霸者之刃",
+      "怒斩",
+      "逍遥之刃"
      ]
     },
     {
      "tier": "caijue",
      "file": "weapon_caijue.png",
-     "minLevel": 31,
+     "minLevel": 1,
      "itemIds": [
-      105018,
-      105021,
       105022,
-      105025,
       205003
      ],
      "names": [
-      "井中月",
-      "赤血魔剑",
       "裁决之杖",
-      "霸者之刃",
       "黄金裁决"
-     ]
+     ],
+     "note": "名器·裁决"
     },
     {
      "tier": "tulong",
@@ -164,20 +197,25 @@
      "minLevel": 34,
      "itemIds": [
       105034,
-      105026,
-      105029,
-      105030,
-      105040,
-      105036
+      105040
      ],
      "names": [
       "屠龙",
-      "怒斩",
-      "逍遥之刃",
-      "开天",
-      "至尊屠龙",
-      "倚天剑"
-     ]
+      "至尊屠龙"
+     ],
+     "note": "名器·屠龙"
+    },
+    {
+     "tier": "kaitian",
+     "file": "weapon_kaitian.png",
+     "minLevel": 61,
+     "itemIds": [
+      105030
+     ],
+     "names": [
+      "开天"
+     ],
+     "note": "名器·开天"
     }
    ],
    "helmet": [
@@ -230,7 +268,8 @@
      ],
      "names": [
       "圣战头盔"
-     ]
+     ],
+     "note": "套装·圣战"
     },
     {
      "tier": "thunder",
@@ -242,6 +281,630 @@
      "names": [
       "雷霆战盔"
      ]
+    }
+   ],
+   "body": [
+    {
+     "tier": "nobun",
+     "file": "body_nobun.png",
+     "minLevel": 1,
+     "itemIds": [
+      115001,
+      115002,
+      115003,
+      115004,
+      115005,
+      115006,
+      115007,
+      115008,
+      115009,
+      115010,
+      115011,
+      115012,
+      115013,
+      115014,
+      115015,
+      115016,
+      115017
+     ],
+     "names": [
+      "头盔",
+      "青铜头盔",
+      "魔法头盔",
+      "道士头盔",
+      "祈祷头盔",
+      "骷髅头盔",
+      "神秘头盔",
+      "道士头盔0",
+      "记忆头盔",
+      "黑铁头盔",
+      "圣战头盔",
+      "法神头盔",
+      "天尊头盔",
+      "雷霆战盔",
+      "烈焰魔盔",
+      "光芒道盔",
+      "斗笠"
+     ],
+     "note": "戴任意头盔时换成无发髻的 body，避免发髻穿出头盔"
+    }
+   ]
+  }
+ },
+ "2": {
+  "canvas": [
+   720,
+   1280
+  ],
+  "layers": [
+   "body",
+   "armor",
+   "helmet",
+   "weapon"
+  ],
+  "note": "法师(prof=2)，仅男性，蓝紫配银。同画布同姿势，脚贴底边，水平居中。",
+  "tiers": {
+   "armor": [
+    {
+     "tier": "cloth",
+     "file": "armor_cloth.png",
+     "minLevel": 1,
+     "itemIds": [
+      110001,
+      205002
+     ],
+     "names": [
+      "布衣",
+      "新人布衣"
+     ]
+    },
+    {
+     "tier": "light",
+     "file": "armor_light.png",
+     "minLevel": 12,
+     "itemIds": [
+      110002,
+      110003
+     ],
+     "names": [
+      "轻型盔甲",
+      "中型盔甲"
+     ]
+    },
+    {
+     "tier": "robe",
+     "file": "armor_robe.png",
+     "minLevel": 25,
+     "itemIds": [
+      110005
+     ],
+     "names": [
+      "魔法长袍"
+     ]
+    },
+    {
+     "tier": "demon",
+     "file": "armor_demon.png",
+     "minLevel": 35,
+     "itemIds": [
+      110008,
+      110011
+     ],
+     "names": [
+      "恶魔长袍",
+      "霓裳羽衣"
+     ]
+    },
+    {
+     "tier": "fashen",
+     "file": "armor_fashen.png",
+     "minLevel": 55,
+     "itemIds": [
+      110014
+     ],
+     "names": [
+      "法神披风"
+     ],
+     "note": "套装·法神"
+    },
+    {
+     "tier": "supreme",
+     "file": "armor_supreme.png",
+     "minLevel": 65,
+     "itemIds": [
+      110017,
+      110020
+     ],
+     "names": [
+      "烈焰魔衣",
+      "至尊披风"
+     ]
+    }
+   ],
+   "weapon": [
+    {
+     "tier": "wood",
+     "file": "weapon_wood.png",
+     "minLevel": 1,
+     "itemIds": [
+      105001,
+      105002,
+      105003,
+      105004,
+      205001
+     ],
+     "names": [
+      "木剑",
+      "匕首",
+      "短剑",
+      "乌木剑",
+      "新人木剑"
+     ]
+    },
+    {
+     "tier": "iron",
+     "file": "weapon_iron.png",
+     "minLevel": 1,
+     "itemIds": [
+      105005,
+      105006,
+      105007,
+      105008,
+      105009,
+      105010,
+      105011,
+      105012,
+      105013,
+      105033,
+      105017,
+      105043,
+      105036
+     ],
+     "names": [
+      "青铜剑",
+      "铁剑",
+      "八荒",
+      "海魂",
+      "半月",
+      "修罗",
+      "偃月",
+      "降魔",
+      "命运之刃",
+      "命运之刃",
+      "祈祷之刃",
+      "破魂",
+      "倚天剑"
+     ]
+    },
+    {
+     "tier": "staff",
+     "file": "weapon_staff.png",
+     "minLevel": 25,
+     "itemIds": [
+      105015,
+      105019,
+      105021,
+      105025,
+      105037
+     ],
+     "names": [
+      "魔杖",
+      "血饮",
+      "赤血魔剑",
+      "霸者之刃",
+      "逍遥王者杖"
+     ]
+    },
+    {
+     "tier": "gumo",
+     "file": "weapon_gumo.png",
+     "minLevel": 1,
+     "itemIds": [
+      105023,
+      205004
+     ],
+     "names": [
+      "骨玉权杖",
+      "黄金骨玉"
+     ],
+     "note": "名器·骨玉权杖"
+    },
+    {
+     "tier": "shihun",
+     "file": "weapon_shihun.png",
+     "minLevel": 28,
+     "itemIds": [
+      105035
+     ],
+     "names": [
+      "嗜魂法杖"
+     ],
+     "note": "名器·嗜魂法杖"
+    },
+    {
+     "tier": "dragon",
+     "file": "weapon_dragon.png",
+     "minLevel": 51,
+     "itemIds": [
+      105027,
+      105031,
+      105041
+     ],
+     "names": [
+      "龙牙",
+      "镇天",
+      "至尊法杖"
+     ]
+    }
+   ],
+   "helmet": [
+    {
+     "tier": "basic",
+     "file": "helmet_basic.png",
+     "minLevel": 1,
+     "itemIds": [
+      115001,
+      115002,
+      115017
+     ],
+     "names": [
+      "头盔",
+      "青铜头盔",
+      "斗笠"
+     ]
+    },
+    {
+     "tier": "magic",
+     "file": "helmet_magic.png",
+     "minLevel": 14,
+     "itemIds": [
+      115003,
+      115004,
+      115005,
+      115006,
+      115007,
+      115008,
+      115009,
+      115010
+     ],
+     "names": [
+      "魔法头盔",
+      "道士头盔",
+      "祈祷头盔",
+      "骷髅头盔",
+      "神秘头盔",
+      "道士头盔0",
+      "记忆头盔",
+      "黑铁头盔"
+     ]
+    },
+    {
+     "tier": "fashen",
+     "file": "helmet_fashen.png",
+     "minLevel": 59,
+     "itemIds": [
+      115012
+     ],
+     "names": [
+      "法神头盔"
+     ],
+     "note": "套装·法神"
+    },
+    {
+     "tier": "flame",
+     "file": "helmet_flame.png",
+     "minLevel": 69,
+     "itemIds": [
+      115015
+     ],
+     "names": [
+      "烈焰魔盔"
+     ]
+    }
+   ]
+  }
+ },
+ "3": {
+  "canvas": [
+   720,
+   1280
+  ],
+  "layers": [
+   "body",
+   "armor",
+   "helmet",
+   "weapon"
+  ],
+  "note": "道士(prof=3)，仅男性，青绿配白。tiers.body 在戴头盔时切换无发髻 body。",
+  "tiers": {
+   "armor": [
+    {
+     "tier": "cloth",
+     "file": "armor_cloth.png",
+     "minLevel": 1,
+     "itemIds": [
+      110001,
+      205002
+     ],
+     "names": [
+      "布衣",
+      "新人布衣"
+     ]
+    },
+    {
+     "tier": "light",
+     "file": "armor_light.png",
+     "minLevel": 12,
+     "itemIds": [
+      110002,
+      110003
+     ],
+     "names": [
+      "轻型盔甲",
+      "中型盔甲"
+     ]
+    },
+    {
+     "tier": "soul",
+     "file": "armor_soul.png",
+     "minLevel": 25,
+     "itemIds": [
+      110006
+     ],
+     "names": [
+      "灵魂战衣"
+     ]
+    },
+    {
+     "tier": "ghost",
+     "file": "armor_ghost.png",
+     "minLevel": 35,
+     "itemIds": [
+      110009,
+      110012
+     ],
+     "names": [
+      "幽灵战衣",
+      "天师道袍"
+     ]
+    },
+    {
+     "tier": "tianzun",
+     "file": "armor_tianzun.png",
+     "minLevel": 55,
+     "itemIds": [
+      110015
+     ],
+     "names": [
+      "天尊道袍"
+     ],
+     "note": "套装·天尊"
+    },
+    {
+     "tier": "supreme",
+     "file": "armor_supreme.png",
+     "minLevel": 65,
+     "itemIds": [
+      110018,
+      110021
+     ],
+     "names": [
+      "光芒道袍",
+      "至尊道袍"
+     ]
+    }
+   ],
+   "weapon": [
+    {
+     "tier": "wood",
+     "file": "weapon_wood.png",
+     "minLevel": 1,
+     "itemIds": [
+      105001,
+      105002,
+      105003,
+      105004,
+      205001
+     ],
+     "names": [
+      "木剑",
+      "匕首",
+      "短剑",
+      "乌木剑",
+      "新人木剑"
+     ]
+    },
+    {
+     "tier": "iron",
+     "file": "weapon_iron.png",
+     "minLevel": 9,
+     "itemIds": [
+      105005,
+      105006,
+      105007,
+      105008,
+      105009,
+      105010,
+      105011,
+      105012,
+      105013,
+      105033,
+      105017
+     ],
+     "names": [
+      "青铜剑",
+      "铁剑",
+      "八荒",
+      "海魂",
+      "半月",
+      "修罗",
+      "偃月",
+      "降魔",
+      "命运之刃",
+      "命运之刃",
+      "祈祷之刃"
+     ]
+    },
+    {
+     "tier": "snake",
+     "file": "weapon_snake.png",
+     "minLevel": 25,
+     "itemIds": [
+      105016,
+      105020,
+      105021,
+      105025,
+      105038
+     ],
+     "names": [
+      "银蛇",
+      "无极棍",
+      "赤血魔剑",
+      "霸者之刃",
+      "逍遥王者剑"
+     ]
+    },
+    {
+     "tier": "longwen",
+     "file": "weapon_longwen.png",
+     "minLevel": 1,
+     "itemIds": [
+      105024,
+      205005
+     ],
+     "names": [
+      "龙纹剑",
+      "黄金龙纹"
+     ],
+     "note": "名器·龙纹剑"
+    },
+    {
+     "tier": "xuantian",
+     "file": "weapon_xuantian.png",
+     "minLevel": 1,
+     "itemIds": [
+      105028,
+      105032,
+      105039,
+      105036
+     ],
+     "names": [
+      "逍遥扇",
+      "玄天",
+      "至尊玉扇",
+      "倚天剑"
+     ]
+    }
+   ],
+   "helmet": [
+    {
+     "tier": "basic",
+     "file": "helmet_basic.png",
+     "minLevel": 1,
+     "itemIds": [
+      115001,
+      115002,
+      115017
+     ],
+     "names": [
+      "头盔",
+      "青铜头盔",
+      "斗笠"
+     ]
+    },
+    {
+     "tier": "tao",
+     "file": "helmet_tao.png",
+     "minLevel": 14,
+     "itemIds": [
+      115003,
+      115004,
+      115005,
+      115006,
+      115007,
+      115008,
+      115009,
+      115010
+     ],
+     "names": [
+      "魔法头盔",
+      "道士头盔",
+      "祈祷头盔",
+      "骷髅头盔",
+      "神秘头盔",
+      "道士头盔0",
+      "记忆头盔",
+      "黑铁头盔"
+     ]
+    },
+    {
+     "tier": "tianzun",
+     "file": "helmet_tianzun.png",
+     "minLevel": 59,
+     "itemIds": [
+      115013
+     ],
+     "names": [
+      "天尊头盔"
+     ],
+     "note": "套装·天尊"
+    },
+    {
+     "tier": "guangmang",
+     "file": "helmet_guangmang.png",
+     "minLevel": 69,
+     "itemIds": [
+      115016
+     ],
+     "names": [
+      "光芒道盔"
+     ]
+    }
+   ],
+   "body": [
+    {
+     "tier": "nobun",
+     "file": "body_nobun.png",
+     "minLevel": 1,
+     "itemIds": [
+      115001,
+      115002,
+      115003,
+      115004,
+      115005,
+      115006,
+      115007,
+      115008,
+      115009,
+      115010,
+      115011,
+      115012,
+      115013,
+      115014,
+      115015,
+      115016,
+      115017
+     ],
+     "names": [
+      "头盔",
+      "青铜头盔",
+      "魔法头盔",
+      "道士头盔",
+      "祈祷头盔",
+      "骷髅头盔",
+      "神秘头盔",
+      "道士头盔0",
+      "记忆头盔",
+      "黑铁头盔",
+      "圣战头盔",
+      "法神头盔",
+      "天尊头盔",
+      "雷霆战盔",
+      "烈焰魔盔",
+      "光芒道盔",
+      "斗笠"
+     ],
+     "note": "戴任意头盔时换成无发髻的 body，避免发髻穿出头盔"
     }
    ]
   }
