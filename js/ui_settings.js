@@ -107,10 +107,12 @@
   function toggleRow(label, get, set){
     var row = el('div', ROW);
     row.appendChild(el('span', '', label));
-    var box = el('span', 'width:36px;height:36px;border:2px solid #a08040;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;background:#2a2218;font-size:22px;color:#ffd76a;');
+    var box = el('span', 'width:44px;height:44px;flex:0 0 auto;border:2px solid #a08040;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;background:#2a2218;font-size:22px;color:#ffd76a;');
     function paint(){ box.textContent = get() ? '✓' : ''; }
     paint();
-    box.onclick = function(){ set(!get()); paint(); ST.applyLegacyMirrors(); };
+    // [G2] 整行可点 (行高 ≥ 64 设计像素 ≈ 33pt+, 勾选框加大)
+    row.style.cursor = 'pointer'; row.style.minHeight = '64px'; row.style.boxSizing = 'border-box';
+    row.onclick = function(ev){ ev.stopPropagation(); set(!get()); paint(); ST.applyLegacyMirrors(); };
     row.appendChild(box);
     return row;
   }
@@ -154,6 +156,12 @@
       body.appendChild(toggleRow('自动走位', function(){return st.afk.autoMove;}, function(v){st.afk.autoMove=v;}));
       body.appendChild(toggleRow('自动分解拾取装备', function(){return st.afk.autoPick;}, function(v){st.afk.autoPick=v;}));
       body.appendChild(toggleRow('背包满时停止挂机', function(){return st.afk.stopBagFull;}, function(v){st.afk.stopBagFull=v;}));
+      // 阵亡/补药 (Systems.settings afk.*, 默认开)
+      function afkFlag(k){ return function(){ return ST.get().afk[k] !== false; }; }
+      function afkSet(k){ return function(v){ ST.set('afk.' + k, !!v); }; }
+      body.appendChild(toggleRow('死亡自动复活（回城复活并返回挂机图）', afkFlag('autoRevive'), afkSet('autoRevive')));
+      body.appendChild(toggleRow('自动购药（药不够时用金币补药）', afkFlag('autoBuyDrug'), afkSet('autoBuyDrug')));
+      body.appendChild(toggleRow('反复阵亡自动退图', afkFlag('autoRetreat'), afkSet('autoRetreat')));
       body.appendChild(el('div', 'padding:12px 6px;color:#a89878;font-size:18px;', '自动分解品质阈值在「回收/药品」页设置（对应原版 role_setup）。'));
     } else if(tab==='skill'){
       var learned = Object.keys(G.role.skills||{});
