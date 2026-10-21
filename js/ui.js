@@ -384,12 +384,17 @@ function stretchBattle(){
   var nm = b && b.find('img_bg_name'), lb = b && (b.ref('layoutboss') || b.find('layoutboss')), grid = b && b.ref('battleNode');
   [nm, lb].forEach(function(n){ if (n && n._sY == null) n._sY = n.y; if (n) n.y = n._sY; });
   if (grid && grid._sSy == null) grid._sSy = grid.d.ly.sy; if (grid) grid.d.ly.sy = grid._sSy;
+  if (grid) { grid.tf = ''; if (grid._sY2 == null) grid._sY2 = grid.y; grid.y = grid._sY2; }
   bg.refresh();
   var D = (sb.el.getBoundingClientRect().top - 6 - bg.el.getBoundingClientRect().bottom) / k; UI.battleStretch = D > 4 ? D : 0;
   if (typeof FX !== 'undefined' && FX.setHeight) FX.setHeight(hold ? (hold._sH || hold.h) + UI.battleStretch : 731);
-  if (D <= 4) return;
-  nodes.forEach(function(n){ n.h = n._sH + D; }); bg.y = bgY - D / 2;
-  if (nm) nm.y = nm._sY - D / 2; if (lb) lb.y = lb._sY + D / 2; if (grid) grid.d.ly.sy = grid._sSy + D / 4;
+  if (D > 4) { nodes.forEach(function(n){ n.h = n._sH + D; }); bg.y = bgY - D / 2;
+    if (nm) nm.y = nm._sY - D / 2; if (lb) lb.y = lb._sY + D / 2; }
+  // [G1d] 格子底部必须在战场左下「英雄/合击」条 (bottom:10px, 高 104) 之上: 先用行距吃掉多余高度, 不够时整体等比缩小 (顶边不动)
+  if (grid && b) { var ly = grid.d.ly, gTop = b.h / 2 - (grid.y + grid.h / 2), avail = b.h - 10 - 104 - 8 - gTop, rows = 5, ch = 125;
+    var need0 = ly.pt + rows * ch + (rows - 1) * grid._sSy; ly.sy = grid._sSy + Math.max(0, Math.min(D > 4 ? D / 4 : 0, (avail - need0) / (rows - 1)));
+    if (avail < need0) { var sc = avail / need0; grid.tf = 'scale(' + sc.toFixed(4) + ')'; grid.y = grid._sY2 + grid.h * (1 - sc) / 2; }
+    UI.gridScale = avail < need0 ? avail / need0 : 1; }
   bg.refresh();
 }
 // [size] 大体型 BOSS: 在顶排/边列时立绘不能超出战场 (375x667 顶排会顶出屏幕), 按可用空间缩小、左右收回
@@ -405,7 +410,7 @@ function fitBoss(it){
 function moveCard(it, idx){
   if (!it || idx == null || !UI.cells || !UI.cells[idx] || it._cell === idx) return;
   var from = it.el.getBoundingClientRect(); UI.cells[idx].addChild(it, true); it._cell = idx;
-  var to = it.el.getBoundingClientRect(), k = 750 / (UI.stage && UI.stage.el ? UI.stage.el.getBoundingClientRect().width || 750 : 750);
+  var to = it.el.getBoundingClientRect(), k = 750 / (UI.stage && UI.stage.el ? UI.stage.el.getBoundingClientRect().width || 750 : 750) / (UI.gridScale || 1);
   if (from.width && to.width && it.el.animate) it.el.animate([{translate: ((from.left - to.left) * k) + 'px ' + ((from.top - to.top) * k) + 'px'}, {translate: '0px 0px'}], {duration: 200, easing: 'ease-out'});
 }
 function syncPositions(){
