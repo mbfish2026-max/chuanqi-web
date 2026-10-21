@@ -69,7 +69,7 @@
     var bg = p.findDeep('img_bg_tipbase'); bg.h = Math.max(440, 336 - (bn.y - 27 - 24)); bg.place();
     var ui = p.findDeep('uiRoot'), extra = bg.h - 440; ui.y = 92 + extra / 2; ui.place();
     // 套装+对比行多时底板会顶出舞台上沿 (标题被裁): 按实际位置下移, 保持在舞台内 (留 12 设计像素)
-    try { var st = (UI.stage && UI.stage.el || document.getElementById('stage')).getBoundingClientRect(), k = st.height / 1334, br = bg.el.getBoundingClientRect();
+    try { var st = (UI.stage && UI.stage.el || document.getElementById('stage')).getBoundingClientRect(), k = (window.CC && CC.k) || st.height / ((window.CC && CC.stageH) || 1334), br = bg.el.getBoundingClientRect();
       if (k > 0) { var over = (st.top + 12 * k) - br.top; if (over > 0) { ui.y -= Math.min(over, Math.max(0, st.bottom - 12 * k - br.bottom)) / k; ui.place(); } } } catch (e) {} }
 
   // ---------- 背包: 自动整理 + 分解设置入口 ----------

@@ -87,6 +87,7 @@
   function stopBgm(){
     curBgm = null;
     if(bgmEl){ try{ bgmEl.pause(); bgmEl.currentTime = 0; }catch(e){} }
+    bgmEl = null; // M6: 先 pause 再释放引用, 避免旧 BGM 残留播放
   }
 
   function playSfx(key){
