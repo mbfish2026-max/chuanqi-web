@@ -74,6 +74,14 @@
     S.books35(r.prof).forEach(function(id){ var it=createStuff(id,1); if(it && addItem(it)!==false) n++; });
     return n;
   };
+  // ---------- 出生自带技能: 法师 火球术(2001) / 道士 召唤骷髅(召唤术 3005) ----------
+  // skill.txt 中召唤术 3005x 的 job 误填为 2 (法师), id 段与原作均属道士 -> 修正为 3
+  S.on('configsLoaded', function(){ if(CFG.skill) CFG.skill.list.forEach(function(x){ if(x && Math.floor(x.id/10)==3005) x.job=3; }); });
+  S.BIRTH_SKILL = {2:2001, 3:3005};
+  S.grantBirthSkill = function(r){ var base=r && S.BIRTH_SKILL[r.prof]; if(!base || r.skills[base]) return 0;
+    r.skills[base]={lv:1, exp:0, cd:0}; r.stat.skillLearned=(r.stat.skillLearned||0)+1; return base; };
+  var _newRole = newRole; newRole = function(){ var r=_newRole.apply(this, arguments); S.grantBirthSkill(r); return r; };
+  S.on('loaded', function(r){ if(r && r.skills && S.grantBirthSkill(r)) log('<span style="color:#ff0">补发: 出生技能 '+skillRow(S.BIRTH_SKILL[r.prof],1).name+'</span>'); });
   S.on('libaoOpened', function(v, lb){ if(lb && lb.id==S.BOOK_GIFT_LIBAO) S.grantBooks35(G.role); });
   // 旧存档: 已开过新手礼包 (背包中没有 2001) 的角色补发一次
   S.on('loaded', function(r){
