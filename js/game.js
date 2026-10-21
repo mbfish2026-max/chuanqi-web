@@ -148,6 +148,8 @@ function roleAttack(b, a){
   FXE('attack',{target:target,dmg:dmg,crit:crit,skills:usedSc});
   if(target.hp<=0 && !target.dead) killMonster(b,target);
 }
+// BOSS 刷新时间(秒), 全部 BOSS 统一; 特权减半 -> 300s
+var BOSS_RESPAWN_SEC = 600;
 function killMonster(b, m){
   FXE('kill',{m:m}); var r=G.role; m.dead=true; m.hp=0; m.respawn = (m.boss? 0 : (m.cfg.rebirth||3));
   r.kills[m.cfg.id]=(r.kills[m.cfg.id]||0)+1;
@@ -163,8 +165,8 @@ function killMonster(b, m){
       else log('获得 <span class="q'+s.q+'">'+(c.type==2?'['+QNAME[s.q]+']':'')+c.name+(s.count>1?' x'+s.count:'')+(s.nonsuch?' (极品+'+s.nonsuch+')':'')+'</span>');
     }
   });
-  // 原版 BossInfo.onBossDie: rebirth = now + map.reborn 秒 (1800/3600); 特权 _timereduce 减半由 prerogative 'kill' 钩子处理, 故先写计时再 H('kill')
-  if(m.boss){ var mc=mapCfg(); r.stat['boss_'+m.cfg.id]=Date.now()+1000*((mc&&mc.reborn)||180); b.mons.splice(b.mons.indexOf(m),1); }
+  // BOSS 刷新统一 BOSS_RESPAWN_SEC (覆盖原版 map.reborn 1800/3600); 特权 _timereduce 减半由 prerogative 'kill' 钩子处理, 故先写计时再 H('kill')
+  if(m.boss){ r.stat['boss_'+m.cfg.id]=Date.now()+1000*BOSS_RESPAWN_SEC; b.mons.splice(b.mons.indexOf(m),1); }
   H('kill', m, b);
 }
 // DropTool.setDropInfo
