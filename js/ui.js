@@ -177,7 +177,8 @@ function showPage(key){
 }
 function refreshTop(){
   var m = UI.main, r = G.role, a = calcAttr();
-  m.ref('labName').setString(r.name); m.ref('labLevel').setString(r.level + '级');
+  var ln = m.ref('labName'); ln.setString(r.name);
+  if (!ln._m2) { ln._m2 = 1; ln.setColor('#ffe9a8'); ln.el.style.textShadow = '1px 0 0 #2a1a08,-1px 0 0 #2a1a08,0 1px 0 #2a1a08,0 -1px 0 #2a1a08,1px 1px 0 #2a1a08,-1px -1px 0 #2a1a08,1px -1px 0 #2a1a08,-1px 1px 0 #2a1a08'; ln.el.style.fontWeight = 'bold'; }  // [M2] 亮色+描边 m.ref('labLevel').setString(r.level + '级');
   m.ref('labCombat').setString('战力：' + combatPower(a));
   m.ref('labCoin').setString(fmtNum(r.gold)); m.ref('labYuanbao').setString(fmtNum(r.yuanbao));
   var need = expNeed(r.level); m.ref('labExp').setString(Math.floor(r.exp) + '/' + need); m.ref('expbar').setProgress(r.exp / need);
@@ -593,7 +594,7 @@ function showCreate(){
   var items = [], roles = [];
   [1, 2, 3].forEach(function(k, i){
     var it = inst('itemProfession'); items.push(it); btns.addChild(it);
-    var rr = inst('itemProfessionRole'); roles.push(rr); view.addChild(rr); rr.setPos((i - 1) * 210, -157);
+    var rr = inst('itemProfessionRole'); roles.push(rr); view.addChild(rr); rr.setPos((i - 1) * 210, -112);   // [G5] 立绘上移, 给介绍框留出位置
     it.on(function(){ sel = k; upd(); });
   });
   btns.d.ly.sx = btns.d.ly.sx || 60; btns.layout();
@@ -607,7 +608,11 @@ function showCreate(){
     });
     roles.forEach(function(rr, i){ var e = i + 1; rr.ref('icon').setImage(IMG + 'role_create/icon_avatar_' + e + '_' + (e === sel ? 1 : 0) + '.png'); rr.ref('icon').el.firstChild.style.backgroundSize = 'contain'; rr.ref('icon').el.firstChild.style.backgroundPosition = 'center bottom'; rr.el.style.opacity = e === sel ? 1 : .55; });
     var lab = p.findDeep('introduce2').find('view/content/item'); lab.setString(CFG.profession.raw[PROF_KEY[sel]].describe || '');
-    lab.el.style.whiteSpace = 'normal'; lab.lbW = 475; lab.place();
+    lab.el.style.whiteSpace = 'normal'; lab.lbW = 475; lab.el.style.lineHeight = '26px'; lab.el.style.color = '#f3e9d2'; lab.place();
+    // [G5] 介绍框下移并加高到 3 行, 不压立绘、不截断 (超出时可滚动)
+    var intro = p.findDeep('introduce2'), iv = intro.find('view'), ibg = intro.find('bg');
+    intro.y = -160; intro.h = 100; intro.place(); ibg.h = 100; ibg.place(); iv.h = 84; iv.place(); iv.el.style.overflowY = 'auto';
+    if (ibg.spEl) ibg.spEl.style.filter = 'brightness(.6)';
   }
   function rn(){ var x = CFG.randomname.list[Math.floor(Math.random() * CFG.randomname.list.length)] || {}; return (x.surname && x.man) ? x.surname + x.man : '勇士' + rnd(100, 999); }
   var eb = p.ref('labName');
@@ -633,7 +638,13 @@ function refreshAll(){
   if (!UI.main || !G.role) return;
   refreshTop();
   if (UI.pageKey === 'fight') { refreshScene(); refreshLog(); }
-  else if (UI.page && UI.pageKey === 'main_role') { drawRole(UI.page); if (UI.roleTab === 'bag') { var b = UI.page.ref('downNode').children[0]; if (b) drawBag(b); } }
+  else if (UI.page && UI.pageKey === 'main_role') {
+    // [M4] 数据变化才重绘 (原来每次刷新都整页重建装备栏和背包 DOM)
+    var r = G.role, rk = JSON.stringify([calcAttr(), Math.floor(r.hp), Math.floor(r.mp), r.level, r.prof, ROLE_SLOTS.map(function(sl){ var e = r.equip[sl]; return e ? [e.uid, e.ench, e.q] : 0; })]);
+    if (UI.page._roleKey !== rk) { UI.page._roleKey = rk; drawRole(UI.page); }
+    if (UI.roleTab === 'bag') { var b = UI.page.ref('downNode').children[0];
+      if (b) { var bk = JSON.stringify([UI.bagTab, r.bagMax, r.essence, r.gold, r.bag.map(function(x){ return [x.uid, x.count, x.lock, x.ench, x.q]; })]);
+        if (b._bagKey !== bk) { b._bagKey = bk; drawBag(b); } } } }
   else if (UI.page && PAGES[UI.pageKey] && UI.pageKey !== 'main_map' && UI.pageKey !== 'main_fuli') { var sc = UI.page.findDeep('view'); var top = sc ? sc.el.scrollTop : 0; PAGES[UI.pageKey](UI.page); if (sc) sc.el.scrollTop = top; }
 }
 function render(){ refreshAll(); }

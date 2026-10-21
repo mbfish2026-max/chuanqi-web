@@ -247,6 +247,9 @@ var CC = (function(){
     root.parent = null; root.x = root.d.x; root.y = root.d.y;
     // Canvas anchor is centre; prefab roots for full-screen UIs sit at (375,667) relative to bottom-left (竖向居中于拉伸后的舞台)
     host = host || stage.el; host.appendChild(root.el);
+    // [G1] 全屏背景图 (750x1334 无 Widget) 跟随拉伸后的舞台高度, 按 cover 铺满, 不留黑边
+    root.children.forEach(function(c){ if (c.w >= DESIGN_W && c.h >= DESIGN_H && !c.d.wg && c.spEl && c.x === 0 && c.y === 0) {
+      c.d.wg = {f: 45, t: 0, b: 0, l: 0, r: 0}; c.spEl.style.backgroundSize = 'cover'; } });
     root.refresh(); root.mountedOnStage = true;
     mounted.push(root);
     return root;

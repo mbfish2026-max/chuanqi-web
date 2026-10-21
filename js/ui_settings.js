@@ -64,7 +64,9 @@
     var note = p.findDeep('img_bg1') && p.findDeep('img_bg1').find('label');
     var rate = (Systems.prerogative && Systems.prerogative.recycleRate) ? Systems.prerogative.recycleRate() : 0.5;
     var rateTxt = Math.round(rate*100)+'%'+(rate>=1?'(特权满额)':'（默认；回收特权可满额）');
-    if(note) note.setString('※自动回收→金币 '+rateTxt+'；手动「分解」→精华(5=1洗练石)；锁/套装/暗金默认保留  精华 '+(G.role.essence||0));
+    // [G4] 说明文字限宽 680 设计像素并允许换行, 不再溢出弹窗
+    if(note){ note.lbW = 680; note.autoSize = true; note.el.style.whiteSpace = 'pre-wrap'; note.el.style.wordBreak = 'break-all'; note.el.style.width = '680px'; }
+    if(note) note.setString('※自动回收→金币 '+rateTxt+'；\n手动「分解」→精华(5=1洗练石)；锁/套装/暗金默认保留  精华 '+(G.role.essence||0));
 
     function refreshDrugRow(kind, revertRef, nameRef, pctRef){
       var d = st.drug[kind];
