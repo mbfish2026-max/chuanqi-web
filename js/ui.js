@@ -168,10 +168,9 @@ function tallLayout(){
   var f = UI.fight;
   if (f) {
     shiftY(f.ref('showRoot'), off);
-    var bg = f.ref('showRoot').find('img_bg_fight');
-    if (bg) { if (bg._baseH == null) bg._baseH = bg.h; bg.h = bg._baseH + 2 * off; shiftY(bg, -off); }
     ['img_bg_battle', 'btnSetup', 'btnBoss', 'btnGM'].forEach(function(k){ shiftY(f.ref(k) || f.find(k), -off); });
     f.children.forEach(function(c){ if (['mask', 'showRoot', 'img_bg_battle', 'btnSetup', 'btnBoss', 'btnGM'].indexOf(c.name) < 0) shiftY(c, -off); });
+    stretchBattle();     // [G1c] 原 find('img_bg_fight') 恒为 null (ref showRoot 本身就是 img_bg_fight), 战场从未加高
   }
   if (UI.page) tallPage(UI.page);
 }
@@ -282,7 +281,7 @@ function buildScene(){
     b.ref('mapName').el.style.whiteSpace = 'pre'; b.ref('mapName').lbW = null;
     var grid = b.ref('battleNode'); UI.cells = [];
     for (var i = 0; i < 30; i++) { var cell = new CC.Node({n: 'grid' + i, x: 0, y: 0, w: 120, h: 125, ax: .5, ay: .5}, null); grid.addChild(cell, true); UI.cells.push(cell); }
-    grid.layout();
+    grid.layout(); stretchBattle();
     brightBattleBg(b); UI.cells.forEach(function(c){ c.el.classList.add('bf-cell'); });
     UI.roleItem = inst('itemRole'); UI.roleItem.ref('monsterRoot').setActive(false); UI.cells[G.battle && G.battle.roleIdx != null ? G.battle.roleIdx : ROLE_CELL].addChild(UI.roleItem); UI.roleItem._cell = G.battle && G.battle.roleIdx;
     UI.roleItem.ref('roleSign').setImage(IMG + 'role_create/icon_avatar_' + G.role.prof + '_0.png');
@@ -374,6 +373,25 @@ function refreshScene(){
   if (bi.active) { var hp = UI.battle.ref('bossHP'); if (boss) { hp.setProgress(boss.hp / boss.maxhp); } else { var t = (r.stat['boss_' + mapCfg().boss] || 0) - Date.now(); hp.setProgress(0); var lt = hp.find('labtime'); if (lt) lt.setString(t > 0 ? Math.ceil(t / 1000) + '秒后刷新' : ''); } }
 }
 
+// [G1c] 战场纵向补齐: 实测 img_bg_fight 下沿到「挂机」行的空白 D (设计像素), 底图/容器/格子层同步加高 D (上沿不动),
+// 6x5 格子行距 sy 增加 D/4 让各行均匀拉开; 右侧地图名跟底边、BOSS 血条跟顶边。每次重建战场或重排时从基准值重算, 不累加。
+function stretchBattle(){
+  var f = UI.fight; if (!f) return; var bg = f.ref('showRoot'), sb = f.ref('btnSetup') || f.find('btnSetup');
+  var k = UI.stage && UI.stage.el ? UI.stage.el.getBoundingClientRect().width / 750 : 0; if (!bg || !sb || !(k > 0) || !bg.el.isConnected) return;
+  var b = UI.battle, hold = bg.children[0], nodes = [bg, hold].concat(b ? [b, b.ref('img_bg') || b.find('img_bg'), b.find('img_bg_battle'), b.ref('battleNode')] : []).filter(Boolean);
+  nodes.forEach(function(n){ if (n._sH == null) { n._sH = n.h; n._sY = n.y; } n.h = n._sH; });
+  var bgY = bg.y = (bg._baseY != null ? bg._baseY + tallOff() : bg._sY);
+  var nm = b && b.find('img_bg_name'), lb = b && (b.ref('layoutboss') || b.find('layoutboss')), grid = b && b.ref('battleNode');
+  [nm, lb].forEach(function(n){ if (n && n._sY == null) n._sY = n.y; if (n) n.y = n._sY; });
+  if (grid && grid._sSy == null) grid._sSy = grid.d.ly.sy; if (grid) grid.d.ly.sy = grid._sSy;
+  bg.refresh();
+  var D = (sb.el.getBoundingClientRect().top - 6 - bg.el.getBoundingClientRect().bottom) / k; UI.battleStretch = D > 4 ? D : 0;
+  if (typeof FX !== 'undefined' && FX.setHeight) FX.setHeight(hold ? (hold._sH || hold.h) + UI.battleStretch : 731);
+  if (D <= 4) return;
+  nodes.forEach(function(n){ n.h = n._sH + D; }); bg.y = bgY - D / 2;
+  if (nm) nm.y = nm._sY - D / 2; if (lb) lb.y = lb._sY + D / 2; if (grid) grid.d.ly.sy = grid._sSy + D / 4;
+  bg.refresh();
+}
 // [size] 大体型 BOSS: 在顶排/边列时立绘不能超出战场 (375x667 顶排会顶出屏幕), 按可用空间缩小、左右收回
 function fitBoss(it){
   var f = it && it._popFig; if (!f || !UI.battle) return; var br = UI.battle.el.getBoundingClientRect(); if (!br.width) return;

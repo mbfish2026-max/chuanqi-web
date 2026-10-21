@@ -39,11 +39,15 @@ var MOVE = (function(){
   function stepToward(b, s, e){ var p = path(b, s, e); if (p.length > 2 || (p.length === 2 && p[1] !== e)) return p[1]; return p.length ? -1 : greedy(b, s, e); }
 
   function roleRange(){ var d = 1; if (typeof eachSkill === 'function') eachSkill(function(sc){ if (sc.triggertype == 1 && sc.distance > d) d = sc.distance; }); return d; }
+  // [boss] 大体型 BOSS 只在第 3 行及以下 (idx>=12) 活动, 上方留出立绘空间, 不必缩小
+  var BOSS_MIN = 12;
+  function bossCell(b){ var o = occ(b), f = []; for (var i = BOSS_MIN; i < N; i++) if (!o[i]) f.push(i); return f.length ? f[Math.floor(f.length / 2)] : freeCell(b); }
   function ensure(b){
     if (b.roleIdx == null) b.roleIdx = ROLE_START;
+    b.mons.forEach(function(m){ if (m.boss && !m.dead && m.idx != null && m.idx < BOSS_MIN) m.idx = bossCell(b); });
     b.mons.forEach(function(m, k){
       if (m.dead) { m._wasDead = true; return; }
-      if (m.idx == null || m._wasDead) { m._wasDead = false; var occ0 = occ(b), want = MON_START[k % MON_START.length]; m.idx = (m.idx == null && !occ0[want]) ? want : freeCell(b); m.moveT = 0.5 + Math.random() * 1.5; }
+      if (m.idx == null || m._wasDead) { m._wasDead = false; var occ0 = occ(b), want = MON_START[k % MON_START.length]; m.idx = (m.idx == null && !occ0[want] && !(m.boss && want < BOSS_MIN)) ? want : m.boss ? bossCell(b) : freeCell(b); m.moveT = 0.5 + Math.random() * 1.5; }
     });
     (b._pets || []).forEach(function(p){ if (p.idx == null) { p.idx = freeCell(b, b.roleIdx); p.moveT = 1; } });
   }
@@ -70,7 +74,7 @@ var MOVE = (function(){
       if ((m._buffs || []).some(function(x){ return (x.vertigo || x.frozen) && x.left > 0; })) return;
       if (monCanAttack(b, m)) return;
       var tg = b.roleIdx, bd = cheb(m.idx, b.roleIdx); (b._pets || []).forEach(function(p){ if (p.hp > 0 && p.idx != null && cheb(m.idx, p.idx) < bd) { bd = cheb(m.idx, p.idx); tg = p.idx; } });
-      var n = stepToward(b, m.idx, tg); if (n >= 0) m.idx = n; });
+      var n = stepToward(b, m.idx, tg); if (n >= 0 && !(m.boss && n < BOSS_MIN)) m.idx = n; });
     (b._pets || []).forEach(function(p){ if (p.hp <= 0 || p.idx == null) return; p.moveT = (p.moveT || 0) - dt; if (p.moveT > 0) return; p.moveT = 1.2;
       var t = nearestMon(b, p.idx); if (!t || cheb(p.idx, t.idx) <= 1) return; var n = stepToward(b, p.idx, t.idx); if (n >= 0) p.idx = n; });
   }

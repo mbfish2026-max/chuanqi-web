@@ -387,6 +387,7 @@ var FX = (function(){
 
   // demo/test helper: FX.demo('leidianshu')
   function demo(dir){ var s = centerOf(roleEl()), m = G.battle && G.battle.mons.filter(function(x){ return !x.dead; })[0], t = centerOf(monEl(m)); playSkill(dir, s, t, function(){ flashCard(monEl(m), 'crit'); text(t.x, t.y - 20, '暴击 -' + (500 + Math.floor(Math.random() * 500)), {c: '#ffd23f', size: 48, life: 1.4}); }); }
-  return {registerHeji: registerHeji, heji: HEJI, hejiImpact: function(d){ return hejiImpact(sheets[d]); }, playAtk: playAtk, attach: attach, emit: emit, preload: preload, hookLog: hookLog, demo: demo, procedural: PROC, SKILL_DIR: SKILL_DIR, _sheets: sheets,
+  function setHeight(h){ H = Math.round(h) || 731; if (canvas) { canvas.style.height = H + 'px'; resize(); } }   // [G1c] 战场加高后同步画布
+  return {setHeight: setHeight, registerHeji: registerHeji, heji: HEJI, hejiImpact: function(d){ return hejiImpact(sheets[d]); }, playAtk: playAtk, attach: attach, emit: emit, preload: preload, hookLog: hookLog, demo: demo, procedural: PROC, SKILL_DIR: SKILL_DIR, _sheets: sheets,
     stats: function(){ return {parts: parts.length, anims: anims.length, texts: texts.length}; }};
 })();
