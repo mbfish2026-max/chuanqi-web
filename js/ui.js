@@ -192,8 +192,8 @@ function initFight(){
   f.ref('btnMap').on(function(){ showPage('main_map'); });
   f.ref('btnMapDesc').on(function(){ tipMapDesc(mapCfg()); });
   f.ref('btnSetup').on(function(){ if (typeof openSettings === 'function') openSettings('recycle'); else { G.settings.autoDrug = !G.settings.autoDrug; save(); toast('自动吃药：' + (G.settings.autoDrug ? '开启' : '关闭')); } });
-  f.ref('btnBoss').on(function(){ var b = f.ref('bossNode'); b.setActive(!b.active); if (b.active) fillBoss(); });
-  f.ref('btnCloseBoss').on(function(){ f.ref('bossNode').setActive(false); });
+  f.ref('btnBoss').on(function(){ setBoss(!f.ref('bossNode').active); });
+  f.ref('btnCloseBoss').on(function(){ setBoss(false); });
   // the 9 itemMap cells live under mapNode/mapLayout in the prefab
   UI.mapCells = f.findDeep('mapLayout').children;
   UI.mapCells.forEach(function(cell, i){ cell.find('root').on(function(){ var id = mapCfg().jiugongge[i]; if (id > 1) { var t = cfg('map', id); if (combatPower() < (t.limitpower || 0)) return toast('战力达到 ' + t.limitpower + ' 才能前往该地图!'); enterMap(id); } }); });
@@ -228,6 +228,13 @@ function tipMapDesc(m){
   p.ref('labMonsters').setString(m.type == 2 ? names.join('、') : '无');
   p.ref('labDrops').setString([m.dropdesc1, m.dropdesc2, m.dropdesc3].filter(Boolean).join('\n') || '无');
 }
+// [G3] BOSS 面板打开时收起下方的小地图/九宫格/日志 (battleNode), 面板加不透明底并置顶, 不再被压住
+function setBoss(on){
+  var f = UI.fight; if (!f) return; var b = f.ref('bossNode'), bn = b.parent && b.parent.find('battleNode');
+  b.setActive(on); if (bn) bn.setActive(!on);
+  b.el.style.zIndex = 20; var mk = b.find('mask'); if (mk) { mk.el.style.background = 'rgba(28,20,12,.96)'; mk.el.style.pointerEvents = 'auto'; }
+  if (on) fillBoss();
+}
 function fillBoss(){
   var content = UI.fight.findDeep('bossInfo').find('view/content'); content.removeAllChildren();
   CFG.map.list.filter(function(m){ return m.boss > 1000; }).forEach(function(m){
@@ -236,7 +243,7 @@ function fillBoss(){
     b.ref('labName').setString(c.name); b.ref('labMap').setString(m.name);
     b.ref('labRefresh').setString(ready ? '已刷新' : Math.ceil((t - Date.now()) / 60000) + '分钟'); b.ref('labRefresh').setColor(ready ? '#32C63D' : '#d62f2f');
     b.ref('labPower').setString(String(m.limitpower || 0));
-    b.ref('btnConvey').on(function(){ if (combatPower() < (m.limitpower || 0)) return toast('战力达到 ' + (m.limitpower || 0) + ' 才能前往该地图!'); UI.fight.ref('bossNode').setActive(false); enterMap(m.id); });
+    b.ref('btnConvey').on(function(){ if (combatPower() < (m.limitpower || 0)) return toast('战力达到 ' + (m.limitpower || 0) + ' 才能前往该地图!'); setBoss(false); enterMap(m.id); });
     content.addChild(b);
   });
 }
@@ -696,7 +703,7 @@ function startMain(){ buildMain(); }
         if (q.tip === 'roles' && window._rolesBoot) { /* 角色列表需无 seed */ }
         if (q.tip === 'week') { UI.fuliMode = 'week'; showPage('main_fuli'); }
         if (q.tip === 'exchange') { showPage('main_fuli'); UI.page.ref('btnExchange').el.click(); }
-        if (q.tip === 'boss') { UI.fight.ref('bossNode').setActive(true); fillBoss(); }
+        if (q.tip === 'boss') setBoss(true);
       }, +(q.wait || 1500));
     }
   }).catch(function(e){ console.error(e); ld.ref('tips').setString('加载配置失败: ' + e); });
