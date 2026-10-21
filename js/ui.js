@@ -49,7 +49,9 @@ function popup(name){
   if (m) { m.el.style.background = 'rgba(0,0,0,.35)'; m.el.style.opacity = 1; m.el.style.pointerEvents = 'auto';
     if (p.modal) m.el.onclick = function(e){ e.stopPropagation(); };
     else m.on(function(){ closePopup(p); }); }
-  // 面板本体内的点击不冒泡到 mask 之外 (mask 是兄弟节点, 只有真正点空白才命中 mask)
+  // 有的弹窗 (tipStore 等) 在 mask 上面还铺了一层全屏透明容器 (root, Widget 拉满), 点空白命中的是它: 同样视为点空白
+  if (m && !p.modal) p.el.addEventListener('click', function(e){ var n = e.target && e.target.ccNode;
+    if (n && n !== m && !n.d.bt && !n.el.onclick && n.w >= 740 && n.h >= 1300 && UI.popups.indexOf(p) >= 0) closePopup(p); });
   layerChanged();
   return p;
 }
