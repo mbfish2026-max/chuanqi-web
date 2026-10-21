@@ -115,21 +115,31 @@
     return row;
   }
 
+  // [N2] 设置面板单例: 增补面板也登记进 UI.popups (受 closePopup / 全屏层队列管理), 再次打开前先关掉已有的设置面板; 点遮罩空白关闭 (G6)
+  var extra = null;
+  function closeAllSettings(){
+    UI.popups.slice().forEach(function(x){ if(x.name === 'role_setup' || x.name === 'settingsExtra') closePopup(x); });
+    if(extra){ extra.destroy(); extra = null; }
+  }
   function openExtra(tab){
+    closeAllSettings();
     ST.ensure();
     var st = ST.get();
     // 遮罩
-    var mask = el('div', 'position:absolute;inset:0;background:rgba(0,0,0,.55);z-index:39;');
-    var box = el('div', PANEL_CSS);
-    var stage = (UI.stage && UI.stage.el) || document.getElementById('stage');
-    stage.appendChild(mask); stage.appendChild(box);
-    function close(){ mask.remove(); box.remove(); }
+    var mask = el('div', 'position:absolute;inset:0;background:rgba(0,0,0,.55);z-index:39;pointer-events:auto;');
+    var box = el('div', PANEL_CSS + 'pointer-events:auto;');
+    var host = UI.layerPop || (UI.stage && UI.stage.el) || document.getElementById('stage');
+    host.appendChild(mask); host.appendChild(box);
+    var handle = {name: 'settingsExtra', modal: false, el: box, destroy: function(){ mask.remove(); box.remove(); if(extra === handle) extra = null; }};
+    extra = handle; UI.popups.push(handle);
+    function close(){ if(UI.popups.indexOf(handle) >= 0) closePopup(handle); else handle.destroy(); }
+    mask.onclick = function(e){ e.stopPropagation(); close(); };
 
     var tabs = el('div', 'text-align:center;');
     ['recycle','afk','skill','game'].forEach(function(k){
       var names={recycle:'回收/药品',afk:'挂机',skill:'技能',game:'游戏'};
       var b=el('span', (tab===k?TAB_ON:TAB), names[k]);
-      b.onclick=function(){ close(); if(k==='recycle') openSettings('recycle'); else openExtra(k); };
+      b.onclick=function(){ if(k===tab) return; if(k==='recycle') openSettings('recycle'); else openExtra(k); };
       tabs.appendChild(b);
     });
     box.appendChild(tabs);
@@ -178,18 +188,21 @@
   window.openSettings = function(tab){
     tab = tab || 'recycle';
     if(tab==='recycle' || tab==='drug' || tab==='sound'){
+      closeAllSettings();
       var p = popup('role_setup');
-      // 顶栏快捷切到增补页
+      // 顶栏快捷切到增补页 [N3] 放在「设置」标题飘带 (uiRoot y≈573) 与「回收设置」小标题 (y≈460) 之间, 按 prefab 坐标挂在 uiRoot 下
       try {
-        var bar = el('div', 'position:absolute;left:50%;top:8%;transform:translateX(-50%);z-index:5;white-space:nowrap;');
+        var ur = p.find('uiRoot');
+        var holder = new CC.Node({n: 'settingsTabs', x: 0, y: 486, w: 0, h: 0, ax: .5, ay: .5}, null); ur.addChild(holder, true);
+        var bar = el('div', 'position:absolute;left:0;top:0;transform:translate(-50%,-50%);z-index:5;white-space:nowrap;display:flex;gap:8px;');
         [['recycle','回收/药品'],['afk','挂机'],['skill','技能'],['game','游戏']].forEach(function(pair){
-          var b=el('span', (pair[0]==='recycle'?TAB_ON:TAB)+'font-size:18px;padding:6px 10px;', pair[1]);
-          b.onclick=function(){ closePopup(p); if(pair[0]==='recycle') openSettings('recycle'); else openExtra(pair[0]); };
+          var b=el('span', (pair[0]==='recycle'?TAB_ON:TAB)+'margin:0;font-size:24px;line-height:32px;padding:8px 16px;', pair[1]);
+          b.onclick=function(ev){ ev.stopPropagation(); if(pair[0]==='recycle') return; openExtra(pair[0]); };
           bar.appendChild(b);
         });
-        p.el.style.position = p.el.style.position || 'relative';
-        p.el.appendChild(bar);
-      } catch(e){}
+        holder.el.style.pointerEvents = 'auto'; holder.el.style.zIndex = 5;
+        holder.el.appendChild(bar);
+      } catch(e){ console.warn('[settings tabs]', e); }
       bindRoleSetup(p);
       return p;
     }
