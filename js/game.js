@@ -281,6 +281,7 @@ function useItem(uid){
     var chk=H('useLibao', null, lb, s); if(chk) return chk; // [systems] 背包空位检查
     removeItem(uid,1); r.gold+=lb.gold||0; r.yuanbao+=lb.yuanbao||0;
     for(var i=1;i<=8;i++){ if(lb['item'+i]){ var it=createStuff(lb['item'+i], lb['num'+i]||1); if(it){ if(stuffCfg(it).type==2){ it.count=1; } addItem(it);} } }
+    H('libaoOpened', null, lb); // [systems] 新手礼包附赠技能书
     return 'OK:打开 '+lb.name; }
   if(c.stdmode==3 && /回城/.test(c.name)){ removeItem(uid,1); enterMap(mapCfg().rebornmap||1004); return 'OK:回城'; }
   if(c.stdmode==2 && /随机/.test(c.name) && mapCfg().type==2){ removeItem(uid,1); startBattle(mapCfg()); return 'OK:随机传送, 刷新怪物'; }

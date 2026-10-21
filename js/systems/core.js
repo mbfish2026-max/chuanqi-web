@@ -57,7 +57,30 @@
     if(r.bag.length >= r.bagCnt){ log('<span style="color:#f77">背包已满, '+c.name+' 丢失</span>'); return true; }
   });
   // ExchangeTool.checkUsed: 打开礼包需要 >=5 个空格
-  S.on('useLibao', function(v, lb){ if(S.bag.free() < 5) return '背包空间不足 (至少需要 5 格)'; });
+  S.on('useLibao', function(v, lb){
+    var need = 5; if(lb && lb.id==S.BOOK_GIFT_LIBAO && !G.role.books35) need = Math.max(5, S.books35(G.role.prof).length + 1);
+    if(S.bag.free() < need) return '背包空间不足 (至少需要 '+need+' 格)'; });
+
+  // ---------- 35级及以前技能书 (随 1级新手礼包 发放, 仅本职业, 每个技能 1 本学习书) ----------
+  // 取 skill 表中各技能 1 级行 (slevel<=35) 的 booknum[0]; 职业按 skill.job 判定, 与 learnFromBook 一致
+  S.BOOK_GIFT_LEVEL = 35; S.BOOK_GIFT_LIBAO = 2001;
+  S.books35 = function(prof){
+    if(!CFG.skill) return [];
+    return CFG.skill.list.filter(function(x){ return x && x.booknum && x.job==prof && x.slevel<=S.BOOK_GIFT_LEVEL && skillRow(Math.floor(x.id/10),1)===x; })
+      .map(function(x){ return x.booknum[0]; }).filter(function(id, i, a){ return a.indexOf(id)==i && cfg('item', id); });
+  };
+  S.grantBooks35 = function(r){
+    if(!r || r.books35) return 0; r.books35 = 1; var n=0;
+    S.books35(r.prof).forEach(function(id){ var it=createStuff(id,1); if(it && addItem(it)!==false) n++; });
+    return n;
+  };
+  S.on('libaoOpened', function(v, lb){ if(lb && lb.id==S.BOOK_GIFT_LIBAO) S.grantBooks35(G.role); });
+  // 旧存档: 已开过新手礼包 (背包中没有 2001) 的角色补发一次
+  S.on('loaded', function(r){
+    if(!r || r.books35 || !r.bag) return;
+    if(r.bag.some(function(x){ return x.id==S.BOOK_GIFT_LIBAO; })) return;
+    var n = S.grantBooks35(r); if(n) log('<span style="color:#ff0">补发: 35级及以前技能书 x'+n+' 已放入背包</span>');
+  });
 
   // ---------- 经济修正 ----------
   // libao.txt 中 2001「1级新手礼包」: gold/yuanbao=9999999、x99 材料、并且 item5 又给自己 (无限开) ——
