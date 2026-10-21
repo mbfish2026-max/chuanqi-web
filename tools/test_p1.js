@@ -31,6 +31,7 @@ R('loadConfigs()').then(()=>{
   ok(!!r.prerogative && r.prerogative._zdhsup===false, '默认无特权');
 
   // —— 死亡 ——
+  r.settings.afk.autoRevive=false; // 手动复活流程 (自动复活见 test_fix1.js)
   R('G.role.mapId=1003; enterMap(1003)');
   R('G.role.hp=0; roleDie()');
   ok(G.dead===true && G.paused===true, '死亡后 paused/dead');

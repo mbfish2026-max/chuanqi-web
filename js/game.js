@@ -195,7 +195,7 @@ function rollDrop(m){
   return res;
 }
 function monsterAttack(b, m, a){
-  var r=G.role;
+  var r=G.role; if(!r || G.dead || r.hp<=0) return; // [M1] 已阵亡: 同 tick 后续怪物不再出手
   if(H('monsterAttack', false, b, m, a)) return; // [systems] 眩晕/冰冻/召唤兽承伤
   if(Math.random()*100 >= 90+(m.cfg.hit||0)-a.evade){ log(m.cfg.name+' 的攻击被你闪避'); FXE('dodge',{m:m}); return; }
   // Monster.getAtk + BattleTool 怪物攻击: 暴击 ceil(1.5x) -> 减 Role.getDefence -> 固伤(暴击x1.5)
@@ -204,7 +204,7 @@ function monsterAttack(b, m, a){
   var def=a.minac; if(a.maxac-a.minac>=1) def=Math.floor(Math.random()*(a.maxac-a.minac)+a.minac); d-=def;
   var mfx=Math.max(0,Math.ceil((m.cfg.fixeddamage||0)-a.fixedac)); if(mfx>0){ if(mcrit) mfx*=1.5; d+=mfx; } d=Math.ceil(d); if(d<=0) d=1;
   d = H('roleHurt', d, m, a); // [systems] 护盾/免伤
-  r.hp-=d; FXE('hurt',{m:m,d:d}); FXE('matk',{m:m}); log('<span style="color:#e77">'+m.cfg.name+' 对你造成 '+d+' 伤害</span>');
+  r.hp=Math.max(0, r.hp-d); FXE('hurt',{m:m,d:d}); FXE('matk',{m:m}); log('<span style="color:#e77">'+m.cfg.name+' 对你造成 '+d+' 伤害</span>');
   if(r.hp<=0) roleDie();
 }
 function roleDie(){

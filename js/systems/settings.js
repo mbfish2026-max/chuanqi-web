@@ -27,7 +27,10 @@
         autoSkill: true,
         autoMove: true,
         autoPick: true,       // false 时跳过自动回收（仍入包）
-        stopBagFull: false
+        stopBagFull: false,
+        autoRevive: true,     // S2: 阵亡后自动回城复活并返回挂机图
+        autoBuyDrug: true,    // S2: 药不够时自动从药店补药 (金币)
+        autoRetreat: true     // S2: 同图反复阵亡自动退回上一张战斗图
       },
       game: {
         dmgNumbers: true,
@@ -181,6 +184,44 @@
     });
   });
 
+  // ---------- 自动补药 (S2) ----------
+  var BUY_LOW = 5, BUY_TO = 20, BUY_INTERVAL = 5;
+  function shopRowFor(id){
+    var Y = S.yyshop, list = Y && Y.drugList ? Y.drugList() : ((CFG.shop && CFG.shop.list) || []).filter(function(x){ return x && x.id === 3002 && x.items; });
+    return list.filter(function(x){ return x.items == id; })[0] || null;
+  }
+  // 当前设置药品若买不到(等级/店里没有), 换成店里能买的同类最好药, 并写回设置
+  function buyableId(kind){
+    var d = ensure().drug[kind], key = kind==='magic' ? 'mp' : 'hp', r = G.role;
+    var c0 = cfg('item', d.id), row0 = shopRowFor(d.id);
+    if(row0 && c0 && (c0.needlevel||0) <= r.level) return d.id;
+    var ids = kind==='life'?LIFE_IDS: kind==='magic'?MAGIC_IDS: SPECIAL_IDS, best = null;
+    ids.forEach(function(id){ var c = cfg('item', id); if(!c || (c.needlevel||0) > r.level || !shopRowFor(id)) return;
+      if(!best || (c[key]||0) > (cfg('item', best)[key]||0)) best = id; });
+    if(best && countItem(d.id) <= 0) d.id = best;
+    return best;
+  }
+  function autoBuyDrug(force){
+    var r = G.role, st = ensure(); if(!r || !st || st.afk.autoBuyDrug === false) return 0;
+    var bought = 0;
+    ['life','magic','special'].forEach(function(kind){
+      var d = st.drug[kind]; if(!d || !d.on) return;
+      if(countItem(d.id) >= BUY_LOW) return;
+      var id = buyableId(kind); if(!id) return;
+      var row = shopRowFor(id); if(!row) return;
+      var price = Math.abs(row.price || 0), cur = (row.currencytype || 1) === 1 ? 'gold' : 'yuanbao';
+      if(cur !== 'gold') return;                    // 只用金币自动购买, 不动元宝
+      var have = countItem(id), n = Math.min(BUY_TO - have, row.oncenum || 99, price > 0 ? Math.floor(r.gold / price) : BUY_TO - have);
+      if(n <= 0) return;
+      if(S.bag && !S.bag.canAdd(id)) return;
+      r.gold -= price * n; addItem(createStuff(id, n)); bought += n;
+      if(typeof log==='function') log('<span style="color:#8cf">自动补药: '+(cfg('item',id)||{}).name+' x'+n+' (−'+(price*n)+' 金币)</span>');
+    });
+    return bought;
+  }
+  var _buyT = 0;
+  S.on('tick', function(dt){ _buyT -= dt; if(_buyT > 0) return; _buyT = BUY_INTERVAL; autoBuyDrug(); });
+
   // 背包满停止挂机
   var _bagPaused = false;
   S.on('tick', function(dt, b, a, m){
@@ -268,7 +309,7 @@
     adjustPct: adjustPct, setDrugId: setDrugId,
     skillEnabled: skillEnabled, setSkillEnabled: setSkillEnabled,
     syncLootCfg: syncLootCfg, applyLegacyMirrors: applyLegacyMirrors,
-    combatAllowed: combatAllowed, fxAllows: fxAllows, rebindFx: rebindFx,
+    combatAllowed: combatAllowed, autoBuyDrug: autoBuyDrug, BUY_LOW: BUY_LOW, BUY_TO: BUY_TO, fxAllows: fxAllows, rebindFx: rebindFx,
     drugName: function(kind){
       var d = get().drug[kind]; var c = cfg('item', d && d.id); return (c && c.name) || '';
     },

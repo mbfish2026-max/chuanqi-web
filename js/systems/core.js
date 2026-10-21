@@ -45,6 +45,26 @@
     // BagTool.sortBagItems: 道具在前, 装备在后, 各按品质降序
     sort: function(){ var r=G.role, p=[], e=[]; r.bag.forEach(function(s){ (stuffCfg(s).type==2?e:p).push(s); });
       p.sort(function(a,b){return b.q-a.q;}); e.sort(function(a,b){return b.q-a.q;}); r.bag = p.concat(e); return S.ok('整理完成'); },
+    isFull: function(){ return !!G.role && S.bag.free() <= 0; },
+    // G8: 满包时回收低品质装备腾格子 —— 白装 + 绿装; 跳过锁定/极品/套装/暗金, 以及比身上更好的 (战力提升 > 0)
+    FULL_RECYCLE_MAXQ: 2,
+    fullRecycleCands: function(){
+      var r = G.role, L = S.loot;
+      return r.bag.filter(function(s){
+        var c = stuffCfg(s); if(!c || c.type != 2) return false;
+        if(s.q > S.bag.FULL_RECYCLE_MAXQ || s.lock || s.nonsuch || s.set || s.uq) return false;
+        if(L && L.compare){ var cmp = L.compare(s.uid); if(cmp && cmp.power && cmp.power.delta > 0) return false; }
+        return true;
+      });
+    },
+    recycleForSpace: function(){
+      var r = G.role, list = S.bag.fullRecycleCands(); if(!list.length) return 0;
+      var rate = (S.prerogative && S.prerogative.recycleRate) ? S.prerogative.recycleRate() : 0.5, gold = 0;
+      list.forEach(function(s){ var c = stuffCfg(s); gold += Math.ceil((c.sellprice||0) * (s.q||1) * rate); removeItem(s.uid); });
+      r.gold += gold; r.stat.all_coin = (r.stat.all_coin||0) + gold;
+      log('<span style="color:#fc6">背包已满, 自动回收白/绿装 '+list.length+' 件, 获得金币 '+gold+'</span>');
+      return list.length;
+    },
     toggleLock: function(uid){ var f=S.findStuff(uid); if(!f) return '物品不存在'; f.s.lock=!f.s.lock; return S.ok(f.s.lock?'已锁定':'已解锁'); }
   };
 
@@ -54,7 +74,14 @@
     if(s.id == S.ITEM_YUANBAO){ r.yuanbao += s.count; return true; }
     if(c.stdmode == 98) return;   // game.js 自身处理 (元宝礼包)
     if(c.type != 2 && r.bag.some(function(x){ return x.id==s.id; })) return;  // 叠加
-    if(r.bag.length >= r.bagCnt){ log('<span style="color:#f77">背包已满, '+c.name+' 丢失</span>'); return true; }
+    if(r.bag.length >= r.bagCnt) S.bag.recycleForSpace();
+    if(r.bag.length >= r.bagCnt){
+      log('<span style="color:#f77">背包已满, '+c.name+' 丢失</span>');
+      r.stat.bagLost = (r.stat.bagLost||0) + 1;
+      if(!S.bag._fullWarned){ S.bag._fullWarned = true; if(typeof toast==='function') toast('背包已满, 掉落将丢失! 请回收或扩充背包'); }
+      return true;
+    }
+    S.bag._fullWarned = false;
   });
   // ExchangeTool.checkUsed: 打开礼包需要 >=5 个空格
   S.on('useLibao', function(v, lb){

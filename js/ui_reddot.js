@@ -58,10 +58,29 @@
     try { return !!Q.red().any; } catch(e){ return false; }
   }
 
+  function bagFull(){
+    var S = window.Systems; if(!S || !S.bag || !G.role) return false;
+    try { return !!S.bag.isFull(); } catch(e){ return false; }
+  }
+
+  function styleFull(host){
+    if(!host || !host.el) return;
+    var d = host.el.querySelector('.cq-reddot[data-k="bagfull"]'); if(!d || d._full) return;
+    var disp = d.style.display;
+    d._full = 1;
+    d.textContent = '满';
+    d.style.cssText = 'position:absolute;right:-6px;top:-6px;width:36px;height:36px;line-height:36px;border-radius:50%;z-index:7;pointer-events:none;' +
+      'text-align:center;font-size:22px;font-weight:bold;color:#fff;background:radial-gradient(circle at 35% 35%,#ff8a7a,#e01b0b 60%,#8a0800);box-shadow:0 0 6px #f00;';
+    d.style.display = disp;
+  }
+
   function refreshNav(){
     if(!UI.main || !G.role) return;
     var fr = fuliRed();
     setDot(UI.main.ref('btnStory'), 'story', storyRed());
+    setDot(UI.main.ref('btnRole'), 'bagfull', bagFull());   // G8 背包满红点（带「满」字，常驻到有空格）
+    styleFull(UI.main.ref('btnRole'));
+    if(UI.page && UI.pageKey === 'main_role'){ try{ setDot(UI.page.findDeep('btnBag'), 'bagfull', bagFull()); }catch(e){} }
     setDot(UI.main.ref('btnFuli'), 'fuli', fr.any);
     // 战斗页任务钮已有红点；这里再刷一次以防遗漏
     if(UI.questBtn && UI.questBtn.dot) UI.questBtn.dot.style.display = questRed() ? '' : 'none';
@@ -99,5 +118,5 @@
   refreshAll = function(){ var r = _ra.apply(this, arguments); try { refresh(); } catch(e){} return r; };
 
   // 导出供测试
-  window.CQ_REDDOT = {refresh:refresh, fuliRed:fuliRed, storyRed:storyRed, questRed:questRed};
+  window.CQ_REDDOT = {refresh:refresh, bagFull:bagFull, fuliRed:fuliRed, storyRed:storyRed, questRed:questRed};
 })();
