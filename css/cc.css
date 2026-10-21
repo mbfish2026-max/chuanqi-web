@@ -1,6 +1,6 @@
 html,body{margin:0;height:100%;background:#000;overflow:hidden;font-family:"PingFang SC","Microsoft YaHei","Noto Sans CJK SC",sans-serif;-webkit-user-select:none;user-select:none}
 #stage{position:absolute;width:750px;height:1334px;transform-origin:0 0;overflow:hidden;background:#000}
-#stage .layer{position:absolute;left:0;top:0;width:750px;height:1334px;pointer-events:none}
+#stage .layer{position:absolute;left:0;top:0;width:750px;height:100%;pointer-events:none}
 #stage .layer>*{pointer-events:auto}
 .cc{position:absolute;box-sizing:border-box}
 .cc-sp{position:absolute;left:0;top:0;right:0;bottom:0;pointer-events:none;background-position:center;box-sizing:border-box}

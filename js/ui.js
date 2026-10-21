@@ -142,14 +142,37 @@ function buildMain(){
   UI.fight = inst('main_fight'); m.ref('fightRoot').addChild(UI.fight);
   initFight();
   showPage('fight');
+  tallLayout();
 }
+// [G1] fitWidth 拉伸后舞台高于 1334 时: 顶栏贴顶、底部导航贴底; 战斗页战场跟随顶栏、日志/小地图跟随底栏, 中间战场底图加高;
+// 其它页面: 上半部内容跟随顶栏, 底部按钮行跟随底栏。
+function tallOff(){ return Math.max(0, ((CC.stageH || 1334) - 1334) / 2); }
+function shiftY(n, dy){ if (!n) return; if (n._baseY == null) n._baseY = n.y; n.y = n._baseY + dy; n.place(); n.children.forEach(function(c){ c.refresh(); }); }
+function tallPage(page){
+  if (!page) return; var off = tallOff();
+  page.children.forEach(function(c){ if (c.name === 'mask' || (c.d.wg && (c.d.wg.f & 5) === 5)) return; var by = c._baseY != null ? c._baseY : c.y; shiftY(c, by < -300 ? -off : off); });
+}
+function tallLayout(){
+  var m = UI.main; if (!m) return; var off = tallOff();
+  shiftY(m.find('topRoot'), off); shiftY(m.find('bottomNode'), -off);
+  var f = UI.fight;
+  if (f) {
+    shiftY(f.ref('showRoot'), off);
+    var bg = f.ref('showRoot').find('img_bg_fight');
+    if (bg) { if (bg._baseH == null) bg._baseH = bg.h; bg.h = bg._baseH + 2 * off; shiftY(bg, -off); }
+    ['img_bg_battle', 'btnSetup', 'btnBoss', 'btnGM'].forEach(function(k){ shiftY(f.ref(k) || f.find(k), -off); });
+    f.children.forEach(function(c){ if (['mask', 'showRoot', 'img_bg_battle', 'btnSetup', 'btnBoss', 'btnGM'].indexOf(c.name) < 0) shiftY(c, -off); });
+  }
+  if (UI.page) tallPage(UI.page);
+}
+window.addEventListener('resize', function(){ setTimeout(tallLayout, 0); });
 function showPage(key){
   var m = UI.main; UI.pageKey = key;
   NAV.forEach(function(n){ var b = m.ref(n[0]), on = n[2] === key; b.find('select').setActive(on); b.find('icon').setImage(IMG + 'main/btn_op_' + n[1] + '_' + (on ? 0 : 1) + '.png'); });
   var fr = m.ref('fightRoot'), sr = m.ref('showRoot');
   if (UI.page) { UI.page.destroy(); UI.page = null; }
   fr.setActive(key === 'fight'); sr.setActive(key !== 'fight');
-  if (key !== 'fight') { UI.page = inst(key); sr.addChild(UI.page); (PAGES[key] || function(){})(UI.page); }
+  if (key !== 'fight') { UI.page = inst(key); sr.addChild(UI.page); (PAGES[key] || function(){})(UI.page); tallPage(UI.page); }
   refreshAll();
 }
 function refreshTop(){
