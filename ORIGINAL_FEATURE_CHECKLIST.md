@@ -169,3 +169,22 @@
 3. **本批（P2）**：音频接入、多角色、引导、运营商店 — ✅。  
 4. **再批**：广告真接入、GM（跳过）；红点 ✅；自动回收金币/SystemMsg ✅。
 
+
+## 原版脚本 vs Web 公式核对 (2026-10-21)
+配置表 assets/config/*.txt 与原版 resources/config 逐字节一致 (monster/map/levelup/skill/shop/item 数值无差异)。
+
+| 项目 | 原版 | Web 修复前 | 已修复 |
+|---|---|---|---|
+| 升级判定 | Role.updateLevel: exp **>** lvCfg.exp | exp >= need | ✅ |
+| 角色命中 | DamageTool.checkHit: 90+role.hit−**monster.hit** | 90+hit−monster.evade | ✅ |
+| 角色普攻取值 | getAttack(3)=floor(rand·(max−min)+min); 幸运取 max | rnd(min,max) 含上限 | ✅ |
+| 角色→怪伤害 | calculateSkillAtk: ceil→暴击×1.5→仅 acappend<0 减怪防→固伤(暴击×1.5) | 减怪物 ac, 固伤不吃暴击 | ✅ |
+| 怪→角色伤害 | Monster.getAtk floor(rand·(zs2−zs)+zs); 暴击 ceil×1.5; 减 getDefence(floor 随机); 固伤暴击×1.5 | rnd 区间/防御含上限, 固伤不吃暴击 | ✅ |
+| 怪物品质倍率 | 绿6/1.1/1.1/1.3/2, 蓝9/1.3/1.3/1.6/3, 紫12/1.5/1.5/1.5/5, BOSS 1x | 同 | — 一致 |
+| 药品 | ItemTool.onPropsUsed 瞬回(封顶), 冷却 红5s/蓝2s/太阳水5s | 5s 内持续回复, 无冷却 | ✅ |
+| 战力 | CombatTool.calculateRole: ×cizhui.vcombat (含攻速1/幸运80/固伤15/固防20/命中闪避暴击30, 逐项 ceil) | 仅 hp/mp/攻/防 | ✅ |
+| 地图战力门槛提示 | COMBAT_NOT_ENOUGH「战力达到 X 才能前往该地图!」 | 「战力不足 X」 | ✅ |
+| 等级/职业提示 | USER_LEVEL_DISSATISFY「等级达到 N级 可使用!」/「职业不相符!」 | 「需要等级 N」/「职业不符」 | ✅ (装备/技能书/礼包) |
+| BOSS 刷新 | map.reborn 1800/3600 | 600s | ❌ 用户决定保留 |
+| 英雄/合击、日常成就、掉落品质档、自动穿戴提示 | 无 | 扩展 | ❌ 有意扩展 |
+| test_equiptip「同部位只保留最好」偶发失败 | — | 极品/词缀随机致 hi<lo | ✅ 测试去随机 |

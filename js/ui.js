@@ -152,7 +152,7 @@ function initFight(){
   f.ref('btnCloseBoss').on(function(){ f.ref('bossNode').setActive(false); });
   // the 9 itemMap cells live under mapNode/mapLayout in the prefab
   UI.mapCells = f.findDeep('mapLayout').children;
-  UI.mapCells.forEach(function(cell, i){ cell.find('root').on(function(){ var id = mapCfg().jiugongge[i]; if (id > 1) { var t = cfg('map', id); if (combatPower() < (t.limitpower || 0)) return toast('战力不足 ' + t.limitpower); enterMap(id); } }); });
+  UI.mapCells.forEach(function(cell, i){ cell.find('root').on(function(){ var id = mapCfg().jiugongge[i]; if (id > 1) { var t = cfg('map', id); if (combatPower() < (t.limitpower || 0)) return toast('战力达到 ' + t.limitpower + ' 才能前往该地图!'); enterMap(id); } }); });
   UI.battleHolder = new CC.Node({n: 'battleHolder', x: 0, y: 0, w: 750, h: 731, ax: .5, ay: .5}, null);
   f.ref('showRoot').addChild(UI.battleHolder);
 }
@@ -192,7 +192,7 @@ function fillBoss(){
     b.ref('labName').setString(c.name); b.ref('labMap').setString(m.name);
     b.ref('labRefresh').setString(ready ? '已刷新' : Math.ceil((t - Date.now()) / 60000) + '分钟'); b.ref('labRefresh').setColor(ready ? '#32C63D' : '#d62f2f');
     b.ref('labPower').setString(String(m.limitpower || 0));
-    b.ref('btnConvey').on(function(){ if (combatPower() < (m.limitpower || 0)) return toast('战力不足'); UI.fight.ref('bossNode').setActive(false); enterMap(m.id); });
+    b.ref('btnConvey').on(function(){ if (combatPower() < (m.limitpower || 0)) return toast('战力达到 ' + (m.limitpower || 0) + ' 才能前往该地图!'); UI.fight.ref('bossNode').setActive(false); enterMap(m.id); });
     content.addChild(b);
   });
 }
@@ -511,7 +511,7 @@ PAGES.main_map = function(p){
     var it = new CC.Node(tpl.d, null); it.active = true; it.x = v[0]; it.y = v[1] + 250;
     it.find('labLv').setString(info.name); it.find('labName').setString(info.level);
     var ok = combatPower() >= info.limitpower; if (!ok) it.el.style.filter = 'grayscale(.8)';
-    it.on(function(){ if (!ok) return toast('需要战力 ' + info.limitpower); enterMap(info.mapid); showPage('fight'); });
+    it.on(function(){ if (!ok) return toast('战力达到 ' + info.limitpower + ' 才能前往该地图!'); enterMap(info.mapid); showPage('fight'); });
     content.addChild(it, true); it.place();
   });
   view.el.style.overflowY = 'auto';

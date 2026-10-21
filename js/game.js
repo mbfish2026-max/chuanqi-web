@@ -79,11 +79,15 @@ function calcAttr(){
   a.atkmin=a['min'+atk]; a.atkmax=Math.max(a['max'+atk],a.atkmin);
   return a;
 }
-function combatPower(a){ a=a||calcAttr(); return Math.ceil(a.maxhp*0.1+a.maxmp*0.1+((a.atkmax+a.atkmin)/2)*12+((a.maxac+a.minac)/2)*12); }
+// CombatTool.calculateRole: 各属性 x cizhui.vcombat (生命/法力0.1 攻/防12 攻速1 幸运80 固伤15 固防20 命中/闪避/暴击30), 每项 ceil
+function combatPower(a){ a=a||calcAttr(); function v(id,d){ var c=cfg('cizhui',id); return c&&c.vcombat!=null?c.vcombat:d; }
+  return Math.ceil(a.maxhp*v(1,.1))+Math.ceil(a.maxmp*v(2,.1))+Math.ceil(((a.atkmax-a.atkmin)/2+a.atkmin)*12)+Math.ceil(((a.maxac-a.minac)/2+a.minac)*v(6,12))
+   +Math.ceil(Math.ceil(a.atkspeed||0)*v(7,1))+Math.ceil(Math.ceil(a.lucky||0)*v(8,80))+Math.ceil(Math.ceil(a.fixeddamage||0)*v(9,15))+Math.ceil(Math.ceil(a.fixedac||0)*v(10,20))
+   +Math.ceil(Math.ceil(a.hit||0)*v(11,30))+Math.ceil(Math.ceil(a.evade||0)*v(12,30))+Math.ceil(Math.ceil(a.critical||0)*v(13,30)); }
 function expNeed(L){ var c=cfg('levelup',L); return c? c.exp : Infinity; }
 function addExp(n){
   var r=G.role; r.exp+=n;
-  while(r.exp>=expNeed(r.level)){ r.exp-=expNeed(r.level); r.level++; var a=calcAttr(); r.hp=a.maxhp; r.mp=a.maxmp; log('<b style="color:#ffd76a">恭喜升级! 当前等级 '+r.level+'</b>'); toast('升级到 '+r.level+' 级'); }
+  while(r.exp>expNeed(r.level)) /* Role.updateLevel: exp > lvCfg.exp (严格大于) */{ r.exp-=expNeed(r.level); r.level++; var a=calcAttr(); r.hp=a.maxhp; r.mp=a.maxmp; log('<b style="color:#ffd76a">恭喜升级! 当前等级 '+r.level+'</b>'); toast('升级到 '+r.level+' 级'); }
 }
 
 // ---------- 技能 ----------
@@ -93,10 +97,10 @@ function learnFromBook(itemId){
   var r=G.role, row=CFG.skill.list.filter(function(x){ return x.booknum && x.booknum[0]==itemId; })[0];
   if(!row) return '无法学习';
   var base=Math.floor(row.id/10);
-  if(row.job!=r.prof) return '职业不符';
+  if(row.job!=r.prof) return '职业不相符!';
   var cur = r.skills[base] ? r.skills[base].lv : 0;
   var next = skillRow(base, cur+1); if(!next) return '技能已满级';
-  if(r.level < next.slevel) return '需要等级 '+next.slevel;
+  if(r.level < next.slevel) return '等级达到 '+next.slevel+'级 可使用!';
   if(cur>0 && r.skills[base].exp < skillRow(base,cur).exp) return '技能熟练度不足 ('+r.skills[base].exp+'/'+skillRow(base,cur).exp+')';
   var need = next.booknum ? next.booknum[1] : 1; if(countItem(itemId) < need) return '需要技能书 x'+need;
   consumeItem(itemId, need);
@@ -129,9 +133,9 @@ function startBattle(m){
 // DamageTool: 命中 = 90 + hit - evade ; 幸运 = 5*lucky% 取最大攻击 ; 暴击 x1.5
 function roleAttack(b, a){
   var r=G.role, target=(typeof MOVE!=='undefined')? MOVE.roleTarget(b) : b.mons.filter(function(x){return !x.dead;})[0]; if(!target) return;
-  if(Math.random()*100 >= 90+a.hit-(target.cfg.evade||0)){ log('你的攻击被 '+target.cfg.name+' 闪避'); FXE('miss',{target:target}); return; }
+  if(Math.random()*100 >= 90+a.hit-(target.cfg.hit||0)) /* DamageTool.checkHit: 90+role.hit-monster.hit (原版即用怪物 hit) */{ log('你的攻击被 '+target.cfg.name+' 闪避'); FXE('miss',{target:target}); return; }
   var lucky = Math.random()*100 < 5*a.lucky;
-  var dmg = lucky ? a.atkmax : rnd(a.atkmin, a.atkmax);
+  var dmg = lucky ? a.atkmax : Math.floor(Math.random()*(a.atkmax-a.atkmin)+a.atkmin); // Role.getAttack(3)
   var used=null, usedSc=[];
   // 主动技能: 按优先级挑选可用 (cd 就绪 & 蓝够)
   var cands=[]; eachSkill(function(sc,st,base){ if(sc.triggertype==1 && sc.power2 && (st.cd||0)<=0 && r.mp>=(sc.spell||0)) cands.push([sc,st]); });
@@ -140,8 +144,9 @@ function roleAttack(b, a){
   if(cands.length){ var sc=cands[0][0], st=cands[0][1]; dmg = dmg*sc.power2/100 + (sc.atktype==2?0:(sc.power||0)); r.mp-=(sc.spell||0); st.cd=sc.basecd||0; st.exp=(st.exp||0)+1; used=sc.name; usedSc.push(sc); }
   // 被动概率技能 (攻杀剑法等)
   eachSkill(function(sc,st){ if(sc.triggertype===0 && sc.gailv && sc.power2 && Math.random()*100<sc.gailv){ dmg=dmg*sc.power2/100+(sc.power||0); st.exp=(st.exp||0)+1; used=(used?used+'+':'')+sc.name; usedSc.push(sc); } });
-  var crit = Math.random()*100 < a.critical; if(crit) dmg*=1.5;
-  dmg = Math.ceil(dmg - target.ac); var fx=Math.max(0,a.fixeddamage-(target.cfg.fixedac||0)); dmg+=fx; if(dmg<=0) dmg=1;
+  // BattleTool.calculateSkillAtk: ceil -> 暴击x1.5 -> (仅 acappend<0 时减怪物防御, 普攻不减) -> 固伤(暴击x1.5) -> ceil
+  var crit = Math.random()*100 < a.critical; dmg=Math.ceil(dmg); if(crit) dmg*=1.5;
+  var fx=Math.max(0,Math.ceil(a.fixeddamage-(target.cfg.fixedac||0))); if(fx>0){ if(crit) fx*=1.5; dmg+=fx; } dmg=Math.ceil(dmg); if(dmg<=0) dmg=1;
   dmg = H('roleDamage', dmg, target, a, usedSc, crit); // [systems] Buff/词缀
   target.hp-=dmg;
   log((used?'['+used+'] ':'')+'你对 <span class="q'+target.q+'">'+target.cfg.name+'</span> 造成 '+dmg+' 伤害'+(crit?' (暴击)':''));
@@ -193,9 +198,11 @@ function monsterAttack(b, m, a){
   var r=G.role;
   if(H('monsterAttack', false, b, m, a)) return; // [systems] 眩晕/冰冻/召唤兽承伤
   if(Math.random()*100 >= 90+(m.cfg.hit||0)-a.evade){ log(m.cfg.name+' 的攻击被你闪避'); FXE('dodge',{m:m}); return; }
-  var d=rnd(Math.floor(m.zs), Math.max(Math.floor(m.zs),Math.floor(m.zsmax)-1));
-  if(Math.random()*100 < (m.cfg.critical||0)) d=Math.ceil(d*1.5);
-  d -= rnd(a.minac, Math.max(a.minac,a.maxac)); d+=Math.max(0,(m.cfg.fixeddamage||0)-a.fixedac); d=Math.ceil(d); if(d<=0) d=1;
+  // Monster.getAtk + BattleTool 怪物攻击: 暴击 ceil(1.5x) -> 减 Role.getDefence -> 固伤(暴击x1.5)
+  var d=Math.floor(Math.random()*(m.zsmax-m.zs)+m.zs), mcrit=Math.random()*100 < (m.cfg.critical||0);
+  if(mcrit) d=Math.ceil(d*1.5);
+  var def=a.minac; if(a.maxac-a.minac>=1) def=Math.floor(Math.random()*(a.maxac-a.minac)+a.minac); d-=def;
+  var mfx=Math.max(0,Math.ceil((m.cfg.fixeddamage||0)-a.fixedac)); if(mfx>0){ if(mcrit) mfx*=1.5; d+=mfx; } d=Math.ceil(d); if(d<=0) d=1;
   d = H('roleHurt', d, m, a); // [systems] 护盾/免伤
   r.hp-=d; FXE('hurt',{m:m,d:d}); FXE('matk',{m:m}); log('<span style="color:#e77">'+m.cfg.name+' 对你造成 '+d+' 伤害</span>');
   if(r.hp<=0) roleDie();
@@ -204,9 +211,15 @@ function roleDie(){
   var r=G.role, m=mapCfg(); r.hp=0; log('<b style="color:#f55">你被击败了! 回到 '+(cfg('map',m.rebornmap)||{}).name+'</b>');
   toast('你已死亡, 复活于安全区'); var a=calcAttr(); r.hp=a.maxhp; r.mp=a.maxmp; enterMap(m.rebornmap||1001);
 }
+// ItemTool.onPropsUsed: 药品瞬回 (relifeBlood/relifeMagic, 封顶上限); 冷却 红药 5s / 蓝药 2s / 太阳水 5s
+// DRUG.hp / DRUG.mp = 对应冷却剩余秒数 (<=0 可用)
 var DRUG={hp:0,mp:0};
 function useDrug(s){
-  var c=stuffCfg(s); if(c.hp) DRUG.hp+=c.hp; if(c.mp) DRUG.mp+=c.mp; removeItem(s.uid,1);
+  var c=stuffCfg(s), r=G.role, a=calcAttr();
+  if(c.hp>0 && c.mp>0){ if(DRUG.hp>0||DRUG.mp>0) return false; } else if(c.hp>0){ if(DRUG.hp>0) return false; } else if(c.mp>0){ if(DRUG.mp>0) return false; }
+  if(c.hp) r.hp=Math.min(a.maxhp, r.hp+c.hp); if(c.mp) r.mp=Math.min(a.maxmp, r.mp+c.mp);
+  if(c.hp>0 && c.mp>0){ DRUG.hp=Math.max(DRUG.hp,5); DRUG.mp=Math.max(DRUG.mp,5); } else if(c.hp>0) DRUG.hp=5; else if(c.mp>0) DRUG.mp=2;
+  removeItem(s.uid,1); return true;
 }
 function autoDrug(a){
   var r=G.role; if(!G.settings.autoDrug) return;
@@ -217,9 +230,8 @@ function autoDrug(a){
 var lastTick=0;
 function tick(dt){
   var r=G.role; if(!r) return; var a=calcAttr();
-  // 药品: 5 秒内持续回复
-  if(DRUG.hp>0){ var h=Math.min(DRUG.hp, Math.ceil(dt*Math.max(16,DRUG.hp/5))); DRUG.hp-=h; r.hp=Math.min(a.maxhp,r.hp+h); }
-  if(DRUG.mp>0){ var mm=Math.min(DRUG.mp, Math.ceil(dt*Math.max(16,DRUG.mp/5))); DRUG.mp-=mm; r.mp=Math.min(a.maxmp,r.mp+mm); }
+  // 药品冷却倒计时
+  if(DRUG.hp>0) DRUG.hp=Math.max(0,DRUG.hp-dt); if(DRUG.mp>0) DRUG.mp=Math.max(0,DRUG.mp-dt);
   eachSkill(function(sc,st){ if(st.cd>0) st.cd-=dt; });
   var b=G.battle, m=mapCfg();
   if(!b || m.type!=2){ r.hp=Math.min(a.maxhp, r.hp+a.maxhp*0.05*dt); r.mp=Math.min(a.maxmp, r.mp+a.maxmp*0.05*dt); return; }
@@ -242,8 +254,8 @@ function tick(dt){
 function equipItem(uid){
   var r=G.role, s=r.bag.filter(function(x){return x.uid==uid;})[0]; if(!s) return '物品不存在';
   var c=stuffCfg(s); if(c.type!=2) return '不可装备';
-  if(c.needlevel>r.level) return '需要等级 '+c.needlevel;
-  if(c.profession && c.profession!=r.prof) return '职业不符';
+  if(c.needlevel>r.level) return '等级达到 '+c.needlevel+'级 可使用!';
+  if(c.profession && c.profession!=r.prof) return '职业不相符!';
   var sl=c.stdmode; if(sl==22||sl==23) sl = !r.equip[22]?22:(!r.equip[23]?23:22); if(sl==24||sl==25) sl=!r.equip[24]?24:(!r.equip[25]?25:24);
   removeItem(uid); if(r.equip[sl]) r.bag.push(r.equip[sl]); r.equip[sl]=s; return 'OK';
 }
@@ -261,11 +273,11 @@ function useItem(uid){
   var r=G.role, s=r.bag.filter(function(x){return x.uid==uid;})[0]; if(!s) return '';
   var c=stuffCfg(s);
   if(c.type==2) return equipItem(uid);
-  if(c.needlevel>r.level) return '需要等级 '+c.needlevel;
-  if(c.stdmode==0){ useDrug(s); return 'OK:使用 '+c.name; }
+  if(c.needlevel>r.level) return '等级达到 '+c.needlevel+'级 可使用!';
+  if(c.stdmode==0){ return useDrug(s)!==false ? 'OK:使用 '+c.name : '药品冷却中'; }
   if(c.stdmode==4) return learnFromBook(s.id);
   if(c.stdmode==99){ var lb=cfg('libao', s.id); if(!lb) return '礼包配置缺失';
-    if(r.level<(lb.lev||1)) return '需要等级 '+lb.lev;
+    if(r.level<(lb.lev||1)) return '等级达到 '+lb.lev+'级 可使用!';
     var chk=H('useLibao', null, lb, s); if(chk) return chk; // [systems] 背包空位检查
     removeItem(uid,1); r.gold+=lb.gold||0; r.yuanbao+=lb.yuanbao||0;
     for(var i=1;i<=8;i++){ if(lb['item'+i]){ var it=createStuff(lb['item'+i], lb['num'+i]||1); if(it){ if(stuffCfg(it).type==2){ it.count=1; } addItem(it);} } }

@@ -34,6 +34,9 @@ R('loadConfigs()').then(()=>{
   r.level=30; r.equip={}; r.bag.length=0; const T=ctx.EquipTip; T.queue.length=0;
   const c=R("CFG.item.list.filter(function(x){return x.type==2&&x.stdmode==5&&x.needlevel<=30&&x.needlevel>=10&&(!x.profession||x.profession==1)})[0]");
   const lo=R("createStuff("+c.id+",1,2)"), hi=R("createStuff("+c.id+",1,5)");
+  // 去随机: 极品/词缀随机会让 hi 偶尔不如 lo -> 固定 lo 为基础属性, hi 明显更强
+  lo.nonsuch=0; lo.affix=null; lo.affixes=null; Object.keys(lo.attr).forEach(k=>lo.attr[k]=R('cfg')('item',c.id)[k]||0);
+  hi.attr=Object.assign({},lo.attr); hi.attr.maxzs+=200; hi.attr.minzs+=100;
   R('addItem')(lo); ok(T.queue.length===1, '可穿更好装备入队');
   R('addItem')(lo); ok(T.queue.length===1, '同 uid 去重');
   R('addItem')(hi); ok(T.queue.length===1 && T.queue[0].uid===hi.uid, '同部位只保留最好');
@@ -41,7 +44,7 @@ R('loadConfigs()').then(()=>{
   R('addItem')(R("createStuff("+hl.id+",1,3)")); ok(T.queue.length===1, '等级不足不提醒');
   ST.set('game.equipTip', false); R('addItem')(R("createStuff("+c.id+",1,4)")); ok(T.queue.length===1, '设置关闭不提醒');
   ST.set('game.equipTip', true); T.queue.length=0;
-  const w=R("createStuff("+c.id+",1,1)"); S.loot._killing={q:1,cfg:{lvl:20,name:'x'}}; S.loot._batch=null; const v=R('addItem')(w); S.loot._killing=null;
+  const w=R("createStuff("+c.id+",1,1)"); w.q=1; w.nonsuch=0; w.set=null; w.uq=null; S.loot._killing={q:1,cfg:{lvl:20,name:'x'}}; S.loot._batch=null; const v=R('addItem')(w); S.loot._killing=null;
   ok(v===false && T.queue.length===0, '自动回收的白装不提醒');
   // 品质分布: 普通怪白装 < 85%
   let n={1:0,2:0,3:0,4:0,5:0}, t=0; for(let i=0;i<20000;i++){ const q=S.loot.rollQuality(25,20,0,1); n[q]++; t++; }
