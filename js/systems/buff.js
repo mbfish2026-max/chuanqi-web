@@ -63,10 +63,12 @@
   S.on('skillHandled', function(v, sc){ if(sc.triggertype==2 && sc.abilityIds && !/治/.test(sc.name)) return true; });
 
   function selfCast(sc, st, a){ var r=G.role; if((st.cd||0)>0 || r.mp<(sc.spell||0)) return false; r.mp-=sc.spell||0; st.cd=sc.basecd||10; st.exp=(st.exp||0)+1; return true; }
+  var PET_ATK_INTERVAL=1.0;   // [pet] 召唤兽攻击间隔: 原 monster.attack_spd 1.5s -> 1.0s (主角 1.3s)
+  S.PET_ATK_INTERVAL=PET_ATK_INTERVAL;
   function spawnPets(sc, a, b){
     var c=cfg('monster', sc.petid); if(!c) return; var base=roleAtk(a, 3, 4), add=sc.petaddition||[];
     b._pets=[]; for(var i=0;i<(sc.petnum||1);i++){
-      var p={name:c.name, cfg:c, maxhp:c.hp, hp:c.hp, minzs:c.zs, maxzs:c.zs2, ac:c.ac, fixeddamage:c.fixeddamage||0, hit:c.hit||0, critical:c.critical||0, atkT:c.attack_spd||1.5};
+      var p={name:c.name, cfg:c, maxhp:c.hp, hp:c.hp, minzs:c.zs, maxzs:c.zs2, ac:c.ac, fixeddamage:c.fixeddamage||0, hit:c.hit||0, critical:c.critical||0, atkT:PET_ATK_INTERVAL};
       if(add[0]>0){ p.maxhp+=Math.ceil(base*add[0]/100); p.hp=p.maxhp; } if(add[1]>0) p.ac+=Math.ceil(base*add[1]/100);    // Partner.setAttrByRole
       if(add[2]>0) p.minzs+=Math.ceil(base*add[2]/100); if(add[3]>0) p.maxzs+=Math.ceil(base*add[3]/100);
       if(add[4]>0) p.fixeddamage+=Math.ceil(base*add[4]/100);
@@ -106,13 +108,16 @@
       }
     });
     // 召唤兽攻击 (DamageTool.getPartnerDamage)
-    (b._pets||[]).forEach(function(p){ if(p.hp<=0) return; p.atkT-=dt; if(p.atkT>0) return; p.atkT=p.cfg.attack_spd||1.5;
+    (b._pets||[]).forEach(function(p){ if(p.hp<=0) return; p.atkT-=dt; if(p.atkT>0) return; p.atkT=PET_ATK_INTERVAL;
       var t=b.mons.filter(function(m){return !m.dead && (typeof MOVE==='undefined' || p.idx==null || m.idx==null || MOVE.cheb(p.idx,m.idx)<=1);})[0]; if(!t) return; // [move] 召唤兽需相邻才能攻击
       if(Math.random()*100 >= 90+p.hit-(t.cfg.evade||0)) return;
       var d=Math.floor(Math.random()*Math.abs(p.maxzs-p.minzs)+p.minzs); if(Math.random()*100<p.critical) d*=1.5;
       if(a.buffDamageUp) d*=1+a.buffDamageUp/100;
-      d=Math.max(1, Math.ceil(d - t.ac + Math.max(0,p.fixeddamage-(t.cfg.fixedac||0)))); t.hp-=d;
-      log(p.name+' 对 '+t.cfg.name+' 造成 '+d+' 伤害'); if(t.hp<=0 && !t.dead) killMonster(b,t); });
+      d=Math.max(1, Math.ceil(d - t.ac + Math.max(0,p.fixeddamage-(t.cfg.fixedac||0))));
+      d=Math.max(1, Math.ceil(d*PET_ATK_INTERVAL/(p.cfg.attack_spd||1.5)));   // [pet] 攻速提高后按比例缩减单次伤害, DPS 不变
+      t.hp-=d; 
+      log('[宝宝] '+p.name+' 对 '+t.cfg.name+' 造成 '+d+' 伤害'); if(typeof FXE==='function') FXE('petatk', {unit:p, target:t, dmg:d});
+      if(t.hp<=0 && !t.dead) killMonster(b,t); });
     if(b._pets) b._pets=b._pets.filter(function(p){return p.hp>0;});
   });
   // 换地图/死亡时清除角色 Buff

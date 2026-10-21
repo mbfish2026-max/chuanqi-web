@@ -79,6 +79,7 @@
     if(bgmEl && bgmEl !== el){ try{ bgmEl.pause(); bgmEl.currentTime = 0; }catch(e){} }
     bgmEl = el;
     el.loop = true; el.volume = 0.55;
+    if(!unlocked) return true;   // [M6] 等 unlock() 手势后再 play, 避免无手势加载被中止
     var p = el.play();
     if(p && p.catch) p.catch(function(){});
     return true;
@@ -86,18 +87,23 @@
 
   function stopBgm(){
     curBgm = null;
-    if(bgmEl){ try{ bgmEl.pause(); bgmEl.currentTime = 0; }catch(e){} }
+    if(bgmEl){ try{ bgmEl.pause(); if(bgmEl.readyState > 0) bgmEl.currentTime = 0; }catch(e){} }
     bgmEl = null; // M6: 先 pause 再释放引用, 避免旧 BGM 残留播放
   }
 
+  // [M6] 音效复用池: 每路径最多 3 个常驻元素, 不再每次 cloneNode(被 GC 回收会中止请求)
+  var pool = {};
   function playSfx(key){
-    if(!enabled()) return false;
+    if(!enabled() || !unlocked) return false;   // 无用户手势时不发请求 (play 必被拒, 请求随即被中止)
     var path = pathOf(key); if(!path) return false;
     var proto = loadEl(path);
     if(!proto) return false;
     try{
-      var a = proto.cloneNode ? proto.cloneNode(true) : new Audio(path);
+      var list = pool[path] || (pool[path] = [proto]), a = null;
+      for(var i = 0; i < list.length; i++){ if(list[i].paused || list[i].ended){ a = list[i]; break; } }
+      if(!a){ if(list.length >= 3) return false; a = proto.cloneNode(true); list.push(a); }
       a.volume = 0.8;
+      if(a.ended || a.currentTime > 0){ try{ a.currentTime = 0; }catch(e){} }
       var p = a.play();
       if(p && p.catch) p.catch(function(){});
       return true;

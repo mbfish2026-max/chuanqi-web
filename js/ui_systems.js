@@ -193,12 +193,9 @@ function storyPage(p){
       c.tasks.forEach(function(t){
         var ti = inst('itemTask');
         ti.ref('lab_taskdesc').setString(t.describe || t.name);
-        ti.ref('lab_schedule').setString('进度： ');
         var pr = t.progress;
         var curN = pr ? Math.min(pr[0], pr[1]) : 0, needN = pr ? pr[1] : 0;
-        var cnt = ti.ref('lab_scheduleCnt');
-        cnt.setString(pr ? (curN + '/' + needN) : '');
-        cnt.setColor(pr && pr[0] >= pr[1] ? '#32C63D' : '#d62f2f');
+        schedLine(ti, '进度：', pr ? (curN + '/' + needN) : '', pr && pr[0] >= pr[1]);
         if (t.reward) { var st = stuffIcon(t.reward[0], t.reward[1]); if (st) { st.tf = 'scale(.8)'; ti.ref('item').addChild(st); } }
         ti.ref('tipReceived').setActive(!!t.done);
         var btn = ti.ref('btnOption');
@@ -234,7 +231,7 @@ function storyPage(p){
         tc.addChild(ti, true);
       });
       tc.layout(); tl.h = Math.min(640, tc.h + 8); tl.find('view').h = tl.h; tl.refresh();
-      it.h = 230 + tl.h; it.place(); it.children.forEach(function(ch){ ch.y += tl.h / 2; ch.place(); });
+      it.h = 230 + tl.h; it.place(); it.children.forEach(function(ch){ ch.refresh(); });   // [G1b] 原 ch.y += tl.h/2 把章节卡顶出条目上沿 ~300 设计像素, 下方留出空白区
     }
     if (go) go.on(function(){
       if (c.locked) return toast('章节未解锁');
@@ -263,15 +260,15 @@ function storyPage(p){
     if (open) {
       var tc = tl.find('view/content'); tc.d.ly = {t: 2, rs: 1, sy: 8, pt: 8, pb: 8, pl: 0, pr: 0, sx: 0};
       c.tasks.forEach(function(t){
-        var ti = inst('itemTask'); ti.ref('lab_taskdesc').setString(t.name); ti.ref('lab_schedule').setString(t.describe + '  ');
-        var pr = t.progress; ti.ref('lab_scheduleCnt').setString(pr ? '(' + Math.min(pr[0], pr[1]) + '/' + pr[1] + ')' : ''); ti.ref('lab_scheduleCnt').setColor(pr && pr[0] >= pr[1] ? '#32C63D' : '#d62f2f');
+        var ti = inst('itemTask'); ti.ref('lab_taskdesc').setString(t.name); 
+        var pr = t.progress; schedLine(ti, t.describe, pr ? '(' + Math.min(pr[0], pr[1]) + '/' + pr[1] + ')' : '', pr && pr[0] >= pr[1]);
         if (t.reward) { var st = stuffIcon(t.reward[0], t.reward[1]); if (st) { st.tf = 'scale(.8)'; ti.ref('item').addChild(st); } }
         ti.ref('tipReceived').setActive(t.done); ti.ref('btnOption').setActive(t.canClaim);
         ti.ref('btnOption').on(function(){ msg(L.claim(t.id)); });
         tc.addChild(ti, true);
       });
       tc.layout(); tl.h = Math.min(600, tc.h); tl.find('view').h = tl.h; tl.refresh();
-      it.h = 230 + tl.h; it.place(); it.children.forEach(function(ch){ ch.y += tl.h / 2; ch.place(); });
+      it.h = 230 + tl.h; it.place(); it.children.forEach(function(ch){ ch.refresh(); });   // [G1b] 原 ch.y += tl.h/2 把章节卡顶出条目上沿 ~300 设计像素, 下方留出空白区
     }
     go.on(function(){ if (c.locked) return toast('章节未解锁'); if (cur && c.id === cur.id) { UI.storyOpen = !open; } refreshAll(); });
     content.addChild(it, true);

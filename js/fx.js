@@ -208,6 +208,7 @@ var FX = (function(){
     else if (type === 'heji') heji(o);                                  // [hero] 合击
     else if (type === 'heroatk') { var he = petEl(o.unit), tg = monEl(o.target), th = centerOf(tg); atkBetween(he, tg, o.unit && o.unit.idx, o.target && o.target.idx);
       PROC.slash(centerOf(he), th, false); flashCard(tg, o.crit ? 'crit' : 'hit'); text(th.x, th.y - 20, (o.crit ? '暴击 ' : '') + '-' + o.dmg, {c: '#7fd7ff', size: o.crit ? 44 : 30}); }
+    else if (type === 'petatk') petAtk(o);                             // [pet] 召唤兽攻击: 突进+斩击+青色伤害
     else if (type === 'drop') dropBeam(o);                              // [loot] 掉落光柱 (按品质)
     else if (type === 'dot') { var td = centerOf(monEl(o.m)); text(td.x, td.y - 10, '-' + o.d, {c: '#7dff6a', size: 24, life: .8}); flashCard(monEl(o.m), 'hit'); }
   }
@@ -220,6 +221,11 @@ var FX = (function(){
     ring(t.x, t.y + 30, 6, 46 + 30 * hgt, col[0], .6, 4); if (o.uq) { ring(t.x, t.y + 30, 10, 120, '#ffd24d', .8, 6); screenFlash('#ffcc66', .18); }
     text(t.x, t.y - 70, (o.uq ? '★' : '') + o.name, {c: o.q <= 1 && !o.uq && !o.set ? col[0] : col[1], size: o.q >= 5 || o.uq ? 34 : o.q >= 3 ? 28 : 24, life: 1.8, vy: -24}); }
   // ---------- [hero] 合击 FX: sheet assets/fx/heji_<pinyin>/ if present, else procedural (registerable) ----------
+  function petAtk(o){ var pe = petEl(o.unit), tg = monEl(o.target); if (!pe || !tg) return; var a = centerOf(pe), t = centerOf(tg);
+    var dx = t.x - a.x, dy = t.y - a.y, L = Math.sqrt(dx * dx + dy * dy) || 1, k = Math.min(36, L * .4) / L;
+    if (pe.animate) pe.animate([{translate: '0px 0px'}, {translate: (dx * k) + 'px ' + (dy * k) + 'px', offset: .45}, {translate: '0px 0px'}], {duration: 250, easing: 'ease-out', composite: 'add'});
+    setTimeout(function(){ if (!visible()) return; PROC.slash(a, t, false); flashCard(tg, 'hit'); burst(t.x, t.y, 10, ['#7dffd8', '#ffffff'], 180, 3, .35);
+      text(t.x + 18, t.y - 34, (o.unit.name || '宝宝').replace(/\d+级$/, '') + ' -' + o.dmg, {c: '#4dffc3', size: 28, life: .9}); }, 110); }
   function petEl(u){ var it = (UI.petItems || []).filter(function(x){ return x._pet === u; })[0]; return it ? it.el : null; }
   var HEJI = {
     heji_pohunzhan: function(s, h, ts){ ts.forEach(function(t, k){ setTimeout(function(){ PROC.slash(s, t, true); PROC.slash(h, t, true); burst(t.x, t.y, 30, ['#ffffff', '#ffd27a', '#ff6a00'], 360, 6, .6); }, k * 70); }); screenShake(16); },

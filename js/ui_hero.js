@@ -82,7 +82,7 @@
     (UI.petItems || []).forEach(function(it){ var p = it._pet; if (!p || !p.isHero || it._heroStyled) return; it._heroStyled = true;
       var src = IMG + 'role_create/icon_avatar_' + p.prof + '_0.png';
       it.ref('monsterIcon').setImage(src); it.ref('monsterIcon').el.style.backgroundSize = 'contain';
-      if (typeof POP !== 'undefined') POP.attach(it, it.ref('monsterIcon'), 'icon_avatar_' + p.prof + '_0', src, {rise: 1.45});
+      if (typeof POP !== 'undefined') POP.attach(it, it.ref('monsterIcon'), 'icon_avatar_' + p.prof + '_0', src, {rise: 2.1});
       var mn = it.ref('monsterRoot').find('name'); mn.setString(p.name); mn.setColor('#7fd7ff'); it.ref('monsterLevel').setString('英雄 Lv.' + G.role.hero.level); }); };
   // popups/top layers must stack above the battlefield's pop-out cards and FX canvas
   ['layerMain', 'layerPop', 'layerTop'].forEach(function(k, i){ if (UI[k]) UI[k].style.zIndex = String(1 + i * 100); });

@@ -18,6 +18,8 @@ var POP = (function(){
     win.style.cssText = 'left:' + l + 'px;top:' + t + 'px;width:' + w + 'px;height:' + h + 'px;';
     var fig = document.createElement('div'); fig.className = 'pop-fig';
     fig.style.cssText = 'height:' + (h * rise) + 'px;';
+    // [size] rise>1.45 (主角/宝宝/英雄/BOSS) 同比加宽, 否则立绘被卡片宽度限制, 只变高不变大
+    var gx = (opts.rise || 1.45) / 1.45; if (gx > 1.01) { var side = (116 * gx - 100) / 2; fig.style.left = fig.style.right = (-side) + '%'; win.style.clipPath = 'inset(-260% ' + (-side - 6) + '% 0 ' + (-side - 6) + '%)'; }
     var img = document.createElement('div'); img.className = 'pop-img'; fig.appendChild(img);
     var shadow = document.createElement('div'); shadow.className = 'pop-shadow'; win.appendChild(shadow);
     win.appendChild(fig); card.appendChild(win); it._pop = win; it._popFig = fig;

@@ -152,7 +152,15 @@ function tallOff(){ return Math.max(0, ((CC.stageH || 1334) - 1334) / 2); }
 function shiftY(n, dy){ if (!n) return; if (n._baseY == null) n._baseY = n.y; n.y = n._baseY + dy; n.place(); n.children.forEach(function(c){ c.refresh(); }); }
 function tallPage(page){
   if (!page) return; var off = tallOff();
-  page.children.forEach(function(c){ if (c.name === 'mask' || (c.d.wg && (c.d.wg.f & 5) === 5)) return; var by = c._baseY != null ? c._baseY : c.y; shiftY(c, by < -300 ? -off : off); });
+  page.children.forEach(function(c){ if (c.name === 'mask' || (c.d.wg && (c.d.wg.f & 5) === 5)) return; var by = c._baseY != null ? c._baseY : c.y;
+    if (off > 0 && c.h >= 900) { growTall(c, off, by); return; }   // [G1b] 大背景/滚动列表: 上沿跟顶栏、下沿跟底栏 (原来只平移, 下方留出空白)
+    shiftY(c, by < -300 ? -off : off); });
+}
+function growTall(n, off, by){
+  if (n._baseH == null) n._baseH = n.h; if (n._baseY == null) n._baseY = by;
+  var bh = n._baseH; n.h = bh + 2 * off; n.y = n._baseY + off - 2 * off * (1 - n.ay); n.place();
+  n.children.forEach(function(c){ if (c._baseH == null && Math.abs(c.h - bh) > 1) return; if (c._baseH == null) c._baseH = c.h; c.h = c._baseH + 2 * off; c.place(); });
+  n.children.forEach(function(c){ c.refresh(); });
 }
 function tallLayout(){
   var m = UI.main; if (!m) return; var off = tallOff();
@@ -180,7 +188,8 @@ function showPage(key){
 function refreshTop(){
   var m = UI.main, r = G.role, a = calcAttr();
   var ln = m.ref('labName'); ln.setString(r.name);
-  if (!ln._m2) { ln._m2 = 1; ln.setColor('#ffe9a8'); ln.el.style.textShadow = '1px 0 0 #2a1a08,-1px 0 0 #2a1a08,0 1px 0 #2a1a08,0 -1px 0 #2a1a08,1px 1px 0 #2a1a08,-1px -1px 0 #2a1a08,1px -1px 0 #2a1a08,-1px 1px 0 #2a1a08'; ln.el.style.fontWeight = 'bold'; }  // [M2] 亮色+描边 m.ref('labLevel').setString(r.level + '级');
+  if (!ln._m2) { ln._m2 = 1; ln.setColor('#ffe9a8'); ln.el.style.textShadow = '1px 0 0 #2a1a08,-1px 0 0 #2a1a08,0 1px 0 #2a1a08,0 -1px 0 #2a1a08,1px 1px 0 #2a1a08,-1px -1px 0 #2a1a08,1px -1px 0 #2a1a08,-1px 1px 0 #2a1a08'; ln.el.style.fontWeight = 'bold'; }  // [M2] 亮色+描边
+  m.ref('labLevel').setString(r.level + '级');  // [R1] 独立成行
   m.ref('labCombat').setString('战力：' + combatPower(a));
   m.ref('labCoin').setString(fmtNum(r.gold)); m.ref('labYuanbao').setString(fmtNum(r.yuanbao));
   var need = expNeed(r.level); m.ref('labExp').setString(Math.floor(r.exp) + '/' + need); m.ref('expbar').setProgress(r.exp / need);
@@ -278,12 +287,12 @@ function buildScene(){
     UI.roleItem = inst('itemRole'); UI.roleItem.ref('monsterRoot').setActive(false); UI.cells[G.battle && G.battle.roleIdx != null ? G.battle.roleIdx : ROLE_CELL].addChild(UI.roleItem); UI.roleItem._cell = G.battle && G.battle.roleIdx;
     UI.roleItem.ref('roleSign').setImage(IMG + 'role_create/icon_avatar_' + G.role.prof + '_0.png');
     UI.roleItem.ref('roleSign').el.style.backgroundSize = 'contain';
-    if (typeof POP !== 'undefined') POP.attach(UI.roleItem, UI.roleItem.ref('roleSign'), 'icon_avatar_' + G.role.prof + '_0', IMG + 'role_create/icon_avatar_' + G.role.prof + '_0.png', {rise: 1.5, paperdoll: true, box: [20, 4, 80, 66]});
+    if (typeof POP !== 'undefined') POP.attach(UI.roleItem, UI.roleItem.ref('roleSign'), 'icon_avatar_' + G.role.prof + '_0', IMG + 'role_create/icon_avatar_' + G.role.prof + '_0.png', {rise: 2.15, paperdoll: true, box: [20, 4, 80, 66]});
     UI.monItems = [];
     UI.petItems = [];
     if (typeof FX !== 'undefined') FX.attach(UI.battleHolder);
     b.ref('labBossMapName').setString('[' + m.name + ']');
-    b.ref('bossInfo').setActive(m.boss > 1000);
+    b.ref('bossInfo').setActive(m.boss > 1000); b.ref('bossInfo').el.style.zIndex = 60;  // [boss] 大体型 BOSS 头部不遮挡 BOSS 血条
     b.ref('labRelive').setActive(false);
   } else {
     UI.battle = null;
@@ -348,22 +357,32 @@ function refreshScene(){
       it.ref('roleRoot').setActive(false); it.ref('monsterRoot').setActive(true);
       it.ref('monsterBg').setImage(IMG + 'main/img_quality_' + x.q + '.png');
       it.ref('monsterIcon').setImage(IMG + 'monster/' + x.cfg.model + '.png'); it.ref('monsterIcon_normal').setActive(false);
-      if (typeof POP !== 'undefined') POP.attach(it, it.ref('monsterIcon'), x.cfg.model, IMG + 'monster/' + x.cfg.model + '.png', {rise: x.boss ? 1.6 : 1.45});
+      if (typeof POP !== 'undefined') POP.attach(it, it.ref('monsterIcon'), x.cfg.model, IMG + 'monster/' + x.cfg.model + '.png', {rise: x.boss ? 2.75 : 1.45});
       var mn = it.ref('monsterRoot').find('name'); mn.setString((x.boss ? '[BOSS]' : '') + x.cfg.name); mn.setColor(QCOLOR[x.q]); mn.el.classList.add('fx-mon-name');
       it.ref('monsterLevel').setString('Lv.' + x.cfg.lvl);
       UI.cells[x.idx != null ? x.idx : MON_CELLS[i % MON_CELLS.length]].addChild(it); it._cell = x.idx;
     }
     if (x.dead && it.active && typeof POP !== 'undefined' && it._pop) { if (!it._dying && !(x._fxHold > performance.now())) { it._dying = true; POP.die(it, function(){ it._dying = false; if (x.dead) it.setActive(false); }); } }
-    else if (!x.dead && !it.active) { it.setActive(true); if (typeof POP !== 'undefined') POP.attach(it, it.ref('monsterIcon'), x.cfg.model, IMG + 'monster/' + x.cfg.model + '.png', {rise: x.boss ? 1.6 : 1.45}); }
+    else if (!x.dead && !it.active) { it.setActive(true); if (typeof POP !== 'undefined') POP.attach(it, it.ref('monsterIcon'), x.cfg.model, IMG + 'monster/' + x.cfg.model + '.png', {rise: x.boss ? 2.75 : 1.45}); }
     else if (!it._dying) it.setActive(!x.dead);
     it.ref('monsterHpBar').setProgress(x.hp / x.maxhp); it.ref('monsterTipHp').setString(Math.max(0, Math.ceil(x.hp)) + '/' + x.maxhp);
   });
   drawPets(); syncPositions();
+  mons.forEach(function(x, i){ if (x.boss && !x.dead) fitBoss(UI.monItems[i]); });
   for (var j = mons.length; j < UI.monItems.length; j++) if (UI.monItems[j]) { UI.monItems[j].destroy(); UI.monItems[j] = null; }
   var boss = mons.filter(function(x){ return x.boss; })[0], bi = UI.battle.ref('bossInfo');
   if (bi.active) { var hp = UI.battle.ref('bossHP'); if (boss) { hp.setProgress(boss.hp / boss.maxhp); } else { var t = (r.stat['boss_' + mapCfg().boss] || 0) - Date.now(); hp.setProgress(0); var lt = hp.find('labtime'); if (lt) lt.setString(t > 0 ? Math.ceil(t / 1000) + '秒后刷新' : ''); } }
 }
 
+// [size] 大体型 BOSS: 在顶排/边列时立绘不能超出战场 (375x667 顶排会顶出屏幕), 按可用空间缩小、左右收回
+function fitBoss(it){
+  var f = it && it._popFig; if (!f || !UI.battle) return; var br = UI.battle.el.getBoundingClientRect(); if (!br.width) return;
+  if (f._h0 == null) { f._h0 = parseFloat(f.style.height); f._l0 = f.style.left; } f.style.height = f._h0 + 'px'; f.style.left = f.style.right = f._l0; f.style.marginLeft = '';
+  var r = f.getBoundingClientRect(); if (!r.height) return;
+  if (r.top < br.top + 2) f.style.height = Math.max(f._h0 * .55, f._h0 * (r.bottom - br.top - 2) / r.height) + 'px';
+  r = f.getBoundingClientRect(); var k = r.width / (parseFloat(getComputedStyle(f).width) || r.width);
+  if (r.left < br.left) f.style.marginLeft = ((br.left - r.left) / k) + 'px'; else if (r.right > br.right) f.style.marginLeft = (-(r.right - br.right) / k) + 'px';
+}
 // ---------- 走位: cards follow MOVE indices with a 0.2s tween (ActionTool.MoveBy .2) ----------
 function moveCard(it, idx){
   if (!it || idx == null || !UI.cells || !UI.cells[idx] || it._cell === idx) return;
@@ -388,7 +407,7 @@ function drawPets(){
       it.ref('monsterBg').setImage(IMG + 'main/img_quality_role.png');
       it.ref('monsterIcon').setImage(IMG + 'monster/' + p.cfg.model + '.png'); it.ref('monsterIcon_normal').setActive(false);
       var mn = it.ref('monsterRoot').find('name'); mn.setString(p.name); mn.setColor('#5BE36B'); mn.el.classList.add('fx-mon-name');
-      it.ref('monsterLevel').setString('宝宝'); if (typeof POP !== 'undefined') POP.attach(it, it.ref('monsterIcon'), p.cfg.model, IMG + 'monster/' + p.cfg.model + '.png'); UI.cells[p.idx].addChild(it); it._cell = p.idx; }
+      it.ref('monsterLevel').setString('宝宝'); if (typeof POP !== 'undefined') POP.attach(it, it.ref('monsterIcon'), p.cfg.model, IMG + 'monster/' + p.cfg.model + '.png', {rise: 2.1}); UI.cells[p.idx].addChild(it); it._cell = p.idx; }
     it.ref('monsterHpBar').setProgress(p.hp / p.maxhp); it.ref('monsterTipHp').setString(Math.ceil(p.hp) + '/' + p.maxhp);
   });
 }
@@ -535,6 +554,11 @@ PAGES.role_skill = function(p){
   });
   p.ref('skillNode').find('view').el.style.overflowY = 'auto';
 };
+// [G1b] 任务进度: 计数紧跟描述同一行 (原 lab_schedule / lab_scheduleCnt 两个 label 同一 left, 文字互相重叠)
+function schedLine(it, txt, cnt, ok){
+  var sl = it.ref('lab_schedule'), cl = it.ref('lab_scheduleCnt'); sl.setString(txt || ''); cl.setString(''); cl.setActive(false);
+  var sp = document.createElement('span'); sp.textContent = ' ' + (cnt || ''); sp.style.color = ok ? '#32C63D' : '#ff5a4f'; sl.el.appendChild(sp);
+}
 PAGES.main_story = function(p){
   if (storyPage(p)) return;
   var r = G.role, content = p.ref('storylist').find('view/content'); content.removeAllChildren();
@@ -544,9 +568,7 @@ PAGES.main_story = function(p){
     var it = inst('itemTask'), pr = taskProgress(t), done = !!r.tasksDone[t.id];
     var sp = sys('taskProgress'); if (!pr && sp) pr = sp(t);
     it.ref('lab_taskdesc').setString(t.name);
-    it.ref('lab_schedule').setString(t.describe + '  ');
-    it.ref('lab_scheduleCnt').setString(pr ? '(' + Math.min(pr[0], pr[1]) + '/' + pr[1] + ')' : '(未实现)');
-    it.ref('lab_scheduleCnt').setColor(pr && pr[0] >= pr[1] ? '#32C63D' : '#d62f2f');
+    schedLine(it, t.describe, pr ? '(' + Math.min(pr[0], pr[1]) + '/' + pr[1] + ')' : '(未实现)', pr && pr[0] >= pr[1]);
     var ic = cfg('item', t.reward[0]); if (ic) { var s = createStuff(t.reward[0], t.reward[1]); var st = makeStuff(s); st.d.sx = st.d.sy = .8; st.tf = 'scale(.8)'; it.ref('item').addChild(st); }
     it.ref('tipReceived').setActive(done);
     var can = !done && pr && pr[0] >= pr[1]; it.ref('btnOption').setActive(can);
@@ -684,7 +706,7 @@ function startMain(){ buildMain(); }
       else showCreate();
       var last = performance.now(), lastSave = 0, lastUi = 0;
       setInterval(function(){ if (!G.role || !UI.main) return; var now = performance.now(), dt = (now - last) / 1000; last = now; if (!(UI.tickPaused && UI.tickPaused())) tick(Math.min(dt, 2));
-        if (now - lastUi > 300 && UI.pageKey === 'fight') { lastUi = now; refreshAll(); } else if (now - lastUi > 1000) { lastUi = now; refreshTop(); }
+        if (now - lastUi > 300 && UI.pageKey === 'fight') { lastUi = now; refreshAll(); } else if (now - lastUi > 1000 && UI.pageKey === 'main_role') { lastUi = now; refreshAll(); /* [R2] 角色页: refreshAll 内 M4 key 比较, 数据不变不重绘 */ } else if (now - lastUi > 1000) { lastUi = now; refreshTop(); }
         if (now - lastSave > 5000) { lastSave = now; save(); } }, 250);
     }
     ld.ref('btnStart').on(go); ld.findDeep('label').on(go);
