@@ -13,8 +13,14 @@ function setLab(node, s){ if (node) node.setString(s); }
 function esc(s){ return String(s).replace(/[&<>]/g, function(c){ return {'&': '&amp;', '<': '&lt;', '>': '&gt;'}[c]; }); }
 
 // ---------- toast (tipToast prefab) ----------
+var _lvToast = null;
 function toast(s){
   if (!UI.stage) return;
+  // [N4] 连升多级: 合并为一条「升级到 N 级（+K）」, 不叠成一团
+  var lv = /^升级到 (\d+) 级$/.exec(String(s));
+  if (lv && _lvToast && Date.now() - _lvToast.t < 800 && _lvToast.node.el.parentNode) {
+    _lvToast.k++; _lvToast.node.find('label').el.innerHTML = esc('升级到 ' + lv[1] + ' 级（+' + _lvToast.k + '）'); return;
+  }
   var t = inst('tipToast'), lab = t.find('label');
   lab.el.innerHTML = esc(s); lab.setColor('#ffffff');
   CC.mount(t, UI.layerTop); t.setPos(375, 667 + 100);
@@ -23,6 +29,7 @@ function toast(s){
   setTimeout(function(){ var w = lab.el.offsetWidth + 60; t.setSize(w, 40); lab.setPos(0, 3); }, 0);
   setTimeout(function(){ t.el.style.opacity = '0'; t.el.style.transform = 'translateY(-80px)'; }, 900);
   setTimeout(function(){ t.destroy(); }, 2200);
+  if (lv) _lvToast = {node: t, k: 1, t: Date.now()};
 }
 function msg(res){ if (!res) return; toast(res.indexOf('OK') === 0 ? (res.slice(3) || '成功') : res); save(); refreshAll(); }
 
@@ -43,10 +50,10 @@ function popup(name){
     if (p.modal) m.el.onclick = function(e){ e.stopPropagation(); };
     else m.on(function(){ closePopup(p); }); }
   // 面板本体内的点击不冒泡到 mask 之外 (mask 是兄弟节点, 只有真正点空白才命中 mask)
-  if (p.modal) layerChanged();
+  layerChanged();
   return p;
 }
-function closePopup(p){ var i = UI.popups.indexOf(p); if (i < 0) return; p.destroy(); UI.popups.splice(i, 1); if (p.modal) layerChanged(); }
+function closePopup(p){ var i = UI.popups.indexOf(p); if (i < 0) return; p.destroy(); UI.popups.splice(i, 1); layerChanged(); }
 function closeBtn(p, path){ var b = typeof path === 'string' ? p.findDeep(path) : path; if (b) b.on(function(){ closePopup(p); }); }
 
 // ---------- itemStuff ----------
@@ -611,6 +618,14 @@ function startMain(){ buildMain(); }
   var bar = ld.ref('loadBar'); bar.setProgress(0.1); ld.ref('labPercent').setString('10.00%');
   var t0 = Date.now();
   loadConfigs().then(function(){
+    // [N5] 金币坊市页 (fuli_coin): 原逻辑 (ui_systems.js fuliPay) 只弹一句 toast, 页面空白; 改为页内常驻说明
+    if (typeof fuliPay === 'function' && !fuliPay._n5) { fuliPay = function(node){
+      ['cointList', 'yuanbaoList'].forEach(function(k){ var n = node.findDeep(k); if (n) n.setActive(false); });
+      var d = document.createElement('div');
+      d.style.cssText = 'position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:600px;box-sizing:border-box;padding:28px 30px;background:rgba(24,18,12,.85);border:2px solid #a08040;border-radius:10px;color:#e8dcc8;font-size:26px;line-height:40px;text-align:center;white-space:normal;';
+      d.innerHTML = '<div style="color:#ffd76a;font-size:32px;margin-bottom:12px">金币坊市</div>网页复刻版不提供充值。<br>金币可通过挂机打怪、离线收益、<br>自动回收装备、历练和任务奖励获得。';
+      node.el.appendChild(d);
+    }; fuliPay._n5 = 1; }
     bar.setProgress(1); ld.ref('labPercent').setString('100.00%');
     ld.ref('loadNode').setActive(false); ld.ref('btnStart').setActive(true); ld.findDeep('label').setActive(true);
     if (window.Systems && Systems.audio) Systems.audio.playBgm('music_login');
