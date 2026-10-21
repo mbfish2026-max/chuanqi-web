@@ -41,7 +41,7 @@
     if(typeof Audio === 'undefined'){ cache[path] = false; return false; }
     try{
       var a = new Audio(path);
-      a.preload = 'auto';
+      a.preload = 'none';   // 不预加载: 避免无手势时 headless/iOS 中止请求报 ERR_ABORTED (bgsound_openDoor 已在 assets/audio)
       a.addEventListener('error', function(){ cache[path] = false; missing[path] = true; });
       cache[path] = a;
       return a;

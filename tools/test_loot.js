@@ -18,7 +18,7 @@ R('loadConfigs()').then(()=>{
   ok(R('cfg("item",122017)').stdmode===22 && R('cfg("item",124016)').stdmode===24, '22=戒指 24=手镯 (文档猜测相反)');
   // 品质公式
   ok(L.mfEff(1000,250)===200 && L.mfEff(100,0)===100, 'MF 递减 MF*F/(MF+F)');
-  ok(L.chance(5,30,30,0,1)===51200 && L.chance(5,30,30,0,5)<L.chance(5,30,30,0,1), '橙色判定 c=(400-0)*128, BOSS 系数折减');
+  ok(L.chance(5,30,30,0,1)===110*128 && L.chance(5,30,30,0,5)<L.chance(5,30,30,0,1), '橙色判定 c=(110-0)*128 (10-21 调品质分布), BOSS 系数折减');
   ok(L.chance(3,40,10,0,1) < L.chance(3,20,10,0,1), 'ilvl 越高越易出稀有');
   const cnt={1:0,2:0,3:0,4:0,5:0}; for(let i=0;i<20000;i++) cnt[L.rollQuality(30,25,0,1)]++;
   ok(cnt[1]>cnt[2] && cnt[2]>cnt[3] && cnt[3]>cnt[5] && cnt[5]>0, '品质分布 白>绿>蓝>橙: '+JSON.stringify(cnt));

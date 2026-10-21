@@ -213,11 +213,12 @@ var FX = (function(){
   }
   function killFx(m){ var tk = centerOf(monEl(m)); burst(tk.x, tk.y, m.boss ? 70 : 26, m.q >= 4 ? ['#ffd24d', '#ff8a00', '#fff'] : ['#ffffff', '#d9c7a3', '#8f7c5a'], m.boss ? 420 : 240, 5, .7); ring(tk.x, tk.y, 10, m.boss ? 180 : 90, 'rgba(255,240,200,.9)', .4, 6); if (m.boss) { screenShake(22); screenFlash('#ffd24d', .35); } }
   // [loot] 掉落光柱: 蓝/紫/橙 不同颜色与高度, 暗金额外金环
-  var BEAM = {3: ['#2E8DD6', '#9fd0ff'], 4: ['#D425D2', '#f2a8ff'], 5: ['#D96324', '#ffd27a']};
-  function dropBeam(o){ var t = centerOf(monEl(o.m)), col = o.set ? ['#32C63D', '#b6ffbf'] : (BEAM[o.q] || BEAM[3]), hgt = o.q >= 5 ? 1 : o.q >= 4 ? .75 : .5;
+  var BEAM = {1: ['#DCD3C7', '#ffffff'], 2: ['#32C63D', '#b6ffbf'], 3: ['#2E8DD6', '#9fd0ff'], 4: ['#D425D2', '#f2a8ff'], 5: ['#D96324', '#ffd27a'], uq: ['#C8A040', '#ffe9a8'], set: ['#00E070', '#b6ffbf']};  // 原版 eQualityColor 白/绿/蓝/紫/橙 + 网页 暗金/套装
+  var BEAM_H = {1: .28, 2: .42, 3: .58, 4: .78, 5: 1};
+  function dropBeam(o){ var t = centerOf(monEl(o.m)), col = o.uq ? BEAM.uq : o.set ? BEAM.set : (BEAM[o.q] || BEAM[3]), hgt = (o.uq || o.set) ? 1.1 : (BEAM_H[o.q] || .5);
     for (var i = 0; i < 36 * hgt + 10; i++) P({x: t.x + (Math.random() - .5) * 16, y: t.y + 30 - Math.random() * 20, vy: -(180 + Math.random() * 320) * hgt, s: 5 + Math.random() * 7, c: col[i % 2], life: .9 + Math.random() * .6, drag: .985});
     ring(t.x, t.y + 30, 6, 46 + 30 * hgt, col[0], .6, 4); if (o.uq) { ring(t.x, t.y + 30, 10, 120, '#ffd24d', .8, 6); screenFlash('#ffcc66', .18); }
-    text(t.x, t.y - 70, (o.uq ? '★' : '') + o.name, {c: col[1], size: o.q >= 5 ? 34 : 26, life: 1.8, vy: -24}); }
+    text(t.x, t.y - 70, (o.uq ? '★' : '') + o.name, {c: o.q <= 1 && !o.uq && !o.set ? col[0] : col[1], size: o.q >= 5 || o.uq ? 34 : o.q >= 3 ? 28 : 24, life: 1.8, vy: -24}); }
   // ---------- [hero] 合击 FX: sheet assets/fx/heji_<pinyin>/ if present, else procedural (registerable) ----------
   function petEl(u){ var it = (UI.petItems || []).filter(function(x){ return x._pet === u; })[0]; return it ? it.el : null; }
   var HEJI = {

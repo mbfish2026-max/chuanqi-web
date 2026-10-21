@@ -60,3 +60,6 @@ html,body{margin:0;height:100%;background:#000;overflow:hidden;font-family:"Ping
 .bf-bg{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none}
 .bf-cell{box-shadow:inset 0 0 0 1px rgba(255,248,225,.22);background:rgba(255,250,235,.05)}
 .pop-card .cc-sp{filter:none}
+/* [loot] 品质配色 — 原版 GameKeys.eQualityColor 白/绿/蓝/紫/橙 + 网页扩展 暗金/套装 (日志/SystemMsg/HTML 面板通用) */
+.q0,.q1{color:#DCD3C7}.q2{color:#32C63D}.q3{color:#2E8DD6}.q4{color:#D425D2}.q5{color:#D96324}
+.quq{color:#E0B850;text-shadow:0 0 4px #7a5200}.qset{color:#00E070;text-shadow:0 0 4px #00602a}

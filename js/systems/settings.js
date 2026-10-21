@@ -1,7 +1,7 @@
 // [settings] 原版 RoleSetup.setupValue + BattleTool.verifySettings / calculateAutoPickup
 // 持久化 role.settings；role.ver >= 3；与 lootCfg / G.settings 双向同步，不重复造回收规则
 (function(S){
-  var VER = 3;
+  var VER = 4;   // v4: 白装默认自动回收 (用户决定 2026-10-21)
   var LIFE_IDS   = [100010,100011,100012,100013,100014,100015];
   var MAGIC_IDS  = [100020,100021,100022,100023,100024,100025];
   var SPECIAL_IDS= [100030,100031,100032];
@@ -12,7 +12,7 @@
       recycle: {
         noProfession: false,
         nonsuch: false,       // true = 极品也自动回收
-        white: false, green: false, blue: false, purple: false,
+        white: true, green: false,   // 白装默认回收 (用户决定) blue: false, purple: false,
         keepSet: true, keepUnique: true  // 网页扩展（原版无暗金/套装概念）
       },
       drug: {
@@ -32,7 +32,8 @@
       game: {
         dmgNumbers: true,
         screenShake: true,
-        fxQuality: 1          // 0 低 1 高（低＝跳过部分粒子）
+        fxQuality: 1,         // 0 低 1 高（低＝跳过部分粒子）
+        equipTip: true        // 发现更好装备提醒
       },
       skills: {},             // baseId -> false 禁用自动施放；缺省 true
       heroSkills: {}
@@ -98,8 +99,11 @@
 
   function ensure(r){
     r = r || G.role; if(!r) return null;
-    if(!r.settings) migrateFromLegacy(r);
+    var fresh = !r.settings;
+    if(fresh) migrateFromLegacy(r);
     else r.settings = deepMerge(defaults(), r.settings);
+    // v3 -> v4 一次性: 白装自动回收打开, 除非用户明确设置过 (recycle._whiteSet)
+    if(!r.settings.mig4){ if(!r.settings.recycle._whiteSet) r.settings.recycle.white = true; r.settings.mig4 = 1; }
     applyLegacyMirrors(r);
     if((r.ver || 1) < VER) r.ver = VER;
     return r.settings;
@@ -110,6 +114,7 @@
     var parts = path.split('.'), cur = st;
     for(var i=0;i<parts.length-1;i++){ cur[parts[i]] = cur[parts[i]] || {}; cur = cur[parts[i]]; }
     cur[parts[parts.length-1]] = value;
+    if(path==='recycle.white') st.recycle._whiteSet = true;
     applyLegacyMirrors(G.role);
     return S.ok();
   }

@@ -3,7 +3,7 @@ const {spawn} = require('child_process'); const fs = require('fs'); const os = r
 const [url, out, wait = 2500] = process.argv.slice(2);
 const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'cdp'));
 const port = 9300 + Math.floor(Math.random() * 500);
-const ch = spawn('google-chrome', ['--headless=new', '--no-sandbox', '--disable-gpu', '--hide-scrollbars', '--remote-debugging-port=' + port, '--user-data-dir=' + dir, '--window-size=375,667', 'about:blank'], {stdio: 'ignore'});
+const ch = spawn('google-chrome', ['--headless=new', '--no-sandbox', '--disable-gpu', '--hide-scrollbars', '--remote-debugging-port=' + port, '--user-data-dir=' + dir, '--window-size=' + (process.env.W || 375) + ',' + (process.env.H || 667) + '', 'about:blank'], {stdio: 'ignore'});
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 (async () => {
   let tabs; for (let i = 0; i < 50; i++) { try { tabs = await (await fetch(`http://127.0.0.1:${port}/json`)).json(); break; } catch (e) { await sleep(200); } }
@@ -14,7 +14,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
     if (m.method === 'Runtime.consoleAPICalled' && /error|warn/.test(m.params.type)) console.log('CONSOLE', m.params.args.map(a => a.value || a.description).join(' ').slice(0, 400)); };
   await new Promise(r => ws.onopen = r);
   await send('Runtime.enable'); await send('Page.enable');
-  await send('Emulation.setDeviceMetricsOverride', {width: 375, height: 667, deviceScaleFactor: 2, mobile: true});
+  await send('Emulation.setDeviceMetricsOverride', {width: +(process.env.W || 375), height: +(process.env.H || 667), deviceScaleFactor: 2, mobile: true});
   await send('Page.navigate', {url}); await sleep(+wait);
   if (process.env.EVAL) { const r = await send('Runtime.evaluate', {expression: process.env.EVAL, awaitPromise: true, returnByValue: true}); console.log('EVAL', JSON.stringify(r.result && r.result.value !== undefined ? r.result.value : r).slice(0, 1500)); await sleep(800); }
   const shot = await send('Page.captureScreenshot', {format: 'png'}); if (out) fs.writeFileSync(out, Buffer.from(shot.data, 'base64'));

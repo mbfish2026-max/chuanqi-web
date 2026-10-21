@@ -46,7 +46,7 @@
     // 回收
     bindToggle('noProfession', function(){ return st.recycle.noProfession; }, function(v){ st.recycle.noProfession=v; });
     bindToggle('eNonsuch', function(){ return st.recycle.nonsuch; }, function(v){ st.recycle.nonsuch=v; });
-    bindToggle('eWhite', function(){ return st.recycle.white; }, function(v){ st.recycle.white=v; });
+    bindToggle('eWhite', function(){ return st.recycle.white; }, function(v){ st.recycle.white=v; st.recycle._whiteSet=true; });
     bindToggle('eGreen', function(){ return st.recycle.green; }, function(v){ st.recycle.green=v; });
     bindToggle('eBule', function(){ return st.recycle.blue; }, function(v){ st.recycle.blue=v; });
     bindToggle('ePurple', function(){ return st.recycle.purple; }, function(v){ st.recycle.purple=v; });
@@ -165,6 +165,7 @@
       body.appendChild(toggleRow('伤害数字', function(){return st.game.dmgNumbers!==false;}, function(v){st.game.dmgNumbers=v;}));
       body.appendChild(toggleRow('屏幕震动', function(){return st.game.screenShake!==false;}, function(v){st.game.screenShake=v;}));
       body.appendChild(toggleRow('高特效质量', function(){return st.game.fxQuality!==0;}, function(v){st.game.fxQuality=v?1:0;}));
+      body.appendChild(toggleRow('发现更好装备提醒', function(){return st.game.equipTip!==false;}, function(v){st.game.equipTip=v;}));
     }
 
     var foot = el('div', 'text-align:center;margin-top:16px;');

@@ -23,7 +23,7 @@ R('loadConfigs()').then(()=>{
   ok(r.ver>=3, 'newRole ver>=3 got '+r.ver);
   ok(!!r.settings && r.settings.drug.life.on===true && r.settings.drug.life.pct===65, '默认生命回复 on@65%');
   ok(r.settings.drug.magic.on===false && r.settings.sound===true, '默认魔法关、音效开');
-  ok(r.lootCfg.auto[1]===false && r.lootCfg.keepNonsuch===true, 'lootCfg 已同步');
+  ok(r.lootCfg.auto[1]===true && r.lootCfg.keepNonsuch===true, 'lootCfg 已同步(白装默认回收)');
 
   // 回收开关 → shouldAuto
   ST.set('recycle.white', true);

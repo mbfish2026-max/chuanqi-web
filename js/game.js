@@ -159,12 +159,13 @@ function killMonster(b, m){
   drop.item.forEach(function(s){ var c=stuffCfg(s);
     if(c.type==2 && G.settings.autoSell && s.q<=G.settings.autoSell && !s.nonsuch){ r.gold+=c.sellprice||0; if(batch){ batch.reclaim.push({name:c.name,q:s.q,count:s.count||1}); batch.fullGold+=(c.sellprice||0)*s.q; } else log('自动出售 '+c.name); return; }
     if(addItem(s)!==false){
-      if(batch) batch.kept.push({name:c.name,q:s.q,count:s.count||1,label:(c.type==2?QNAME[s.q]+' ':'')+c.name});
+      if(batch) batch.kept.push({name:c.name,q:s.q,count:s.count||1,label:(c.type==2?(Systems.loot&&Systems.loot.label?Systems.loot.label(s):QNAME[s.q]):null),cls:(Systems.loot&&Systems.loot.qcls?Systems.loot.qcls(s):'q'+s.q)});
       else log('获得 <span class="q'+s.q+'">'+(c.type==2?'['+QNAME[s.q]+']':'')+c.name+(s.count>1?' x'+s.count:'')+(s.nonsuch?' (极品+'+s.nonsuch+')':'')+'</span>');
     }
   });
+  // 原版 BossInfo.onBossDie: rebirth = now + map.reborn 秒 (1800/3600); 特权 _timereduce 减半由 prerogative 'kill' 钩子处理, 故先写计时再 H('kill')
+  if(m.boss){ var mc=mapCfg(); r.stat['boss_'+m.cfg.id]=Date.now()+1000*((mc&&mc.reborn)||180); b.mons.splice(b.mons.indexOf(m),1); }
   H('kill', m, b);
-  if(m.boss){ r.stat['boss_'+m.cfg.id]=Date.now()+60000*(m.cfg.rebirth||3); b.mons.splice(b.mons.indexOf(m),1); }
 }
 // DropTool.setDropInfo
 function rollDrop(m){

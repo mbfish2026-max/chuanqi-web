@@ -3,7 +3,9 @@
 var IMG = 'assets/images/';
 var UI = {stage: null, main: null, fight: null, page: null, pageKey: 'fight', battle: null, popups: [], logShown: 0};
 var PROF_NAME = ['', '战士', '法师', '道士'];
-var QCOLOR = ['#DCD3C7', '#DCD3C7', '#32C63D', '#2E8DD6', '#D425D2', '#D96324'];
+var QCOLOR = ['#DCD3C7', '#DCD3C7', '#32C63D', '#2E8DD6', '#D425D2', '#D96324'];  // 原版 eQualityColor
+var QCOLOR_UQ = '#E0B850', QCOLOR_SET = '#00E070';
+function stuffColor(s){ return !s ? QCOLOR[1] : s.uq ? QCOLOR_UQ : s.set ? QCOLOR_SET : (QCOLOR[s.q] || QCOLOR[1]); }
 function inst(name){ return CC.instantiate(name); }
 function sys(name){ return window.Systems && window.Systems[name]; }
 function fmtNum(n){ n = Math.floor(n); return n >= 1e8 ? (n / 1e8).toFixed(2) + '亿' : n >= 1e4 ? (n / 1e4).toFixed(2) + '万' : String(n); }
@@ -55,7 +57,7 @@ function makeStuff(s, opts){
   if (typeof iconHas != 'function' || iconHas(c.icon)) icn.setImage(IMG + 'icon/' + c.icon + '.png'); else { icn.setFrame(null); icn.el.dataset.iconMissing = c.icon || ''; }
   it.ref('labCnt').setString(s.count > 1 ? 'x' + s.count : '');
   it.ref('intensify').setActive(!!s.ench); it.ref('intensify').setString('+' + s.ench);
-  lab.setString(c.name); lab.setColor(QCOLOR[q]);
+  lab.setString(c.name); lab.setColor(isEq ? stuffColor(s) : QCOLOR[q]);
   if (isEq && s.nonsuch) { lab.setString(c.name); lab.el.style.textShadow = '0 0 4px #D96324'; }
   if (opts.click !== false) it.on(function(){ (opts.click || stuffTip)(s, opts); });
   return it;
@@ -67,7 +69,7 @@ var PART_NAME = PARTS;
 function tipEquip(s, opts){
   var p = popup('tipEquip'), c = stuffCfg(s), equipped = opts && opts.slot;
   closeBtn(p, p.ref('btnClose'));
-  p.ref('labName').setString(c.name + (s.ench ? ' +' + s.ench : '')); p.ref('labName').setColor(QCOLOR[s.q]);
+  p.ref('labName').setString(c.name + (s.ench ? ' +' + s.ench : '')); p.ref('labName').setColor(stuffColor(s));
   var holder = p.ref('item'); holder.addChild(makeStuff(s, {click: false}));
   var cp = Math.ceil((s.attr.hp + s.attr.mp) * 0.1 + ((s.attr.maxzs + s.attr.minzs + s.attr.maxfs + s.attr.minfs + s.attr.maxds + s.attr.minds) / 2) * 12 + ((s.attr.maxac + s.attr.minac) / 2) * 12);
   p.ref('labPower').setString('战斗力：' + cp);

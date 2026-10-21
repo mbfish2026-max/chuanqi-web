@@ -57,8 +57,8 @@
     return out; }
   S.on('kill', function(m){ if(!G.role || S.loot.tcOff) return; tcPick(m).forEach(function(s){ var c=stuffCfg(s);
     if(addItem(s)!==false){
-      if(S.loot._batch) S.loot._batch.kept.push({name:c.name, q:s.q, count:s.count||1, label:label(s)});
-      else log('获得 <span class="q'+s.q+'">['+label(s)+']'+c.name+'</span>');
+      if(S.loot._batch) S.loot._batch.kept.push({name:c.name, q:s.q, count:s.count||1, label:label(s), cls:qcls(s)});
+      else log('获得 <span class="'+qcls(s)+'">['+label(s)+']'+c.name+'</span>');
     } }); });
 
   // ---------- 掉落光柱 + 自动回收→金币 (原版 calculateAutoPickup；手动分解仍→精华) ----------
@@ -84,7 +84,7 @@
       if(batch.dropGold) parts.push('金币 +'+batch.dropGold);
       if(batch.kept.length){
         parts.push('掉落了'+batch.kept.map(function(it){
-          return '<span class="q'+it.q+'">【'+escLite(it.label||it.name)+'】</span>x'+(it.count||1);
+          return '<span class="'+(it.cls||'q'+it.q)+'">【'+escLite(it.label==null?it.name:(it.label+'·'+it.name))+'】</span>x'+(it.count||1);
         }).join('<span style="color:#fff">,</span>'));
       }
       if(batch.reclaim.length){
@@ -103,7 +103,7 @@
     finally { if(S.loot._batch) endKill(m, batch); }
   };
   (S.hooks.addItem = S.hooks.addItem || []).unshift(function(v, s, c){ if(v || !c || c.type!=2 || !G.role) return;
-    var m = S.loot._killing; if(m && (s.q>=3 || s.uq || s.set)) FXE('drop', {m:m, q:s.q, name:c.name, uq:!!s.uq, set:!!s.set});
+    var m = S.loot._killing; if(m) FXE('drop', {m:m, q:s.q, name:c.name, uq:!!s.uq, set:!!s.set});
     if(m && shouldAuto(s)){
       var full = equipGold(s, c);
       var batch = S.loot._batch;
@@ -119,6 +119,7 @@
   function shouldAuto(s){ var L=cfgL(); if(s.lock || (L.keepSet && s.set) || (L.keepUnique && s.uq)) return false; if(L.offProf){ var oc=stuffCfg(s); if(oc.profession && oc.profession!=G.role.prof && !(L.keepNonsuch && s.nonsuch)) return true; } if(!L.auto[s.q]) return false;
     if(L.keepNonsuch && s.nonsuch) return false; if(L.keepSet && s.set) return false; if(L.keepUnique && s.uq) return false; return true; }
   function essOf(s){ return s.uq ? ESS_UQ : s.set ? ESS_SET : (ESS[s.q]||1); }
+  function qcls(s){ return 'q'+(s.q||1)+(s.uq?' quq':s.set?' qset':''); }
   function label(s){ return s.uq ? '暗金' : s.set ? SETS[s.set].name+'套装' : QNAME[s.q]; }
 
   // ---------- 套装加成 ----------
@@ -171,7 +172,7 @@
 
   S.loot = {
     VER:VER, DATA_FILE:'js/systems/lootdata/{tc,uniques,sets}.js', UNIQUES:UNIQUES, SETS:SETS, SET_OF:SET_OF, TC:TC, RATIO:RATIO, ANAME:ANAME, _ilvl:0, _killing:null, tcOff:false,
-    chance:chance, rollQuality:rollQuality, bases:bases, mfEff:mfEff, tcPick:tcPick, finalize:finalize, makeUnique:makeUnique, label:label,
+    chance:chance, rollQuality:rollQuality, bases:bases, mfEff:mfEff, tcPick:tcPick, finalize:finalize, makeUnique:makeUnique, label:label, qcls:qcls,
     setCounts:setCounts, setBonus:setBonus, compare:compare, salvage:salvage, salvageAll:salvageAll, essOf:essOf, exchangeStone:exchangeStone,
     beginKill:beginKill, endKill:endKill, equipGold:equipGold,
     cfg:cfgL, shouldAuto:shouldAuto, migrate:migrate,
