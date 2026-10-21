@@ -27,12 +27,26 @@ function toast(s){
 function msg(res){ if (!res) return; toast(res.indexOf('OK') === 0 ? (res.slice(3) || '成功') : res); save(); refreshAll(); }
 
 // ---------- popups ----------
+// [S1/G6] 全屏层管理: 系统弹窗 (死亡/离线) 为 modal, 点空白不关; 其余弹窗点遮罩空白处统一关闭。
+// modal 显示期间: 新手引导暂停 (隐藏遮罩, 关闭后恢复), 「更好装备」提示缓存, 离线弹窗期间暂停 tick (M5)。
+var MODAL_POPUPS = {role_die: 1, tipOffline: 1}, PAUSE_TICK_POPUPS = {tipOffline: 1};
+UI.layerListeners = [];
+UI.onLayerChange = function(fn){ UI.layerListeners.push(fn); };
+UI.modalOpen = function(){ return UI.popups.some(function(p){ return p.modal; }); };
+UI.tickPaused = function(){ return UI.popups.some(function(p){ return p.pauseTick; }); };
+function layerChanged(){ var m = UI.modalOpen(); UI.layerListeners.forEach(function(fn){ try { fn(m); } catch (e) { console.warn('[layer]', e); } }); }
 function popup(name){
   var p = inst(name); CC.mount(p, UI.layerPop); UI.popups.push(p);
-  var m = p.find('mask'); if (m) { m.el.style.background = 'rgba(0,0,0,.35)'; m.el.style.opacity = 1; if (m.d.bt) m.on(function(){ closePopup(p); }); }
+  p.modal = !!MODAL_POPUPS[name]; p.pauseTick = !!PAUSE_TICK_POPUPS[name];
+  var m = p.find('mask');
+  if (m) { m.el.style.background = 'rgba(0,0,0,.35)'; m.el.style.opacity = 1; m.el.style.pointerEvents = 'auto';
+    if (p.modal) m.el.onclick = function(e){ e.stopPropagation(); };
+    else m.on(function(){ closePopup(p); }); }
+  // 面板本体内的点击不冒泡到 mask 之外 (mask 是兄弟节点, 只有真正点空白才命中 mask)
+  if (p.modal) layerChanged();
   return p;
 }
-function closePopup(p){ p.destroy(); UI.popups.splice(UI.popups.indexOf(p), 1); }
+function closePopup(p){ var i = UI.popups.indexOf(p); if (i < 0) return; p.destroy(); UI.popups.splice(i, 1); if (p.modal) layerChanged(); }
 function closeBtn(p, path){ var b = typeof path === 'string' ? p.findDeep(path) : path; if (b) b.on(function(){ closePopup(p); }); }
 
 // ---------- itemStuff ----------
@@ -611,7 +625,7 @@ function startMain(){ buildMain(); }
       else if (load()) enterGame();
       else showCreate();
       var last = performance.now(), lastSave = 0, lastUi = 0;
-      setInterval(function(){ if (!G.role || !UI.main) return; var now = performance.now(), dt = (now - last) / 1000; last = now; tick(Math.min(dt, 2));
+      setInterval(function(){ if (!G.role || !UI.main) return; var now = performance.now(), dt = (now - last) / 1000; last = now; if (!(UI.tickPaused && UI.tickPaused())) tick(Math.min(dt, 2));
         if (now - lastUi > 300 && UI.pageKey === 'fight') { lastUi = now; refreshAll(); } else if (now - lastUi > 1000) { lastUi = now; refreshTop(); }
         if (now - lastSave > 5000) { lastSave = now; save(); } }, 250);
     }

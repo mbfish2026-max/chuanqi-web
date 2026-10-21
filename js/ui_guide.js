@@ -9,8 +9,16 @@
     overlay = null;
   }
 
+  // [S1] 系统弹窗 (离线/死亡) 显示期间暂停引导: 不绘制, 记录待恢复, 弹窗关闭后重绘
+  var pending = null;
+  function blocked(){ return UI && UI.modalOpen && UI.modalOpen(); }
+  if(UI && UI.onLayerChange) UI.onLayerChange(function(modal){
+    if(modal){ if(overlay){ pending = {force: !!(overlay && overlay._force)}; remove(); } }
+    else if(pending){ var pf = pending.force; pending = null; setTimeout(function(){ if(!blocked()) paint(pf); }, 0); }
+  });
   function paint(force){
     remove();
+    if(blocked()){ pending = {force: !!force}; return; }
     if(!force && !GDE.active()) return;
     var stage = GDE.getStage();
     if(!stage || stage === 0){ GDE.setStage(GDE.STAGE.introduce); stage = GDE.STAGE.introduce; }
@@ -18,7 +26,7 @@
     var info = { stage: stage, text: GDE.textOf(stage), key: '' };
     if(!info.text && !force) return;
     overlay = document.createElement('div');
-    overlay.id = 'cq-guide';
+    overlay.id = 'cq-guide'; overlay._force = !!force;
     overlay.style.cssText = 'position:absolute;left:0;top:0;right:0;bottom:0;z-index:50;pointer-events:auto;background:rgba(0,0,0,.55);display:flex;align-items:flex-end;justify-content:center;';
     var card = document.createElement('div');
     card.style.cssText = 'max-width:680px;width:90%;margin-bottom:120px;background:rgba(28,22,14,.95);border:2px solid #a08040;border-radius:10px;padding:18px 20px 16px;color:#f0e6d0;font-size:22px;line-height:1.45;box-shadow:0 8px 24px rgba(0,0,0,.5);';
@@ -65,6 +73,7 @@
 
   window._guideStart = maybeStart;
   window._guideRefresh = paint;
+  window._guideActive = function(){ return !!overlay || !!pending; };
 
   // 进主界面后稍延迟弹出，避免挡 loading
   var _startMain = typeof startMain === 'function' ? startMain : null;
