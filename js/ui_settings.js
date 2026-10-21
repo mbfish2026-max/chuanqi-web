@@ -42,6 +42,10 @@
       var t = p.ref(ref); if(!t) return;
       ck(t, get());
       t.on(function(){ var v=!get(); set(v); ck(t, get()); ST.applyLegacyMirrors(); });
+      // [G2] 整行可点: 勾选框下垫一块透明热区覆盖该行文字 (z-index:-1, 不挡 +/- 与选药按钮)
+      if(!t._rowHit){ t._rowHit = 1; t.el.style.isolation = 'isolate';
+        var hit = el('div', 'position:absolute;left:-14px;top:50%;width:340px;height:64px;transform:translateY(-50%);z-index:-1;cursor:pointer;');
+        t.el.appendChild(hit); }
     }
     // 回收
     bindToggle('noProfession', function(){ return st.recycle.noProfession; }, function(v){ st.recycle.noProfession=v; });

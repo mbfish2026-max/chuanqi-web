@@ -63,3 +63,7 @@ html,body{margin:0;height:100%;background:#000;overflow:hidden;font-family:"Ping
 /* [loot] 品质配色 — 原版 GameKeys.eQualityColor 白/绿/蓝/紫/橙 + 网页扩展 暗金/套装 (日志/SystemMsg/HTML 面板通用) */
 .q0,.q1{color:#DCD3C7}.q2{color:#32C63D}.q3{color:#2E8DD6}.q4{color:#D425D2}.q5{color:#D96324}
 .quq{color:#E0B850;text-shadow:0 0 4px #7a5200}.qset{color:#00E070;text-shadow:0 0 4px #00602a}
+
+/* [G2] 按钮热区: 至少 88x88 设计像素 (390 宽 iPhone 上约 46pt), 透明伪元素垫在按钮内容下方, 不挡子按钮 */
+.cc-btn{isolation:isolate}
+.cc-btn::after{content:'';position:absolute;left:50%;top:50%;width:max(100%,88px);height:max(100%,88px);transform:translate(-50%,-50%);z-index:-1}
